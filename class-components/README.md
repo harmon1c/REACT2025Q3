@@ -38,6 +38,16 @@ This is a Pokemon search application built using React class components. The pro
 npm install
 ```
 
+### Setup Git Hooks (Important!)
+
+After installing dependencies, you need to initialize Husky:
+
+```bash
+npx husky install
+```
+
+This will set up the git hooks for pre-commit linting.
+
 ### Commands
 
 ```bash
