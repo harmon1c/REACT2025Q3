@@ -40,13 +40,15 @@ npm install
 
 ### Setup Git Hooks (Important!)
 
-After installing dependencies, you need to initialize Husky:
+After installing dependencies, you need to initialize Husky if cloning from scratch:
 
 ```bash
+# Only if you cloned just this folder and don't have .git initialized
+git init
 npx husky install
 ```
 
-This will set up the git hooks for pre-commit linting.
+The pre-commit hooks are already configured and will run automatically on commit.
 
 ### Commands
 
