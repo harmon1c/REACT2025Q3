@@ -6,8 +6,6 @@ import { ErrorTester } from './components/ErrorTester';
 import { Header } from './components/Header';
 import { Main } from './components/Main';
 
-// test comment for husky pre-commit hook testing
-
 interface AppState {
   results: ResultItem[];
   isLoading: boolean;
@@ -27,7 +25,6 @@ class App extends Component<Record<string, never>, AppState> {
   }
 
   public override componentDidMount(): void {
-    // Load initial search term from localStorage
     const savedSearchTerm = localStorage.getItem('searchTerm');
     if (savedSearchTerm) {
       this.handleSearch(savedSearchTerm);
@@ -102,7 +99,6 @@ class App extends Component<Record<string, never>, AppState> {
   };
 
   private handleClear = (): void => {
-    // Clear search results and localStorage
     this.setState({
       results: [],
       isLoading: false,
