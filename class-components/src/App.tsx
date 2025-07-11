@@ -6,6 +6,8 @@ import { ErrorTester } from './components/ErrorTester';
 import { Header } from './components/Header';
 import { Main } from './components/Main';
 
+// test comment for husky pre-commit hook testing
+
 interface AppState {
   results: ResultItem[];
   isLoading: boolean;
