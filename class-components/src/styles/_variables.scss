@@ -1,0 +1,148 @@
+:root {
+  // body wrapper
+  --wrapper-width: calc(var(--large-offset) * 18); // 1440px
+
+  // small vars
+  --one: 0.0625rem; // 1px
+  --two: 0.125rem; // 2px
+  --five: 0.3125rem; // 5px
+
+  // offsets
+  --tiny-offset: calc(var(--extra-small-offset) / 2); // 10px
+  --extra-small-offset: 1.25rem; // 20px
+  --small-offset: 2.5rem; // 40px
+  --medium-offset: 3.75rem; // 60px
+  --large-offset: 5rem; // 80px
+  --extra-large-offset: 6.25rem; // 100px
+
+  // border-radius
+  --large-br: var(--extra-small-offset); // 20px
+  --medium-br: calc(var(--large-br) / 2); // 10px
+  --small-br: calc(var(--large-br) / 4); // 5px
+
+  // shadows
+  --mellow-shadow-050: 0 0 20px rgb(0 0 0 / 6%);
+  --mellow-shadow-100:
+    rgba(0 0 0 / 19%) 0 10px 20px, rgba(0 0 0 / 23%) 0 6px 6px;
+  --mellow-shadow-200:
+    hsl(0deg 0% 100% / 10%) 0 1px 1px 0 inset,
+    rgb(50 50 93 / 25%) 0 50px 100px -20px, rgb(0 0 0 / 30%) 0 30px 60px -30px;
+  --mellow-shadow-300:
+    rgba(0 0 0 / 25%) 0 14px 28px, rgba(0 0 0 / 22%) 0 10px 10px;
+  --mellow-shadow-400:
+    rgba(0 0 0 / 9%) 0 2px 1px, rgba(0 0 0 / 9%) 0 4px 2px,
+    rgba(0 0 0 / 9%) 0 8px 4px, rgba(0 0 0 / 9%) 0 16px 8px,
+    rgba(0 0 0 / 9%) 0 32px 16px;
+  --mellow-shadow-500: 0 0 10px 0 rgb(0 0 0 / 10%);
+  --mellow-shadow-600: 0 1px 5px #353535;
+
+  // fonts
+  --small-font: 400 0.625rem 'Lato', sans-serif; // 10px
+  --regular-font: 400 0.8125rem 'Lato', sans-serif; // 13px
+  --basic-regular-font: 400 1.125rem 'Lato', sans-serif; // 18px
+  --extra-regular-font: 500 1.5rem 'Lato', sans-serif; // 24px
+  --medium-font: 500 1.25rem 'Lato', sans-serif; // 20px
+  --extra-medium-font: 500 1.875rem 'Merriweather', serif; // 30px
+  --bold-font: 700 1rem 'Lato', sans-serif; // 16px
+  --medium-bold-font: 700 1.125rem 'Lato', sans-serif; // 18px
+  --extra-bold-font: 700 2.1875rem 'Merriweather', serif; // 35px
+  --heading-font: 700 2.5rem 'Merriweather', serif; // 40px
+
+  // base
+  --honeycomb-bg: #fffff0;
+  --honeycomb-light: #fff8dc;
+
+  // honey
+  --honey-gold-300: #ffe082;
+  --honey-gold-400: #ffd54f;
+  --honey-gold-500: #ffc107;
+  --honey-gold-600: #ffb300;
+
+  // amber/gold
+  --honey-amber-500: #ff9800;
+  --honey-amber-600: #fb8c00;
+  --honey-amber-700: #f57c00;
+
+  // beige/brown
+  --noble-brown-100: #f5f5dc;
+  --noble-brown-200: #e6d9b8;
+  --noble-brown-300: #d7cca3;
+  --noble-brown-700: #8d6e63;
+  --noble-brown-800: #6d4c41;
+  --noble-brown-900: #5d4037;
+
+  // natural
+  --forest-green-500: #2e8b57; // accent
+  --forest-green-600: #2e7d32;
+
+  // book
+  --library-blue-300: #a4ddee;
+  --library-blue-500: #007bff;
+  --library-blue-700: #191970;
+  --library-burgundy: #800020;
+
+  // base
+  --white: #fff;
+  --black: #000;
+  --red-power-600: #d0302f;
+
+  // functional
+  --background: var(--honeycomb-bg);
+  --foreground: var(--noble-brown-800);
+  --card: var(--honeycomb-light);
+  --card-foreground: var(--noble-brown-900);
+  --hover-highlight: var(--honey-gold-300);
+  --active: var(--honey-gold-500);
+  --accent: var(--honey-amber-500);
+  --heading: var(--library-burgundy);
+
+  body.dark {
+    // dark
+    --honeycomb-bg: #2b2922;
+    --honeycomb-light: #3a382f;
+
+    // honey
+    --honey-gold-300: #d4af37;
+    --honey-gold-400: #cfb53b;
+    --honey-gold-500: #c9a227;
+    --honey-gold-600: #b8860b;
+
+    // amber
+    --honey-amber-500: #e78200;
+    --honey-amber-600: #d27700;
+    --honey-amber-700: #bf6900;
+
+    // beige/brown
+    --noble-brown-100: #4a4639;
+    --noble-brown-200: #5a5648;
+    --noble-brown-300: #6a6857;
+    --noble-brown-700: #9d8e7e;
+    --noble-brown-800: #bfb39e;
+    --noble-brown-900: #dcd3c3;
+
+    // natural
+    --forest-green-500: #4caf50;
+    --forest-green-600: #388e3c;
+
+    // book
+    --library-blue-300: #64b5f6;
+    --library-blue-500: #2196f3;
+    --library-blue-700: #1976d2;
+    --library-burgundy: #ad1457;
+
+    --background: var(--honeycomb-bg);
+    --foreground: var(--noble-brown-800);
+    --card: var(--noble-brown-100);
+    --card-foreground: var(--noble-brown-900);
+    --hover-highlight: var(--honey-gold-600);
+    --active: var(--honey-gold-500);
+    --accent: var(--honey-amber-500);
+    --heading: var(--library-blue-300);
+  }
+}
+
+.page-content {
+  perspective: 1500px;
+  transform-style: preserve-3d;
+  height: 100%;
+}

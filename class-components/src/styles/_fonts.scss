@@ -1,0 +1,56 @@
+// headings
+@font-face {
+  src:
+    local('Merriweather-Bold'),
+    url('/fonts/Merriweather-Bold.woff2') format('woff2'),
+    url('/fonts/Merriweather-Bold.woff') format('woff');
+  font-family: 'Merriweather';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  src:
+    local('Merriweather-Regular'),
+    url('/fonts/Merriweather-Regular.woff2') format('woff2'),
+    url('/fonts/Merriweather-Regular.woff') format('woff');
+  font-family: 'Merriweather';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+// base
+@font-face {
+  src:
+    local('Lato-Bold'),
+    url('/fonts/Lato-Bold.woff2') format('woff2'),
+    url('/fonts/Lato-Bold.woff') format('woff');
+  font-family: 'Lato';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  src:
+    local('Lato-Medium'),
+    url('/fonts/Lato-Medium.woff2') format('woff2'),
+    url('/fonts/Lato-Medium.woff') format('woff');
+  font-family: 'Lato';
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  src:
+    local('Lato-Regular'),
+    url('/fonts/Lato-Regular.woff2') format('woff2'),
+    url('/fonts/Lato-Regular.woff') format('woff');
+  font-family: 'Lato';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
