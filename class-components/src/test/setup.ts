@@ -1,5 +1,5 @@
-import '@testing-library/jest-dom';
 import { vi, beforeEach } from 'vitest';
+import '@testing-library/jest-dom';
 
 const localStorageMock = {
   getItem: vi.fn(),
