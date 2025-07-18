@@ -106,7 +106,7 @@ export default tseslint.config(
       curly: ['error', 'all'],
       'max-lines-per-function': [
         'error',
-        { max: 200, skipBlankLines: true, skipComments: true },
+        { max: 300, skipBlankLines: true, skipComments: true },
       ],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-restricted-globals': 'off',
