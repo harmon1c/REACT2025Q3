@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { parsePokemonDetails } from '../utils/pokemonUtils';
 import { type ResultItem } from './Results';
+import { PokemonDetailsList, PokemonDetailsGrid } from './PokemonDetails';
 
 interface CardProps {
   item: ResultItem;
@@ -8,30 +10,43 @@ interface CardProps {
   selectedPokemon?: ResultItem | null | undefined;
 }
 
-export class Card extends Component<CardProps> {
-  private capitalizeFirstLetter(str: string): string {
+export function Card({
+  item,
+  onPokemonClick,
+  isSelected,
+  selectedPokemon,
+}: CardProps): React.JSX.Element {
+  const capitalizeFirstLetter = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+  };
 
-  private handleClick = async (e?: React.MouseEvent): Promise<void> => {
+  const handleClick = async (e?: React.MouseEvent): Promise<void> => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    if (this.props.onPokemonClick) {
-      await this.props.onPokemonClick(this.props.item.name);
+
+    const scrollPosition = window.scrollY;
+
+    if (onPokemonClick) {
+      await onPokemonClick(item.name);
+
+      setTimeout(() => {
+        window.scrollTo({
+          top: scrollPosition,
+          behavior: 'instant',
+        });
+      }, 10);
     }
   };
 
-  private isListItem(): boolean {
-    return this.props.item.description.includes('Click to view details');
-  }
+  const isListItem = (): boolean => {
+    return item.description.includes('Click to view details');
+  };
 
-  private renderListItemCard(): React.JSX.Element {
-    const { item, isSelected } = this.props;
-
+  const renderListItemCard = (): React.JSX.Element => {
     return (
-      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden">
         <div className="flex">
           {/* base card */}
           <div
@@ -42,18 +57,18 @@ export class Card extends Component<CardProps> {
             }`}
             onClick={(e) => {
               e.preventDefault();
-              void this.handleClick(e);
+              void handleClick(e);
             }}
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                    {this.capitalizeFirstLetter(item.name)[0]}
+                    {capitalizeFirstLetter(item.name)[0]}
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-800">
-                      {this.capitalizeFirstLetter(item.name)}
+                      {capitalizeFirstLetter(item.name)}
                     </h3>
                     <p className="text-gray-500 text-sm">Pokemon #{item.id}</p>
                   </div>
@@ -66,7 +81,7 @@ export class Card extends Component<CardProps> {
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
-                      void this.handleClick(e);
+                      void handleClick(e);
                     }}
                     className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                       isSelected
@@ -87,22 +102,20 @@ export class Card extends Component<CardProps> {
           {/* details */}
           {isSelected && (
             <div className="w-80 bg-gradient-to-b from-blue-50 to-indigo-100 border-l border-blue-200">
-              {this.renderPokemonDetails()}
+              {renderPokemonDetails()}
             </div>
           )}
         </div>
       </div>
     );
-  }
+  };
 
-  private renderPokemonDetails(): React.JSX.Element {
-    const { selectedPokemon } = this.props;
-
+  const renderPokemonDetails = (): React.JSX.Element => {
     if (!selectedPokemon) {
       return <div></div>;
     }
 
-    const details = selectedPokemon.description.split(' | ');
+    const details = parsePokemonDetails(selectedPokemon.description);
 
     return (
       <div className="p-6">
@@ -111,43 +124,20 @@ export class Card extends Component<CardProps> {
             ⚡
           </div>
           <h4 className="text-xl font-bold text-gray-800 mb-1">
-            {this.capitalizeFirstLetter(selectedPokemon.name)}
+            {capitalizeFirstLetter(selectedPokemon.name)}
           </h4>
           <p className="text-blue-600 font-medium text-sm">
             Pokemon #{selectedPokemon.id}
           </p>
         </div>
 
-        <div className="space-y-3">
-          {details.map((detail, index) => {
-            const [label, value] = detail.split(':');
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-lg p-3 border border-blue-200 hover:border-blue-300 transition-colors duration-200"
-              >
-                {label && value ? (
-                  <div>
-                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
-                      {label.trim()}
-                    </p>
-                    <p className="text-sm text-gray-800 font-medium">
-                      {value.trim()}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-700">{detail}</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <PokemonDetailsList details={details} />
       </div>
     );
-  }
+  };
 
-  private renderDetailedView(): React.JSX.Element {
-    const { item } = this.props;
+  const renderDetailedView = (): React.JSX.Element => {
+    const details = parsePokemonDetails(item.description);
 
     return (
       <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl shadow-xl p-8 border border-blue-200 hover:shadow-2xl transition-shadow duration-300">
@@ -155,11 +145,11 @@ export class Card extends Component<CardProps> {
           <div className="flex-1">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-2xl">
-                {this.capitalizeFirstLetter(item.name)[0]}
+                {capitalizeFirstLetter(item.name)[0]}
               </div>
               <div>
                 <h3 className="text-3xl font-bold text-gray-800 mb-2">
-                  {this.capitalizeFirstLetter(item.name)}
+                  {capitalizeFirstLetter(item.name)}
                 </h3>
                 <span className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">
                   Pokemon #{item.id}
@@ -170,41 +160,14 @@ export class Card extends Component<CardProps> {
           <div className="text-6xl opacity-30">⚡</div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {item.description.split(' | ').map((detail, index) => {
-            const [label, value] = detail.split(':');
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:border-blue-300 transition-colors duration-200"
-              >
-                {label && value ? (
-                  <div>
-                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">
-                      {label.trim()}
-                    </p>
-                    <p className="text-sm text-gray-800 font-medium">
-                      {value.trim()}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-700 font-medium">{detail}</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <PokemonDetailsGrid details={details} />
       </div>
     );
+  };
+
+  if (isListItem()) {
+    return renderListItemCard();
   }
 
-  public override render(): React.JSX.Element {
-    const isListItem = this.isListItem();
-
-    if (isListItem) {
-      return this.renderListItemCard();
-    }
-
-    return this.renderDetailedView();
-  }
+  return renderDetailedView();
 }

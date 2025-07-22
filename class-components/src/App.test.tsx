@@ -204,7 +204,7 @@ describe('App Component', () => {
 
       await waitFor(() => {
         expect(mockFetch).toHaveBeenCalledWith(
-          'https://pokeapi.co/api/v2/pokemon?limit=20'
+          'https://pokeapi.co/api/v2/pokemon?offset=0&limit=20'
         );
       });
     });
@@ -645,7 +645,7 @@ describe('App Component', () => {
       await waitFor(() => {
         expect(screen.getByTestId('result-item-1')).toBeInTheDocument();
         expect(mockFetch).toHaveBeenCalledWith(
-          'https://pokeapi.co/api/v2/pokemon?limit=20'
+          'https://pokeapi.co/api/v2/pokemon?offset=0&limit=20'
         );
       });
 

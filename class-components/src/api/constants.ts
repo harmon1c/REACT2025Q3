@@ -2,9 +2,6 @@ export const API_BASE_URL = 'https://pokeapi.co/api/v2';
 
 export const API_ROUTES = {
   getPokemonList: (offset = 0, limit = 20): string => {
-    if (offset === 0) {
-      return `${API_BASE_URL}/pokemon?limit=${limit}`;
-    }
     const params = new URLSearchParams({
       offset: offset.toString(),
       limit: limit.toString(),

@@ -65,7 +65,7 @@ class PokemonApi {
       return {
         id,
         name: item.name.charAt(0).toUpperCase() + item.name.slice(1),
-        description: `Pokemon #${id}`,
+        description: `Pokemon #${id} - Click to view details`,
       };
     });
   }

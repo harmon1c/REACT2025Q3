@@ -23,7 +23,7 @@ export function usePokemonSearch(): UsePokemonSearchState {
   const [selectedPokemon, setSelectedPokemon] =
     useState<ProcessedPokemon | null>(null);
 
-  const searchPokemon = useCallback(async (query: string) => {
+  const performSearch = useCallback(async (query: string) => {
     setIsLoading(true);
     setError(null);
     setSelectedPokemon(null);
@@ -40,15 +40,9 @@ export function usePokemonSearch(): UsePokemonSearchState {
           pokemonApi.parsePokemonToProcessed(pokemonDetails);
         setResults([processedPokemon]);
       }
-    } catch {
-      try {
-        const listResponse = await pokemonApi.getPokemonList(0, 20);
-        const processedList = pokemonApi.parseListToProcessed(listResponse);
-        setResults(processedList);
-      } catch (listError) {
-        setError(getErrorMessage(listError));
-        setResults([]);
-      }
+    } catch (apiError) {
+      setError(getErrorMessage(apiError, query));
+      setResults([]);
     } finally {
       setIsLoading(false);
     }
@@ -79,30 +73,33 @@ export function usePokemonSearch(): UsePokemonSearchState {
     }
   }, []);
 
-  const selectPokemon = useCallback(async (pokemonName: string) => {
-    setIsLoading(true);
-    setError(null);
+  const selectPokemon = useCallback(
+    async (pokemonName: string) => {
+      const currentSelected = selectedPokemon;
+      if (currentSelected?.name.toLowerCase() === pokemonName.toLowerCase()) {
+        setSelectedPokemon(null);
+        return;
+      }
 
-    try {
-      const pokemonDetails: PokemonDetails =
-        await pokemonApi.getPokemonDetails(pokemonName);
-      const processedPokemon =
-        pokemonApi.parsePokemonToProcessed(pokemonDetails);
+      setIsLoading(true);
+      setError(null);
 
-      setSelectedPokemon((current) => {
-        if (current?.name.toLowerCase() === pokemonName.toLowerCase()) {
-          return null;
-        }
+      try {
+        const pokemonDetails: PokemonDetails =
+          await pokemonApi.getPokemonDetails(pokemonName);
+        const processedPokemon =
+          pokemonApi.parsePokemonToProcessed(pokemonDetails);
 
-        return processedPokemon;
-      });
-    } catch (apiError) {
-      setError(getErrorMessage(apiError, pokemonName));
-      setSelectedPokemon(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        setSelectedPokemon(processedPokemon);
+      } catch (apiError) {
+        setError(getErrorMessage(apiError, pokemonName));
+        setSelectedPokemon(null);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [selectedPokemon]
+  );
 
   const clearResults = useCallback(() => {
     setResults([]);
@@ -122,7 +119,7 @@ export function usePokemonSearch(): UsePokemonSearchState {
     isLoading,
     error,
     selectedPokemon,
-    searchPokemon,
+    searchPokemon: performSearch,
     clearResults,
     selectPokemon,
     clearSelection,
