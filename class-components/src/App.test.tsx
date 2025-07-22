@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  act,
+} from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import App from './App';
 
@@ -151,31 +157,39 @@ afterEach(() => {
 
 describe('App Component', () => {
   describe('Initial Rendering Tests', () => {
-    it('renders all main components', () => {
+    it('renders all main components', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockPokemonListResponse,
       });
 
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
 
-      expect(screen.getByTestId('mock-error-boundary')).toBeInTheDocument();
-      expect(screen.getByTestId('mock-main')).toBeInTheDocument();
-      expect(screen.getByTestId('mock-header')).toBeInTheDocument();
-      expect(screen.getByTestId('mock-search')).toBeInTheDocument();
-      expect(screen.getByTestId('mock-results')).toBeInTheDocument();
-      expect(screen.getByTestId('mock-error-tester')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('mock-error-boundary')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-main')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-header')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-search')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-results')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-error-tester')).toBeInTheDocument();
+      });
     });
 
-    it('displays header with correct title', () => {
+    it('displays header with correct title', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockPokemonListResponse,
       });
 
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
 
-      expect(screen.getByText('Pokemon Search')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Pokemon Search')).toBeInTheDocument();
+      });
     });
   });
 
@@ -211,17 +225,21 @@ describe('App Component', () => {
       });
     });
 
-    it('passes saved search term to Search component', () => {
+    it('passes saved search term to Search component', async () => {
       mockLocalStorage.getItem.mockReturnValue('charizard');
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockPokemonListResponse,
       });
 
-      render(<App />);
+      await act(async () => {
+        render(<App />);
+      });
 
-      const searchInput = screen.getByTestId('search-input');
-      expect(searchInput).toHaveValue('charizard');
+      await waitFor(() => {
+        const searchInput = screen.getByTestId('search-input');
+        expect(searchInput).toHaveValue('charizard');
+      });
     });
   });
 
@@ -300,9 +318,9 @@ describe('App Component', () => {
         expect(screen.getByTestId('result-item-3')).toBeInTheDocument();
       });
 
-      expect(screen.getByText(/bulbasaur/)).toBeInTheDocument();
-      expect(screen.getByText(/ivysaur/)).toBeInTheDocument();
-      expect(screen.getByText(/venusaur/)).toBeInTheDocument();
+      expect(screen.getByText(/bulbasaur/i)).toBeInTheDocument();
+      expect(screen.getByText(/ivysaur/i)).toBeInTheDocument();
+      expect(screen.getByText(/venusaur/i)).toBeInTheDocument();
     });
 
     it('handles successful pokemon search API response', async () => {
@@ -316,10 +334,10 @@ describe('App Component', () => {
       render(<App />);
 
       await waitFor(() => {
-        expect(screen.getByText(/pikachu/)).toBeInTheDocument();
-        expect(screen.getByText(/electric/)).toBeInTheDocument();
-        expect(screen.getByText(/Height: 4dm/)).toBeInTheDocument();
-        expect(screen.getByText(/Weight: 60kg/)).toBeInTheDocument();
+        expect(screen.getByText(/pikachu/i)).toBeInTheDocument();
+        expect(screen.getByText(/electric/i)).toBeInTheDocument();
+        expect(screen.getByText(/Height: 4dm/i)).toBeInTheDocument();
+        expect(screen.getByText(/Weight: 60kg/i)).toBeInTheDocument();
       });
     });
 
@@ -371,7 +389,7 @@ describe('App Component', () => {
       await waitFor(() => {
         expect(screen.getByTestId('error')).toBeInTheDocument();
         expect(
-          screen.getByText(/Server error \(500\). Please try again later/)
+          screen.getByText(/Server error \(500\). Please try again later/i)
         ).toBeInTheDocument();
       });
     });
@@ -567,7 +585,7 @@ describe('App Component', () => {
       await waitFor(() => {
         expect(screen.getByTestId('error')).toBeInTheDocument();
         expect(
-          screen.getByText(/Pokemon "bulbasaur" not found/)
+          screen.getByText(/Pokemon "bulbasaur" not found/i)
         ).toBeInTheDocument();
       });
     });
@@ -595,7 +613,7 @@ describe('App Component', () => {
 
       await waitFor(() => {
         expect(screen.getByTestId('selected-pokemon')).toBeInTheDocument();
-        expect(screen.getByText('Selected: bulbasaur')).toBeInTheDocument();
+        expect(screen.getByText(/Selected: bulbasaur/i)).toBeInTheDocument();
       });
 
       fireEvent.click(resultItem);
@@ -638,13 +656,13 @@ describe('App Component', () => {
         expect(mockFetch).toHaveBeenCalledWith(
           'https://pokeapi.co/api/v2/pokemon/pikachu'
         );
-        expect(screen.getByText(/pikachu/)).toBeInTheDocument();
+        expect(screen.getByText(/pikachu/i)).toBeInTheDocument();
       });
 
       const clearButton = screen.getByTestId('clear-button');
       fireEvent.click(clearButton);
 
-      expect(screen.queryByText(/pikachu/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/pikachu/i)).not.toBeInTheDocument();
       expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('searchTerm');
     });
 

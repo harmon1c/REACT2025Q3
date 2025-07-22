@@ -18,6 +18,12 @@ export class Search extends Component<SearchProps, SearchState> {
     };
   }
 
+  public override componentDidUpdate(prevProps: SearchProps): void {
+    if (this.props.initialQuery !== prevProps.initialQuery) {
+      this.setState({ searchTerm: this.props.initialQuery || '' });
+    }
+  }
+
   private handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
@@ -28,9 +34,6 @@ export class Search extends Component<SearchProps, SearchState> {
     event.preventDefault();
     const trimmedQuery = this.state.searchTerm.trim();
     this.props.onSearch(trimmedQuery);
-
-    // Save to localStorage
-    localStorage.setItem('searchTerm', trimmedQuery);
   };
 
   private handleClear = (): void => {

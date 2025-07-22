@@ -79,31 +79,30 @@ export function usePokemonSearch(): UsePokemonSearchState {
     }
   }, []);
 
-  const selectPokemon = useCallback(
-    async (pokemonName: string) => {
-      if (selectedPokemon?.name.toLowerCase() === pokemonName.toLowerCase()) {
-        setSelectedPokemon(null);
-        return;
-      }
+  const selectPokemon = useCallback(async (pokemonName: string) => {
+    setIsLoading(true);
+    setError(null);
 
-      setIsLoading(true);
-      setError(null);
+    try {
+      const pokemonDetails: PokemonDetails =
+        await pokemonApi.getPokemonDetails(pokemonName);
+      const processedPokemon =
+        pokemonApi.parsePokemonToProcessed(pokemonDetails);
 
-      try {
-        const pokemonDetails: PokemonDetails =
-          await pokemonApi.getPokemonDetails(pokemonName);
-        const processedPokemon =
-          pokemonApi.parsePokemonToProcessed(pokemonDetails);
-        setSelectedPokemon(processedPokemon);
-      } catch (apiError) {
-        setError(getErrorMessage(apiError, pokemonName));
-        setSelectedPokemon(null);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [selectedPokemon]
-  );
+      setSelectedPokemon((current) => {
+        if (current?.name.toLowerCase() === pokemonName.toLowerCase()) {
+          return null;
+        }
+
+        return processedPokemon;
+      });
+    } catch (apiError) {
+      setError(getErrorMessage(apiError, pokemonName));
+      setSelectedPokemon(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const clearResults = useCallback(() => {
     setResults([]);
