@@ -32,10 +32,12 @@ export function Card({
       await onPokemonClick(item.name);
 
       setTimeout(() => {
-        window.scrollTo({
-          top: scrollPosition,
-          behavior: 'instant',
-        });
+        if (typeof window !== 'undefined') {
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: 'instant',
+          });
+        }
       }, 10);
     }
   };

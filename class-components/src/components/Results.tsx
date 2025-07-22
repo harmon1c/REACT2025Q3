@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { CardList } from './CardList';
 
 export interface ResultItem {
@@ -15,8 +15,14 @@ interface ResultsProps {
   selectedPokemon?: ResultItem | null | undefined;
 }
 
-export class Results extends Component<ResultsProps> {
-  private renderLoadingState(): React.JSX.Element {
+export function Results({
+  results,
+  isLoading,
+  error,
+  onPokemonClick,
+  selectedPokemon,
+}: ResultsProps): React.JSX.Element {
+  const renderLoadingState = (): React.JSX.Element => {
     return (
       <div className="bg-white shadow-xl rounded-2xl p-12 min-h-[400px] border border-gray-200">
         <div className="flex flex-col justify-center items-center h-64">
@@ -33,9 +39,9 @@ export class Results extends Component<ResultsProps> {
         </div>
       </div>
     );
-  }
+  };
 
-  private renderErrorState(error: string): React.JSX.Element {
+  const renderErrorState = (error: string): React.JSX.Element => {
     return (
       <div className="bg-white shadow-xl rounded-2xl p-12 min-h-[400px] border border-red-200">
         <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -66,9 +72,9 @@ export class Results extends Component<ResultsProps> {
         </div>
       </div>
     );
-  }
+  };
 
-  private renderEmptyState(): React.JSX.Element {
+  const renderEmptyState = (): React.JSX.Element => {
     return (
       <div className="bg-white shadow-xl rounded-2xl p-12 min-h-[400px] border border-gray-200">
         <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -102,41 +108,38 @@ export class Results extends Component<ResultsProps> {
         </div>
       </div>
     );
+  };
+
+  if (isLoading) {
+    return renderLoadingState();
   }
 
-  public override render(): React.JSX.Element {
-    const { results, isLoading, error, onPokemonClick, selectedPokemon } =
-      this.props;
+  if (error) {
+    return renderErrorState(error);
+  }
 
-    if (isLoading) {
-      return this.renderLoadingState();
-    }
+  if (results.length === 0) {
+    return renderEmptyState();
+  }
 
-    if (error) {
-      return this.renderErrorState(error);
-    }
-
-    if (results.length === 0) {
-      return this.renderEmptyState();
-    }
-
-    return (
-      <div className="space-y-8">
-        <div className="text-left">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">
-            Search Results
-          </h2>
-          <div className="w-32 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
-        </div>
-
-        <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
-          <CardList
-            items={results}
-            onPokemonClick={onPokemonClick}
-            selectedPokemon={selectedPokemon}
-          />
-        </div>
+  return (
+    <div className="space-y-8">
+      <div className="text-left">
+        <h2 className="text-3xl font-bold text-gray-800 mb-4">
+          Search Results
+        </h2>
+        <div className="w-32 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
       </div>
-    );
-  }
+
+      <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
+        <CardList
+          items={results}
+          onPokemonClick={onPokemonClick}
+          selectedPokemon={selectedPokemon}
+        />
+      </div>
+    </div>
+  );
 }
+
+export default Results;
