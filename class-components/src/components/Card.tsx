@@ -103,7 +103,7 @@ export function Card({
 
           {/* details */}
           {isSelected && (
-            <div className="w-80 bg-gradient-to-b from-blue-50 to-indigo-100 border-l border-blue-200">
+            <div className="min-w-80 max-w-md flex-shrink-0 bg-gradient-to-b from-blue-50 to-indigo-100 border-l border-blue-200">
               {renderPokemonDetails()}
             </div>
           )}

@@ -35,7 +35,7 @@ export function Search({
   };
 
   return (
-    <div className="mb-12">
+    <div className="mb-12 w-full">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
           Search Pokemon
@@ -44,7 +44,7 @@ export function Search({
           Enter a Pokemon name to search for detailed information
         </p>
       </div>
-      <form onSubmit={handleSubmit} className="flex gap-4 max-w-2xl mx-auto">
+      <form onSubmit={handleSubmit} className="flex gap-4 w-full">
         <div className="flex-1">
           <input
             type="text"

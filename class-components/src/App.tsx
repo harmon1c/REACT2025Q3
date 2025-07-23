@@ -1,82 +1,25 @@
-import React, { useEffect, useRef } from 'react';
-import { Search } from './components/Search';
-import { Results, type ResultItem } from './components/Results';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { ErrorTester } from './components/ErrorTester';
-import { Header } from './components/Header';
-import { Main } from './components/Main';
-import { useLocalStorage, usePokemonSearch } from './hooks';
+import { Layout } from './components/Layout';
+import { Home } from './pages/Home';
+import { About } from './pages/About';
+import { NotFound } from './pages/NotFound';
 
 function App(): React.JSX.Element {
-  const isFirstRender = useRef(true);
-
-  const [savedSearchTerm, setSavedSearchTerm] = useLocalStorage<string>(
-    'searchTerm',
-    ''
-  );
-  const {
-    results,
-    isLoading,
-    error,
-    selectedPokemon,
-    searchPokemon,
-    clearResults,
-    selectPokemon,
-    loadInitialData,
-  } = usePokemonSearch();
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      void loadInitialData(savedSearchTerm);
-    }
-  }, [loadInitialData, savedSearchTerm]);
-
-  const handleSearch = (query: string): void => {
-    setSavedSearchTerm(query);
-    void searchPokemon(query);
-  };
-
-  const handleClear = (): void => {
-    setSavedSearchTerm('');
-    clearResults();
-  };
-
-  const resultItems: ResultItem[] = results.map((pokemon) => ({
-    id: pokemon.id,
-    name: pokemon.name,
-    description: pokemon.description,
-  }));
-
-  const selectedResultItem: ResultItem | null = selectedPokemon
-    ? {
-        id: selectedPokemon.id,
-        name: selectedPokemon.name,
-        description: selectedPokemon.description,
-      }
-    : null;
-
   return (
     <ErrorBoundary>
-      <Main>
-        <Header title="Pokemon Search" />
-
-        <Search
-          onSearch={handleSearch}
-          onClear={handleClear}
-          initialQuery={savedSearchTerm}
-        />
-
-        <Results
-          results={resultItems}
-          isLoading={isLoading}
-          error={error}
-          onPokemonClick={selectPokemon}
-          selectedPokemon={selectedResultItem}
-        />
-
-        <ErrorTester />
-      </Main>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="about" element={<About />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </div>
     </ErrorBoundary>
   );
 }

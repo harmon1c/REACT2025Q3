@@ -6,8 +6,12 @@ interface MainProps {
 
 export const Main: React.FC<MainProps> = ({ children }) => {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-8">{children}</div>
-    </main>
+    <div className="w-full bg-gray-50 py-8">
+      <div className="w-full max-w-[1440px] mx-auto px-4">
+        <div className="bg-white shadow-xl rounded-2xl border border-gray-200 w-full p-8">
+          <div className="w-full">{children}</div>
+        </div>
+      </div>
+    </div>
   );
 };

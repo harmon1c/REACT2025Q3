@@ -14,7 +14,7 @@ export function CardList({
   selectedPokemon,
 }: CardListProps): React.JSX.Element {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {items.map((item) => (
         <Card
           key={item.id}
