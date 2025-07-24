@@ -19,10 +19,21 @@ export const Home: React.FC = () => {
     selectPokemon,
     clearResults,
     clearSelection,
+    setUrlSelectedPokemon,
+    setSelectedPokemon,
   } = usePokemonData();
 
   const handleSearch = (query: string): void => {
-    searchPokemon(query);
+    const currentParams = new URLSearchParams(window.location.search);
+    currentParams.delete('details');
+    const newUrl = `${window.location.pathname}${currentParams.toString() ? '?' + currentParams.toString() : ''}`;
+    window.history.replaceState({}, '', newUrl);
+
+    clearSelection();
+    searchPokemon(query).then(() => {
+      setSelectedPokemon(null);
+      setUrlSelectedPokemon(null);
+    });
   };
 
   const handlePageChange = (page: number): void => {

@@ -22,6 +22,9 @@ interface UsePokemonDataState {
   clearResults: () => void;
   clearSelection: () => void;
   clearSelectionSync: () => void;
+  forceUrlCleanup: () => void;
+  setUrlSelectedPokemon: (pokemonName: string | null) => void;
+  setSelectedPokemon: (pokemon: ProcessedPokemon | null) => void;
 }
 
 export function usePokemonData(): UsePokemonDataState {
@@ -80,8 +83,6 @@ export function usePokemonData(): UsePokemonDataState {
       setSelectedPokemon(null);
       setUrlSelectedPokemon(null);
 
-      forceUrlCleanup();
-
       setSearchQuery(trimmedQuery);
 
       if (!trimmedQuery) {
@@ -112,7 +113,7 @@ export function usePokemonData(): UsePokemonDataState {
         setIsSearchInProgress(false);
       }
     },
-    [loadPage, setPage, setUrlSelectedPokemon, forceUrlCleanup]
+    [loadPage, setPage, setUrlSelectedPokemon]
   );
 
   const selectPokemon = useCallback(
@@ -173,40 +174,28 @@ export function usePokemonData(): UsePokemonDataState {
   }, [results.length, searchQuery, currentPage, loadPage]);
 
   useEffect(() => {
-    const loadSelectedPokemon = async (): Promise<void> => {
-      if (isSearchInProgress) {
-        return;
-      }
-
-      if (
-        selectedPokemonName &&
-        (!selectedPokemon ||
-          selectedPokemon.name.toLowerCase() !==
-            selectedPokemonName.toLowerCase())
-      ) {
+    if (
+      selectedPokemonName &&
+      (!selectedPokemon ||
+        selectedPokemon.name.toLowerCase() !==
+          selectedPokemonName.toLowerCase())
+    ) {
+      (async (): Promise<void> => {
         try {
-          const pokemonDetails: PokemonDetails =
+          const pokemonDetails =
             await pokemonApi.getPokemonDetails(selectedPokemonName);
           const processedPokemon =
             pokemonApi.parsePokemonToProcessed(pokemonDetails);
           setSelectedPokemon(processedPokemon);
-        } catch (apiError) {
-          setError(getErrorMessage(apiError, selectedPokemonName));
+        } catch {
           setSelectedPokemon(null);
           clearSelectedPokemon();
         }
-      } else if (!selectedPokemonName && selectedPokemon) {
-        setSelectedPokemon(null);
-      }
-    };
-
-    loadSelectedPokemon();
-  }, [
-    selectedPokemonName,
-    selectedPokemon,
-    clearSelectedPokemon,
-    isSearchInProgress,
-  ]);
+      })();
+    } else if (!selectedPokemonName) {
+      setSelectedPokemon(null);
+    }
+  }, [selectedPokemonName, selectedPokemon, clearSelectedPokemon]);
 
   return {
     results,
@@ -223,5 +212,8 @@ export function usePokemonData(): UsePokemonDataState {
     clearResults,
     clearSelection,
     clearSelectionSync,
+    forceUrlCleanup,
+    setUrlSelectedPokemon,
+    setSelectedPokemon,
   };
 }
