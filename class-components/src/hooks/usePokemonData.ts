@@ -25,6 +25,8 @@ interface UsePokemonDataState {
   forceUrlCleanup: () => void;
   setUrlSelectedPokemon: (pokemonName: string | null) => void;
   setSelectedPokemon: (pokemon: ProcessedPokemon | null) => void;
+  setPage: (page: number) => void;
+  clearParams: (params: string[]) => void;
 }
 
 export function usePokemonData(): UsePokemonDataState {
@@ -44,6 +46,7 @@ export function usePokemonData(): UsePokemonDataState {
     setSelectedPokemon: setUrlSelectedPokemon,
     clearSelectedPokemon,
     forceUrlCleanup,
+    clearParams,
   } = useUrlState();
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
@@ -215,5 +218,7 @@ export function usePokemonData(): UsePokemonDataState {
     forceUrlCleanup,
     setUrlSelectedPokemon,
     setSelectedPokemon,
+    setPage,
+    clearParams,
   };
 }

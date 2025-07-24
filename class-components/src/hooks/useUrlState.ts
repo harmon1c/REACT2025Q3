@@ -8,6 +8,7 @@ interface UseUrlStateReturn {
   setSelectedPokemon: (name: string | null) => void;
   clearSelectedPokemon: () => void;
   forceUrlCleanup: () => void;
+  clearParams: (params: string[]) => void;
 }
 
 export const useUrlState = (): UseUrlStateReturn => {
@@ -59,6 +60,17 @@ export const useUrlState = (): UseUrlStateReturn => {
     }, 0);
   }, []);
 
+  const clearParams = useCallback(
+    (params: string[]) => {
+      setSearchParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+        params.forEach((p) => newParams.delete(p));
+        return newParams;
+      });
+    },
+    [setSearchParams]
+  );
+
   return {
     currentPage,
     selectedPokemonName,
@@ -66,5 +78,6 @@ export const useUrlState = (): UseUrlStateReturn => {
     setSelectedPokemon,
     clearSelectedPokemon,
     forceUrlCleanup,
+    clearParams,
   };
 };

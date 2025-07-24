@@ -1,98 +1,29 @@
 import React from 'react';
-import { Main } from '../components/Main';
-import { Search } from '../components/Search';
-import { Results } from '../components/Results';
-import { Pagination } from '../components/Pagination';
-import { PokemonDetailPanel } from '../components/PokemonDetailPanel';
-import { usePokemonData } from '../hooks/usePokemonData';
+import { Outlet, useMatch } from 'react-router-dom';
+import PokemonList from './PokemonList';
 
 export const Home: React.FC = () => {
-  const {
-    results,
-    isLoading,
-    error,
-    selectedPokemon,
-    currentPage,
-    totalPages,
-    searchPokemon,
-    loadPage,
-    selectPokemon,
-    clearResults,
-    clearSelection,
-    setUrlSelectedPokemon,
-    setSelectedPokemon,
-  } = usePokemonData();
-
-  const handleSearch = (query: string): void => {
-    const currentParams = new URLSearchParams(window.location.search);
-    currentParams.delete('details');
-    const newUrl = `${window.location.pathname}${currentParams.toString() ? '?' + currentParams.toString() : ''}`;
-    window.history.replaceState({}, '', newUrl);
-
-    clearSelection();
-    searchPokemon(query).then(() => {
-      setSelectedPokemon(null);
-      setUrlSelectedPokemon(null);
-    });
-  };
-
-  const handlePageChange = (page: number): void => {
-    loadPage(page);
-  };
-
-  const handlePokemonClick = async (pokemonName: string): Promise<void> => {
-    await selectPokemon(pokemonName);
-  };
-
+  const detailsOpen = !!useMatch('/details/:name');
   return (
-    <Main>
-      <div className="space-y-8">
-        <section className="search-section">
-          <div className={selectedPokemon ? 'lg:pr-72' : ''}>
-            <Search
-              onSearch={handleSearch}
-              onClear={() => {
-                clearResults();
-                clearSelection();
-              }}
-            />
-          </div>
-        </section>
-
-        <section className="results-section">
-          <div className={selectedPokemon ? 'lg:pr-72 space-y-6' : 'space-y-6'}>
-            <Results
-              results={results}
-              isLoading={isLoading}
-              error={error}
-              onPokemonClick={handlePokemonClick}
-            />
-
-            {results.length > 0 && !isLoading && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            )}
-          </div>
-
+    <div>
+      <div className="w-full max-w-[1440px] mx-auto px-4">
+        <div className="flex flex-row relative min-h-[80vh] h-[calc(100vh-7.5rem)]">
           <div
-            className={`fixed top-48 right-[13rem] w-64 h-fit max-h-[calc(100vh-6rem)] overflow-y-auto z-40 transition-opacity duration-300 rounded-lg shadow-lg ${
-              selectedPokemon
-                ? 'opacity-100 pointer-events-auto'
-                : 'opacity-0 pointer-events-none'
-            }`}
+            className={
+              detailsOpen
+                ? 'w-2/3 transition-all h-full overflow-y-auto'
+                : 'w-full transition-all h-full overflow-y-auto'
+            }
           >
-            {selectedPokemon && (
-              <PokemonDetailPanel
-                pokemon={selectedPokemon}
-                onClose={clearSelection}
-              />
-            )}
+            <PokemonList />
           </div>
-        </section>
+          {detailsOpen && (
+            <div className="w-1/3 transition-all h-full flex flex-col">
+              <Outlet />
+            </div>
+          )}
+        </div>
       </div>
-    </Main>
+    </div>
   );
 };
