@@ -113,7 +113,7 @@ export function Card({
   };
 
   const renderPokemonDetails = (): React.JSX.Element => {
-    if (!selectedPokemon) {
+    if (!selectedPokemon || !isSelected) {
       return <div></div>;
     }
 
