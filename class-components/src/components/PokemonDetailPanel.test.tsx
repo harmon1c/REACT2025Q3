@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import type { JSX } from 'react';
-import PokemonDetailPanel from './PokemonDetailPanel';
+import PokemonDetailPanel from '../components/PokemonDetailPanel';
 
 vi.mock('../api', () => ({
   pokemonApi: {

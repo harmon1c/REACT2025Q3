@@ -21,7 +21,7 @@ vi.mock('./pages/Home', () => ({
   Home: (): React.JSX.Element => <div data-testid="home">Home Component</div>,
 }));
 
-vi.mock('./pages/PokemonDetailPanel', () => ({
+vi.mock('./components/PokemonDetailPanel', () => ({
   default: (): React.JSX.Element => (
     <div data-testid="pokemon-detail">Pokemon Detail Panel</div>
   ),

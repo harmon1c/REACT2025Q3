@@ -198,4 +198,39 @@ describe('usePokemonData Hook', () => {
 
     expect(mockGetPokemonList).toHaveBeenCalled();
   });
+  it('handles API error and sets error state', async () => {
+    mockGetPokemonList.mockRejectedValueOnce(new Error('API fail'));
+    const { result } = renderHook(() => usePokemonData());
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(result.current.error).toBe('Test error');
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('handles empty results from API', async () => {
+    mockGetPokemonList.mockResolvedValueOnce({
+      count: 0,
+      next: null,
+      previous: null,
+      results: [],
+    });
+    // Remove default mock for this test to ensure empty array is returned
+    mockParseListToProcessed.mockReset();
+    mockParseListToProcessed.mockReturnValue([]);
+    const { result } = renderHook(() => usePokemonData());
+    await waitFor(() => {
+      expect(result.current.results).toEqual([]);
+      expect(result.current.totalPages).toBe(0);
+    });
+  }, 3000);
+
+  it('sets error when searchPokemon fails', async () => {
+    mockSearchPokemon.mockRejectedValueOnce(new Error('search fail'));
+    const { result } = renderHook(() => usePokemonData());
+    await act(async () => {
+      await result.current.searchPokemon('failmon');
+    });
+    expect(result.current.error).toBe('Test error');
+  });
 });

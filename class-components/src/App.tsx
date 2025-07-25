@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
-import PokemonDetailPanel from './pages/PokemonDetailPanel';
+import PokemonDetailPanel from './components/PokemonDetailPanel';
 import { About } from './pages/About';
 import { NotFound } from './pages/NotFound';
 
