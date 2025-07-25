@@ -49,19 +49,19 @@ export function PokemonDetailsGrid({
       {details.map((detail, index) => (
         <div
           key={index}
-          className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:border-blue-300 transition-colors duration-200"
+          className="bg-white rounded-md p-2 shadow-sm border border-gray-200 hover:border-blue-300 transition-colors duration-200"
         >
           {detail.label && detail.value !== detail.label ? (
             <div>
-              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">
+              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
                 {detail.label}
               </p>
-              <p className="text-sm text-gray-800 font-medium">
+              <p className="text-xs text-gray-800 font-medium">
                 {detail.value}
               </p>
             </div>
           ) : (
-            <p className="text-sm text-gray-700 font-medium">{detail.value}</p>
+            <p className="text-xs text-gray-700 font-medium">{detail.value}</p>
           )}
         </div>
       ))}

@@ -3,10 +3,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
+import PokemonDetailPanel from './pages/PokemonDetailPanel';
 import { About } from './pages/About';
 import { NotFound } from './pages/NotFound';
-import PokemonList from './pages/PokemonList';
-import PokemonDetailPanel from './pages/PokemonDetailPanel';
 
 function App(): React.JSX.Element {
   return (
@@ -15,9 +14,17 @@ function App(): React.JSX.Element {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>
-              <Route element={<Home />}>
-                <Route index element={<PokemonList />} />
-                <Route path="details/:name" element={<PokemonDetailPanel />} />
+              <Route path="" element={<Home />}>
+                <Route
+                  path="details/:pokemonName"
+                  element={<PokemonDetailPanel />}
+                />
+              </Route>
+              <Route path=":page" element={<Home />}>
+                <Route
+                  path="details/:pokemonName"
+                  element={<PokemonDetailPanel />}
+                />
               </Route>
               <Route path="about" element={<About />} />
               <Route path="*" element={<NotFound />} />

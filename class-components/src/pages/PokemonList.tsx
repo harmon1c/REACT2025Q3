@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Main } from '../components/Main';
 import { Search } from '../components/Search';
 import { Results } from '../components/Results';
@@ -7,6 +7,7 @@ import { Pagination } from '../components/Pagination';
 import { usePokemonData } from '../hooks/usePokemonData';
 
 const PokemonList: React.FC = () => {
+  const navigate = useNavigate();
   const {
     results,
     isLoading,
@@ -20,9 +21,6 @@ const PokemonList: React.FC = () => {
     setPage,
     clearParams,
   } = usePokemonData();
-
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const handleSearch = (query: string): void => {
     clearSelection();
@@ -42,8 +40,7 @@ const PokemonList: React.FC = () => {
   };
 
   const handlePokemonClick = async (pokemonName: string): Promise<void> => {
-    // Открываем детали через navigate
-    navigate(`details/${pokemonName}${location.search}`);
+    navigate(`/details/${pokemonName}`);
   };
 
   return (

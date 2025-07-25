@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams } from 'react-router-dom';
 import { useCallback } from 'react';
 
 interface UseUrlStateReturn {
@@ -13,9 +13,11 @@ interface UseUrlStateReturn {
 
 export const useUrlState = (): UseUrlStateReturn => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const params = useParams();
 
-  const currentPage = Number(searchParams.get('page')) || 1;
-  const selectedPokemonName = searchParams.get('details');
+  const currentPage =
+    Number(params['page']) || Number(searchParams.get('page')) || 1;
+  const selectedPokemonName = params['name'] || searchParams.get('details');
 
   const setPage = useCallback(
     (page: number) => {

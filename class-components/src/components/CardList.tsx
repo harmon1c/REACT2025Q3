@@ -13,8 +13,28 @@ export function CardList({
   onPokemonClick,
   selectedPokemon,
 }: CardListProps): React.JSX.Element {
+  const hasDetailedCards = items.some(
+    (item) => !item.description.includes('Click to view details')
+  );
+
+  if (hasDetailedCards) {
+    return (
+      <div className="space-y-4 w-full">
+        {items.map((item) => (
+          <Card
+            key={item.id}
+            item={item}
+            onPokemonClick={onPokemonClick}
+            isSelected={selectedPokemon?.name === item.name}
+            selectedPokemon={selectedPokemon}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6 w-full">
+    <div className="grid grid-cols-2 gap-4 w-full">
       {items.map((item) => (
         <Card
           key={item.id}

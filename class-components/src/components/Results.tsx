@@ -123,14 +123,7 @@ export function Results({
   }
 
   return (
-    <div className="space-y-8 w-full">
-      <div className="text-left">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">
-          Search Results
-        </h2>
-        <div className="w-32 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
-      </div>
-
+    <div className="w-full max-h-[15rem] overflow-y-auto">
       <div className="w-full">
         <CardList
           items={results}
