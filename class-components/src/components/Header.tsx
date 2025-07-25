@@ -1,29 +1,48 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
-interface HeaderProps {
-  title: string;
-}
+export const Header: React.FC = () => {
+  const location = useLocation();
 
-export class Header extends Component<HeaderProps> {
-  public override render(): React.JSX.Element {
-    return (
-      <header className="text-center mb-12">
-        <div className="relative">
-          <h1 className="text-6xl font-bold text-gray-800 mb-4">
-            {this.props.title}
-          </h1>
-        </div>
-        <div className="mt-6 mx-auto">
-          <p className="text-xl text-gray-600 leading-relaxed">
-            Discover and explore Pokemon using the Pokemon API
-          </p>
-          <div className="mt-4 flex justify-center space-x-2">
-            <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
-            <span className="inline-block w-2 h-2 bg-indigo-500 rounded-full"></span>
-            <span className="inline-block w-2 h-2 bg-purple-500 rounded-full"></span>
+  return (
+    <header className="header bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white w-screen">
+      <div className="w-full max-w-[1440px] mx-auto px-4">
+        <div className="flex items-center justify-between py-4">
+          <div className="header__logo">
+            <Link to="/" className="text-2xl font-bold">
+              Pokemon Explorer
+            </Link>
           </div>
+          <nav className="nav">
+            <ul className="nav__list flex space-x-8">
+              <li className="nav__list-item">
+                <Link
+                  to="/"
+                  className={`nav__list-link px-3 py-2 rounded-lg transition-colors duration-200 ${
+                    location.pathname === '/'
+                      ? 'bg-white/20 text-white font-semibold'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  Home
+                </Link>
+              </li>
+              <li className="nav__list-item">
+                <Link
+                  to="/about"
+                  className={`nav__list-link px-3 py-2 rounded-lg transition-colors duration-200 ${
+                    location.pathname === '/about'
+                      ? 'bg-white/20 text-white font-semibold'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  About
+                </Link>
+              </li>
+            </ul>
+          </nav>
         </div>
-      </header>
-    );
-  }
-}
+      </div>
+    </header>
+  );
+};

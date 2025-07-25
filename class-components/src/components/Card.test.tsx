@@ -6,7 +6,13 @@ import { type ResultItem } from './Results';
 
 const mockOnPokemonClick = vi.fn();
 
-const mockPokemon: ResultItem = {
+const mockListItemPokemon: ResultItem = {
+  id: 2,
+  name: 'charizard',
+  description: 'Fire/Flying type Pokemon. Click to view details',
+};
+
+const mockSimpleDetailedPokemon: ResultItem = {
   id: 25,
   name: 'pikachu',
   description: 'Electric type Pokemon',
@@ -19,38 +25,79 @@ const mockDetailedPokemon: ResultItem = {
     'Height: 0.7m | Weight: 6.9kg | Type: Grass/Poison | Abilities: Overgrow, Chlorophyll',
 };
 
-const mockListItemPokemon: ResultItem = {
-  id: 2,
-  name: 'charizard',
-  description: 'Fire/Flying type Pokemon. Click to view details',
-};
-
 beforeEach(() => {
   vi.clearAllMocks();
+
+  Object.defineProperty(window, 'scrollTo', {
+    value: vi.fn(),
+    writable: true,
+  });
+});
+
+describe('Card Component', () => {
+  describe('Detailed Card Rendering', () => {
+    it('renders simple description as a single detail item', () => {
+      render(<Card item={mockSimpleDetailedPokemon} />);
+
+      expect(screen.getByText('Pikachu')).toBeInTheDocument();
+      expect(screen.getAllByText('Electric type Pokemon')).toHaveLength(2); // label and value
+    });
+  });
+
+  describe('List Item Card Rendering', () => {
+    it('renders list item pokemon name correctly', () => {
+      render(<Card item={mockListItemPokemon} />);
+      expect(screen.getByText('Charizard')).toBeInTheDocument();
+    });
+
+    it('renders list item with View Details button', () => {
+      render(<Card item={mockListItemPokemon} />);
+      expect(
+        screen.getByRole('button', { name: /view details/i })
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe('Interaction Tests', () => {
+    it('calls onPokemonClick when View Details button is clicked', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <Card item={mockListItemPokemon} onPokemonClick={mockOnPokemonClick} />
+      );
+
+      const viewButton = screen.getByRole('button', { name: /view details/i });
+      await user.click(viewButton);
+
+      await waitFor(() => {
+        expect(mockOnPokemonClick).toHaveBeenCalledWith('charizard');
+      });
+    });
+  });
 });
 
 describe('Card Component', () => {
   describe('Basic Rendering Tests', () => {
     it('renders pokemon name correctly capitalized', () => {
-      render(<Card item={mockPokemon} />);
+      render(<Card item={mockSimpleDetailedPokemon} />);
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument();
     });
 
-    it('renders pokemon description', () => {
-      render(<Card item={mockPokemon} />);
+    it('renders pokemon description for detailed card', () => {
+      render(<Card item={mockSimpleDetailedPokemon} />);
 
-      expect(screen.getByText('Electric type Pokemon')).toBeInTheDocument();
+      expect(screen.getAllByText('Electric type Pokemon')).toHaveLength(2);
     });
 
     it('renders pokemon ID with "Pokemon #" prefix', () => {
-      render(<Card item={mockPokemon} />);
+      render(<Card item={mockSimpleDetailedPokemon} />);
 
       expect(screen.getByText('Pokemon #25')).toBeInTheDocument();
     });
 
     it('renders first letter of pokemon name in avatar circle', () => {
-      render(<Card item={mockPokemon} />);
+      render(<Card item={mockSimpleDetailedPokemon} />);
 
       const avatar = screen.getByText('P');
       expect(avatar).toBeInTheDocument();
@@ -196,7 +243,7 @@ describe('Card Component', () => {
       );
 
       const clickableDiv = container.querySelector(
-        'div[class*="flex-1"][class*="cursor-pointer"]'
+        'div[class*="cursor-pointer"]'
       );
       expect(clickableDiv).toHaveClass(
         'bg-gradient-to-r',
@@ -211,7 +258,7 @@ describe('Card Component', () => {
       );
 
       const clickableDiv = container.querySelector(
-        'div[class*="flex-1"][class*="cursor-pointer"]'
+        'div[class*="cursor-pointer"]'
       );
       expect(clickableDiv).toHaveClass('hover:bg-gray-50');
       expect(clickableDiv).not.toHaveClass('bg-gradient-to-r');
@@ -225,13 +272,7 @@ describe('Card Component', () => {
           'Height: 0.4m | Weight: 6.0kg | Type: Electric | Abilities: Static, Lightning Rod',
       };
 
-      render(
-        <Card
-          item={mockListItemPokemon}
-          isSelected={true}
-          selectedPokemon={selectedPokemon}
-        />
-      );
+      render(<Card item={selectedPokemon} isSelected={true} />);
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument();
       expect(screen.getByText('0.4m')).toBeInTheDocument();
@@ -288,10 +329,10 @@ describe('Card Component', () => {
       render(<Card item={simplePokemon} />);
 
       expect(
-        screen.getByText(
+        screen.getAllByText(
           'A legendary psychic-type Pokemon created through genetic manipulation.'
         )
-      ).toBeInTheDocument();
+      ).toHaveLength(2); // Should appear as both label and value
     });
   });
 
@@ -307,7 +348,7 @@ describe('Card Component', () => {
     });
 
     it('has proper heading structure', () => {
-      render(<Card item={mockPokemon} />);
+      render(<Card item={mockSimpleDetailedPokemon} />);
 
       const heading = screen.getByRole('heading', { level: 3 });
       expect(heading).toHaveTextContent('Pikachu');

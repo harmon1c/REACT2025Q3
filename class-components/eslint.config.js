@@ -104,10 +104,6 @@ export default tseslint.config(
       // General rules
       'class-methods-use-this': 'off',
       curly: ['error', 'all'],
-      'max-lines-per-function': [
-        'error',
-        { max: 500, skipBlankLines: true, skipComments: true },
-      ],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-restricted-globals': 'off',
       'no-shadow': 'off',

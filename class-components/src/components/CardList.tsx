@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Card } from './Card';
 import { type ResultItem } from './Results';
 
@@ -8,13 +8,20 @@ interface CardListProps {
   selectedPokemon?: ResultItem | null | undefined;
 }
 
-export class CardList extends Component<CardListProps> {
-  public override render(): React.JSX.Element {
-    const { items, onPokemonClick, selectedPokemon } = this.props;
+export function CardList({
+  items,
+  onPokemonClick,
+  selectedPokemon,
+}: CardListProps): React.JSX.Element {
+  const hasDetailedCards =
+    items?.some(
+      (item) => !item.description.includes('Click to view details')
+    ) || false;
 
+  if (hasDetailedCards) {
     return (
-      <div className="space-y-6">
-        {items.map((item) => (
+      <div className="space-y-4 w-full">
+        {items?.map((item) => (
           <Card
             key={item.id}
             item={item}
@@ -26,4 +33,18 @@ export class CardList extends Component<CardListProps> {
       </div>
     );
   }
+
+  return (
+    <div className="grid grid-cols-2 gap-2 w-full">
+      {items?.map((item) => (
+        <Card
+          key={item.id}
+          item={item}
+          onPokemonClick={onPokemonClick}
+          isSelected={selectedPokemon?.name === item.name}
+          selectedPokemon={selectedPokemon}
+        />
+      ))}
+    </div>
+  );
 }

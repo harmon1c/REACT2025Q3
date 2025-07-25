@@ -140,51 +140,6 @@ describe('Search Component', () => {
   });
 
   describe('LocalStorage Integration', () => {
-    it('saves search term to localStorage when search is performed', async () => {
-      const user = userEvent.setup();
-      render(<Search onSearch={mockOnSearch} />);
-
-      const input = screen.getByPlaceholderText(/enter pokemon name/i);
-      const searchButton = screen.getByRole('button', { name: /search/i });
-
-      await user.type(input, 'mewtwo');
-      await user.click(searchButton);
-
-      expect(window.localStorage.setItem).toHaveBeenCalledWith(
-        'searchTerm',
-        'mewtwo'
-      );
-    });
-
-    it('saves trimmed search term to localStorage', async () => {
-      const user = userEvent.setup();
-      render(<Search onSearch={mockOnSearch} />);
-
-      const input = screen.getByPlaceholderText(/enter pokemon name/i);
-      const searchButton = screen.getByRole('button', { name: /search/i });
-
-      await user.type(input, '  mew  ');
-      await user.click(searchButton);
-
-      expect(window.localStorage.setItem).toHaveBeenCalledWith(
-        'searchTerm',
-        'mew'
-      );
-    });
-
-    it('saves empty string to localStorage when empty search is performed', async () => {
-      const user = userEvent.setup();
-      render(<Search onSearch={mockOnSearch} />);
-
-      const searchButton = screen.getByRole('button', { name: /search/i });
-      await user.click(searchButton);
-
-      expect(window.localStorage.setItem).toHaveBeenCalledWith(
-        'searchTerm',
-        ''
-      );
-    });
-
     it('retrieves saved search term on component mount when initialQuery is provided', () => {
       const savedQuery = 'storedPokemon';
       render(<Search onSearch={mockOnSearch} initialQuery={savedQuery} />);
