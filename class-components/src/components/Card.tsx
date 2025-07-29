@@ -1,5 +1,7 @@
 import React from 'react';
 import { parsePokemonDetails } from '../utils/pokemonUtils';
+import { useAppDispatch } from '../store/hooks';
+import { addItem, removeItem } from '../store/selectedItemsSlice';
 import { type ResultItem } from './Results';
 
 interface CardProps {
@@ -14,6 +16,7 @@ export function Card({
   onPokemonClick,
   isSelected,
 }: CardProps): React.JSX.Element {
+  const dispatch = useAppDispatch();
   const capitalizeFirstLetter = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
@@ -44,6 +47,23 @@ export function Card({
     return item.description.includes('Click to view details');
   };
 
+  const handleCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    if (e.target.checked) {
+      dispatch(
+        addItem({
+          id: String(item.id),
+          name: item.name,
+          description: item.description,
+          detailsUrl: undefined,
+        })
+      );
+    } else {
+      dispatch(removeItem(String(item.id)));
+    }
+  };
+
   const renderListItemCard = (): React.JSX.Element => {
     return (
       <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 overflow-hidden">
@@ -59,6 +79,14 @@ export function Card({
           }}
         >
           <div className="flex items-center gap-3 mb-3">
+            <input
+              type="checkbox"
+              checked={!!isSelected}
+              onChange={handleCheckboxChange}
+              onClick={(e) => e.stopPropagation()}
+              className="form-checkbox h-5 w-5 text-blue-600 mr-2"
+              aria-label="Select Pokemon"
+            />
             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
               {capitalizeFirstLetter(item.name)[0]}
             </div>
@@ -79,13 +107,9 @@ export function Card({
                 e.preventDefault();
                 void handleClick(e);
               }}
-              className={`px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-offset-1 ${
-                isSelected
-                  ? 'bg-gradient-to-r from-red-500 to-pink-600 text-white hover:from-red-600 hover:to-pink-700 focus:ring-red-500'
-                  : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 focus:ring-blue-500'
-              }`}
+              className="px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-offset-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 focus:ring-blue-500"
             >
-              {isSelected ? 'Hide Details' : 'View Details'}
+              View Details
             </button>
           </div>
         </div>

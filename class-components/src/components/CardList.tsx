@@ -1,18 +1,21 @@
 import React from 'react';
+import { useAppSelector } from '../store/hooks';
 import { Card } from './Card';
 import { type ResultItem } from './Results';
 
 interface CardListProps {
   items: ResultItem[];
   onPokemonClick?: ((pokemonName: string) => Promise<void>) | undefined;
-  selectedPokemon?: ResultItem | null | undefined;
 }
-
 export function CardList({
   items,
   onPokemonClick,
-  selectedPokemon,
 }: CardListProps): React.JSX.Element {
+  const selectedItems = useAppSelector((state) => state.selectedItems.items);
+
+  const isItemSelected = (item: ResultItem): boolean =>
+    selectedItems.some((selected) => String(selected.id) === String(item.id));
+
   const hasDetailedCards =
     items?.some(
       (item) => !item.description.includes('Click to view details')
@@ -26,8 +29,7 @@ export function CardList({
             key={item.id}
             item={item}
             onPokemonClick={onPokemonClick}
-            isSelected={selectedPokemon?.name === item.name}
-            selectedPokemon={selectedPokemon}
+            isSelected={isItemSelected(item)}
           />
         ))}
       </div>
@@ -41,8 +43,7 @@ export function CardList({
           key={item.id}
           item={item}
           onPokemonClick={onPokemonClick}
-          isSelected={selectedPokemon?.name === item.name}
-          selectedPokemon={selectedPokemon}
+          isSelected={isItemSelected(item)}
         />
       ))}
     </div>

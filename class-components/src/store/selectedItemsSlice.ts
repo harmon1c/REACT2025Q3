@@ -5,7 +5,7 @@ export interface SelectedItem {
   id: string;
   name: string;
   description?: string;
-  detailsUrl?: string;
+  detailsUrl?: string | undefined;
 }
 
 interface SelectedItemsState {
