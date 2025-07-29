@@ -1,7 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { CardList } from './CardList';
+import { Provider } from 'react-redux';
+import { store } from '../store';
+import { ThemeProvider } from '../context/ThemeContext';
 import { type ResultItem } from './Results';
+import { CardList } from './CardList';
 
 const mockOnPokemonClick = vi.fn();
 
@@ -30,7 +33,14 @@ describe('CardList Component', () => {
 
   it('renders all pokemon cards', (): void => {
     render(
-      <CardList items={mockPokemonList} onPokemonClick={mockOnPokemonClick} />
+      <Provider store={store}>
+        <ThemeProvider>
+          <CardList
+            items={mockPokemonList}
+            onPokemonClick={mockOnPokemonClick}
+          />
+        </ThemeProvider>
+      </Provider>
     );
 
     expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
@@ -40,7 +50,14 @@ describe('CardList Component', () => {
 
   it('uses grid layout when showAsGrid is true', (): void => {
     const { container } = render(
-      <CardList items={mockPokemonList} onPokemonClick={mockOnPokemonClick} />
+      <Provider store={store}>
+        <ThemeProvider>
+          <CardList
+            items={mockPokemonList}
+            onPokemonClick={mockOnPokemonClick}
+          />
+        </ThemeProvider>
+      </Provider>
     );
 
     const gridContainer = container.querySelector('.grid-cols-2');
@@ -49,7 +66,14 @@ describe('CardList Component', () => {
 
   it('uses single column layout when items have detailed descriptions', (): void => {
     const { container } = render(
-      <CardList items={mockPokemonList} onPokemonClick={mockOnPokemonClick} />
+      <Provider store={store}>
+        <ThemeProvider>
+          <CardList
+            items={mockPokemonList}
+            onPokemonClick={mockOnPokemonClick}
+          />
+        </ThemeProvider>
+      </Provider>
     );
 
     const spaceContainer = container.querySelector('.space-y-4');
@@ -65,7 +89,11 @@ describe('CardList Component', () => {
     }));
 
     const { container } = render(
-      <CardList items={gridOnlyItems} onPokemonClick={mockOnPokemonClick} />
+      <Provider store={store}>
+        <ThemeProvider>
+          <CardList items={gridOnlyItems} onPokemonClick={mockOnPokemonClick} />
+        </ThemeProvider>
+      </Provider>
     );
 
     const gridContainer = container.querySelector('.grid-cols-2');
@@ -78,7 +106,13 @@ describe('CardList Component', () => {
       description: item.description + '. Click to view details',
     }));
 
-    render(<CardList items={gridItems} onPokemonClick={mockOnPokemonClick} />);
+    render(
+      <Provider store={store}>
+        <ThemeProvider>
+          <CardList items={gridItems} onPokemonClick={mockOnPokemonClick} />
+        </ThemeProvider>
+      </Provider>
+    );
 
     const viewDetailsButtons = screen.getAllByText('View Details');
     if (viewDetailsButtons[0]) {
@@ -90,7 +124,11 @@ describe('CardList Component', () => {
 
   it('handles empty pokemon list', (): void => {
     const { container } = render(
-      <CardList items={[]} onPokemonClick={mockOnPokemonClick} />
+      <Provider store={store}>
+        <ThemeProvider>
+          <CardList items={[]} onPokemonClick={mockOnPokemonClick} />
+        </ThemeProvider>
+      </Provider>
     );
 
     const gridContainer = container.querySelector('.grid');
@@ -105,7 +143,11 @@ describe('CardList Component', () => {
     }));
 
     const { container } = render(
-      <CardList items={gridOnlyItems} onPokemonClick={mockOnPokemonClick} />
+      <Provider store={store}>
+        <ThemeProvider>
+          <CardList items={gridOnlyItems} onPokemonClick={mockOnPokemonClick} />
+        </ThemeProvider>
+      </Provider>
     );
 
     const gridContainer = container.querySelector('.grid');
