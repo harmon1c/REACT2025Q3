@@ -1,5 +1,6 @@
 import React from 'react';
 import { CardList } from './CardList';
+import { SelectedFlyout } from './SelectedFlyout';
 
 export interface ResultItem {
   id: number;
@@ -20,7 +21,6 @@ export function Results({
   isLoading,
   error,
   onPokemonClick,
-  selectedPokemon,
 }: ResultsProps): React.JSX.Element {
   const renderLoadingState = (): React.JSX.Element => {
     return (
@@ -123,14 +123,11 @@ export function Results({
   }
 
   return (
-    <div className="w-full max-h-[15rem] overflow-y-auto">
+    <div className="relative w-full max-h-[15rem] overflow-y-auto">
       <div className="w-full">
-        <CardList
-          items={results}
-          onPokemonClick={onPokemonClick}
-          selectedPokemon={selectedPokemon}
-        />
+        <CardList items={results} onPokemonClick={onPokemonClick} />
       </div>
+      <SelectedFlyout />
     </div>
   );
 }
