@@ -6,14 +6,14 @@ export const About: React.FC = () => {
     <Main>
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4">
           About This Application
         </h2>
         <div className="w-32 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto"></div>
       </div>
 
       {/* Author Info */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-lg mb-8">
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 p-8 rounded-lg mb-8 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row items-center gap-6">
           <div className="flex-shrink-0">
             <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -21,13 +21,13 @@ export const About: React.FC = () => {
             </div>
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
               Author Information
             </h3>
-            <p className="text-gray-700 text-lg mb-3">
+            <p className="text-gray-700 dark:text-gray-200 text-lg mb-3">
               Created by <strong>Harmon1c</strong>
             </p>
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
               This Pokemon Explorer application was developed as part of the RS
               School React course, demonstrating modern React development
               practices including functional components, hooks, routing, and
@@ -38,7 +38,7 @@ export const About: React.FC = () => {
                 href="https://github.com/harmon1c"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 dark:bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200 shadow-lg hover:shadow-xl"
               >
                 <img
                   src="/img/svg/github-logo.svg"
@@ -68,8 +68,10 @@ export const About: React.FC = () => {
       {/* Application Info */}
       <div className="grid md:grid-cols-2 gap-8 mb-8">
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-700">Purpose</h3>
-          <p className="text-gray-600 leading-relaxed">
+          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+            Purpose
+          </h3>
+          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
             Pokemon Explorer is a modern React application built to demonstrate
             best practices in functional component development, routing, and
             state management. It provides an intuitive interface for searching
@@ -78,8 +80,10 @@ export const About: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-700">Features</h3>
-          <ul className="text-gray-600 space-y-2">
+          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+            Features
+          </h3>
+          <ul className="text-gray-600 dark:text-gray-300 space-y-2">
             <li className="flex items-center">
               <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
               Pokemon search with real-time results
@@ -106,41 +110,49 @@ export const About: React.FC = () => {
 
       {/* Technology Stack */}
       <div className="space-y-4 mb-8">
-        <h3 className="text-xl font-semibold text-gray-700">
+        <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
           Technology Stack
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-50 p-4 rounded-lg text-center">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-center border border-gray-100 dark:border-gray-700">
             <div className="font-semibold text-blue-600">React 19</div>
-            <div className="text-sm text-gray-500">Frontend Framework</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Frontend Framework
+            </div>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg text-center">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-center border border-gray-100 dark:border-gray-700">
             <div className="font-semibold text-purple-600">TypeScript</div>
-            <div className="text-sm text-gray-500">Type Safety</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Type Safety
+            </div>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg text-center">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-center border border-gray-100 dark:border-gray-700">
             <div className="font-semibold text-green-600">React Router</div>
-            <div className="text-sm text-gray-500">Navigation</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Navigation
+            </div>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg text-center">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-center border border-gray-100 dark:border-gray-700">
             <div className="font-semibold text-cyan-600">Tailwind CSS</div>
-            <div className="text-sm text-gray-500">Styling</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Styling
+            </div>
           </div>
         </div>
       </div>
 
       {/* Data Source */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
-        <h3 className="text-xl font-semibold text-gray-700 mb-3">
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-3">
           Data Source
         </h3>
-        <p className="text-gray-600 leading-relaxed">
+        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
           All Pokemon data is fetched from the{' '}
           <a
             href="https://pokeapi.co/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 underline font-semibold"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline font-semibold"
           >
             PokeAPI
           </a>

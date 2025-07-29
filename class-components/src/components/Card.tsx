@@ -66,12 +66,12 @@ export function Card({
 
   const renderListItemCard = (): React.JSX.Element => {
     return (
-      <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-900/90 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div
           className={`p-4 cursor-pointer transition-all duration-200 ${
             isSelected
-              ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-l-blue-500'
-              : 'hover:bg-gray-50'
+              ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 border-l-4 border-l-blue-500 dark:border-l-blue-400'
+              : 'hover:bg-gray-50 dark:hover:bg-gray-800'
           }`}
           onClick={(e) => {
             e.preventDefault();
@@ -87,17 +87,19 @@ export function Card({
               className="form-checkbox h-5 w-5 text-blue-600 mr-2"
               aria-label="Select Pokemon"
             />
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-sm">
               {capitalizeFirstLetter(item.name)[0]}
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-gray-800 truncate">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 truncate">
                 {capitalizeFirstLetter(item.name)}
               </h3>
-              <p className="text-gray-500 text-xs">Pokemon #{item.id}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs">
+                Pokemon #{item.id}
+              </p>
             </div>
           </div>
-          <p className="text-gray-600 text-xs mb-3 leading-relaxed line-clamp-2">
+          <p className="text-gray-600 dark:text-gray-300 text-xs mb-3 leading-relaxed line-clamp-2">
             {item.description}
           </p>
           <div className="flex justify-center">
@@ -107,7 +109,8 @@ export function Card({
                 e.preventDefault();
                 void handleClick(e);
               }}
-              className="px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-offset-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 focus:ring-blue-500"
+              className="px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-offset-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 focus:ring-blue-500
+                dark:from-blue-700 dark:to-purple-800 dark:hover:from-blue-800 dark:hover:to-purple-900"
             >
               View Details
             </button>
@@ -128,21 +131,23 @@ export function Card({
     );
 
     return (
-      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-lg shadow-md p-3 border border-blue-200 hover:shadow-lg transition-shadow duration-300">
+      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 rounded-lg shadow-md p-3 border border-blue-200 dark:border-blue-900 hover:shadow-lg transition-shadow duration-300">
         <div className="flex gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-xs">
               {capitalizeFirstLetter(item.name)[0]}
             </div>
             <div>
-              <h3 className="text-base font-bold text-gray-800">
+              <h3 className="text-base font-bold text-gray-800 dark:text-gray-100">
                 {capitalizeFirstLetter(item.name)}
               </h3>
-              <span className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-2 py-0.5 rounded-full text-xs font-medium">
+              <span className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 text-white px-2 py-0.5 rounded-full text-xs font-medium">
                 Pokemon #{item.id}
               </span>
             </div>
-            <div className="text-xl opacity-30">⚡</div>
+            <div className="text-xl opacity-30 text-gray-400 dark:text-gray-600">
+              ⚡
+            </div>
           </div>
 
           <div className="flex-1 space-y-2">
@@ -150,12 +155,12 @@ export function Card({
               {otherDetails.map((detail, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-md p-1.5 shadow-sm border border-gray-200"
+                  className="bg-white dark:bg-gray-800 rounded-md p-1.5 shadow-sm border border-gray-200 dark:border-gray-700"
                 >
-                  <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-0.5">
+                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-0.5">
                     {detail.label}
                   </p>
-                  <p className="text-xs text-gray-800 font-medium">
+                  <p className="text-xs text-gray-800 dark:text-gray-100 font-medium">
                     {detail.value}
                   </p>
                 </div>
@@ -163,11 +168,11 @@ export function Card({
             </div>
 
             {abilities && (
-              <div className="bg-white rounded-md p-1.5 shadow-sm border border-gray-200">
-                <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-0.5">
+              <div className="bg-white dark:bg-gray-800 rounded-md p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
+                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-0.5">
                   {abilities.label}
                 </p>
-                <p className="text-xs text-gray-800 font-medium">
+                <p className="text-xs text-gray-800 dark:text-gray-100 font-medium">
                   {abilities.value}
                 </p>
               </div>

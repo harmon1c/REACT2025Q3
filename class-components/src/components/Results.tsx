@@ -123,7 +123,7 @@ export function Results({
   }
 
   return (
-    <div className="relative w-full max-h-[15rem] overflow-y-auto">
+    <div className="relative w-full max-h-[15rem] overflow-y-auto custom-scrollbar">
       <div className="w-full">
         <CardList items={results} onPokemonClick={onPokemonClick} />
       </div>

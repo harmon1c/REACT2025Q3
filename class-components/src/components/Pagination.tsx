@@ -43,7 +43,8 @@ export const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1 || isLoading}
-        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200
+          dark:text-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
       >
         Previous
       </button>
@@ -53,12 +54,15 @@ export const Pagination: React.FC<PaginationProps> = ({
           <button
             onClick={() => onPageChange(1)}
             disabled={isLoading}
-            className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+            className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200
+              dark:text-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
           >
             1
           </button>
           {firstPage > 2 && (
-            <span className="px-2 py-2 text-sm text-gray-500">...</span>
+            <span className="px-2 py-2 text-sm text-gray-500 dark:text-gray-400">
+              ...
+            </span>
           )}
         </>
       )}
@@ -68,11 +72,13 @@ export const Pagination: React.FC<PaginationProps> = ({
           key={page}
           onClick={() => onPageChange(page)}
           disabled={isLoading}
-          className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-            page === currentPage
-              ? 'text-white bg-blue-500 border border-blue-500'
-              : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-          }`}
+          className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200
+            ${
+              page === currentPage
+                ? 'text-white bg-blue-500 border border-blue-500 dark:bg-blue-600 dark:border-blue-400'
+                : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:text-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700'
+            }
+          `}
         >
           {page}
         </button>
@@ -81,12 +87,15 @@ export const Pagination: React.FC<PaginationProps> = ({
       {lastPage < totalPages && (
         <>
           {lastPage < totalPages - 1 && (
-            <span className="px-2 py-2 text-sm text-gray-500">...</span>
+            <span className="px-2 py-2 text-sm text-gray-500 dark:text-gray-400">
+              ...
+            </span>
           )}
           <button
             onClick={() => onPageChange(totalPages)}
             disabled={isLoading}
-            className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+            className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200
+              dark:text-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
           >
             {totalPages}
           </button>
@@ -96,7 +105,8 @@ export const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages || isLoading}
-        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200
+          dark:text-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
       >
         Next
       </button>
