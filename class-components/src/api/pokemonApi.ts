@@ -51,6 +51,7 @@ class PokemonApi {
       id: pokemon.id,
       name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
       description,
+      image: pokemon.sprites?.front_default ?? null,
     };
   }
 
@@ -61,11 +62,12 @@ class PokemonApi {
       const urlParts = item.url.split('/').filter(Boolean);
       const idString = urlParts[urlParts.length - 1];
       const id = idString ? parseInt(idString, 10) : index + 1;
-
+      const image = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
       return {
         id,
         name: item.name.charAt(0).toUpperCase() + item.name.slice(1),
         description: `Pokemon #${id} - Click to view details`,
+        image,
       };
     });
   }

@@ -52,6 +52,7 @@ export interface ProcessedPokemon {
   id: number;
   name: string;
   description: string;
+  image?: string | null;
 }
 
 export interface ApiError {

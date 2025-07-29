@@ -6,6 +6,7 @@ export interface ResultItem {
   id: number;
   name: string;
   description: string;
+  image?: string | null;
 }
 
 interface ResultsProps {

@@ -64,11 +64,20 @@ const PokemonDetailPanel: React.FC = () => {
         </h2>
       </div>
       <div className="text-center mb-4">
-        <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-2">
-          <span className="text-white text-lg font-bold">
-            {pokemon.name.charAt(0).toUpperCase()}
-          </span>
-        </div>
+        {pokemon.image ? (
+          <img
+            src={pokemon.image}
+            alt={pokemon.name}
+            className="w-24 h-24 mx-auto mb-2 object-contain drop-shadow-lg rounded-full"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-2">
+            <span className="text-white text-lg font-bold">
+              {pokemon.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
         <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 mb-1">
           {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
         </h3>

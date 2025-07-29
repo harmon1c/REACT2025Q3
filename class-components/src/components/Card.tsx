@@ -87,9 +87,18 @@ export function Card({
               className="form-checkbox h-5 w-5 text-blue-600 mr-2"
               aria-label="Select Pokemon"
             />
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-sm">
-              {capitalizeFirstLetter(item.name)[0]}
-            </div>
+            {item.image ? (
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-10 h-10 rounded-full object-contain"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                {capitalizeFirstLetter(item.name)[0]}
+              </div>
+            )}
             <div className="flex-1">
               <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 truncate">
                 {capitalizeFirstLetter(item.name)}
@@ -134,9 +143,18 @@ export function Card({
       <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 rounded-lg shadow-md p-3 border border-blue-200 dark:border-blue-900 hover:shadow-lg transition-shadow duration-300">
         <div className="flex gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-xs">
-              {capitalizeFirstLetter(item.name)[0]}
-            </div>
+            {item.image ? (
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-12 h-12 rounded-full object-contain"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                {capitalizeFirstLetter(item.name)[0]}
+              </div>
+            )}
             <div>
               <h3 className="text-base font-bold text-gray-800 dark:text-gray-100">
                 {capitalizeFirstLetter(item.name)}
