@@ -510,5 +510,25 @@ describe('Card Component', () => {
         expect(mockOnPokemonClick).toHaveBeenCalledWith('charizard');
       });
     });
+
+    it('renders avatar image if item.image is provided', () => {
+      const pokemonWithImage = {
+        ...mockSimpleDetailedPokemon,
+        image: 'https://img.pokemontest.com/pikachu.png',
+      };
+      render(
+        <Provider store={store}>
+          <ThemeProvider>
+            <Card item={pokemonWithImage} />
+          </ThemeProvider>
+        </Provider>
+      );
+      const img = screen.getByRole('img', { name: /pikachu/i });
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute(
+        'src',
+        'https://img.pokemontest.com/pikachu.png'
+      );
+    });
   });
 });

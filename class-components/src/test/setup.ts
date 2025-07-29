@@ -1,3 +1,12 @@
+// Mock URL.createObjectURL and URL.revokeObjectURL for download tests
+if (!('createObjectURL' in URL)) {
+  // @ts-expect-error: JSDOM does not implement createObjectURL, so we mock it for download tests
+  URL.createObjectURL = (): string => 'blob:url';
+}
+if (!('revokeObjectURL' in URL)) {
+  // @ts-expect-error: JSDOM does not implement revokeObjectURL, so we mock it for download tests
+  URL.revokeObjectURL = (): void => {};
+}
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: (query: string) => ({
