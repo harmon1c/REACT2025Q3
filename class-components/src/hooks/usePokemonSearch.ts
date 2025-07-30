@@ -1,130 +1,127 @@
-import { useState, useCallback } from 'react';
-import { pokemonApi, getErrorMessage } from '../api';
-import type { ProcessedPokemon, PokemonDetails } from '../api';
+import React, { useState } from 'react';
+import {
+  useGetPokemonListQuery,
+  useGetPokemonDetailsQuery,
+  useSearchPokemonQuery,
+} from '../api/pokemonApiSlice';
+import { pokemonApi as legacyApi } from '../api/pokemonApi';
+import type { ProcessedPokemon } from '../api/types';
 
 interface UsePokemonSearchState {
   results: ProcessedPokemon[];
   isLoading: boolean;
   error: string | null;
-
   selectedPokemon: ProcessedPokemon | null;
-
-  searchPokemon: (query: string) => Promise<void>;
+  searchPokemon: (query: string) => void;
   clearResults: VoidFunction;
-  selectPokemon: (pokemonName: string) => Promise<void>;
+  selectPokemon: (pokemonName: string) => void;
   clearSelection: VoidFunction;
-  loadInitialData: (searchTerm?: string) => Promise<void>;
+  loadInitialData: (searchTerm?: string) => void;
 }
 
 export function usePokemonSearch(): UsePokemonSearchState {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedName, setSelectedName] = useState<string | null>(null);
   const [results, setResults] = useState<ProcessedPokemon[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [selectedPokemon, setSelectedPokemon] =
     useState<ProcessedPokemon | null>(null);
 
-  const performSearch = useCallback(async (query: string) => {
-    setIsLoading(true);
-    setError(null);
-    setSelectedPokemon(null);
+  const {
+    data: listData,
+    isLoading: isListLoading,
+    error: listError,
+  } = useGetPokemonListQuery(
+    { offset: 0, limit: 20 },
+    { skip: Boolean(searchQuery && searchQuery.trim()) }
+  );
+  const {
+    data: searchData,
+    isLoading: isSearchLoading,
+    error: searchError,
+  } = useSearchPokemonQuery(searchQuery, { skip: !searchQuery });
+  const {
+    data: detailsData,
+    isLoading: isDetailsLoading,
+    error: detailsError,
+  } = useGetPokemonDetailsQuery(selectedName ?? '', { skip: !selectedName });
 
-    try {
-      if (!query.trim()) {
-        const listResponse = await pokemonApi.getPokemonList(0, 20);
-        const processedList = pokemonApi.parseListToProcessed(listResponse);
-        setResults(processedList);
-      } else {
-        const trimmedQuery = query.trim().toLowerCase();
-        const pokemonDetails = await pokemonApi.searchPokemon(trimmedQuery);
-        const processedPokemon =
-          pokemonApi.parsePokemonToProcessed(pokemonDetails);
-        setResults([processedPokemon]);
-      }
-    } catch (apiError) {
-      setError(getErrorMessage(apiError, query));
-      setResults([]);
-    } finally {
-      setIsLoading(false);
+  React.useEffect(() => {
+    if (searchQuery && searchData) {
+      setResults([legacyApi.parsePokemonToProcessed(searchData)]);
+    } else if (!searchQuery && listData) {
+      setResults(legacyApi.parseListToProcessed(listData));
     }
-  }, []);
+  }, [searchQuery, searchData, listData]);
 
-  const loadInitialData = useCallback(async (searchTerm?: string) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      if (searchTerm?.trim()) {
-        const pokemonDetails = await pokemonApi.searchPokemon(
-          searchTerm.trim()
-        );
-        const processedPokemon =
-          pokemonApi.parsePokemonToProcessed(pokemonDetails);
-        setResults([processedPokemon]);
-      } else {
-        const listResponse = await pokemonApi.getPokemonList(0, 20);
-        const processedList = pokemonApi.parseListToProcessed(listResponse);
-        setResults(processedList);
-      }
-    } catch (apiError) {
-      setError(getErrorMessage(apiError, searchTerm));
-      setResults([]);
-    } finally {
-      setIsLoading(false);
+  React.useEffect(() => {
+    if (detailsData) {
+      setSelectedPokemon(legacyApi.parsePokemonToProcessed(detailsData));
+    } else if (!selectedName) {
+      setSelectedPokemon(null);
     }
-  }, []);
+  }, [detailsData, selectedName]);
 
-  const selectPokemon = useCallback(
-    async (pokemonName: string) => {
-      const currentSelected = selectedPokemon;
-      if (currentSelected?.name.toLowerCase() === pokemonName.toLowerCase()) {
-        setSelectedPokemon(null);
-        return;
+  function errorToString(err: unknown): string | null {
+    if (!err) {
+      return null;
+    }
+    if (typeof err === 'string') {
+      return err;
+    }
+    if (typeof err === 'object' && err !== null) {
+      if ('status' in err && 'data' in err) {
+        return `Error: ${JSON.stringify(err)}`;
       }
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const pokemonDetails: PokemonDetails =
-          await pokemonApi.getPokemonDetails(pokemonName);
-        const processedPokemon =
-          pokemonApi.parsePokemonToProcessed(pokemonDetails);
-
-        setSelectedPokemon(processedPokemon);
-      } catch (apiError) {
-        setError(getErrorMessage(apiError, pokemonName));
-        setSelectedPokemon(null);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [selectedPokemon]
+    }
+    return 'Unknown error';
+  }
+  const isLoading = isListLoading || isSearchLoading || isDetailsLoading;
+  const error = errorToString(
+    (searchQuery ? searchError : listError) || detailsError
   );
 
-  const clearResults = useCallback(() => {
+  // API
+  const searchPokemon = (query: string): void => {
+    setSearchQuery(query.trim());
+    setSelectedName(null);
+  };
+  const selectPokemon = (pokemonName: string): void => {
+    if (selectedPokemon?.name.toLowerCase() === pokemonName.toLowerCase()) {
+      setSelectedPokemon(null);
+      setSelectedName(null);
+      return;
+    }
+    setSelectedName(pokemonName);
+  };
+  const clearResults = (): void => {
     setResults([]);
-    setError(null);
+    setSearchQuery('');
+    setSelectedName(null);
     setSelectedPokemon(null);
-    setIsLoading(false);
-  }, []);
-
-  const clearSelection = useCallback(() => {
+  };
+  const clearSelection = (): void => {
     setSelectedPokemon(null);
-  }, []);
+    setSelectedName(null);
+  };
+  const loadInitialData = (searchTerm?: string): void => {
+    if (searchTerm?.trim()) {
+      setSearchQuery(searchTerm.trim());
+    } else {
+      setSearchQuery('');
+    }
+    setSelectedName(null);
+    setSelectedPokemon(null);
+  };
 
-  const returnValue: UsePokemonSearchState & {
-    loadInitialData: (searchTerm?: string) => Promise<void>;
-  } = {
+  return {
     results,
     isLoading,
     error,
     selectedPokemon,
-    searchPokemon: performSearch,
+    searchPokemon,
     clearResults,
     selectPokemon,
     clearSelection,
     loadInitialData,
   };
-
-  return returnValue;
 }

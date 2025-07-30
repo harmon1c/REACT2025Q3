@@ -61,6 +61,7 @@ export const PokemonCatalogueContainer: React.FC<
               onClear={() => {
                 clearResults();
                 clearSelection();
+                loadPage(1);
               }}
             />
           </section>

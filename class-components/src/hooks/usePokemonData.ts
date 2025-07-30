@@ -1,19 +1,23 @@
 import { useState, useCallback, useEffect } from 'react';
-import { pokemonApi } from '../api';
-import type { ProcessedPokemon, PokemonDetails } from '../api/types';
-import { getErrorMessage } from '../api/errorHandler';
+import { pokemonApi as legacyApi } from '../api/pokemonApi';
+import {
+  useGetPokemonListQuery,
+  useGetPokemonDetailsQuery,
+  useSearchPokemonQuery,
+} from '../api/pokemonApiSlice';
+import type { ProcessedPokemon } from '../api/types';
 import { useUrlState } from './useUrlState';
 
 const ITEMS_PER_PAGE = 20;
 
 interface UsePokemonDataState {
   results: ProcessedPokemon[];
-  isLoading: boolean;
   error: string | null;
   selectedPokemon: ProcessedPokemon | null;
   currentPage: number;
   totalPages: number;
   totalCount: number;
+  isLoading: boolean;
   isSearchInProgress: boolean;
 
   searchPokemon: (query: string) => Promise<void>;
@@ -31,20 +35,18 @@ interface UsePokemonDataState {
 
 export function usePokemonData(): UsePokemonDataState {
   const [results, setResults] = useState<ProcessedPokemon[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [selectedPokemon, setSelectedPokemon] =
     useState<ProcessedPokemon | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isSearchInProgress, setIsSearchInProgress] = useState(false);
+  // Dummy param for manual list refetch
+  const [listResetCount, setListResetCount] = useState(0);
 
   const {
     currentPage,
     selectedPokemonName,
     setPage,
     setSelectedPokemon: setUrlSelectedPokemon,
-    clearSelectedPokemon,
     forceUrlCleanup,
     clearParams,
   } = useUrlState();
@@ -52,99 +54,34 @@ export function usePokemonData(): UsePokemonDataState {
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   const loadPage = useCallback(
-    async (page: number) => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const offset = (page - 1) * ITEMS_PER_PAGE;
-        const listResponse = await pokemonApi.getPokemonList(
-          offset,
-          ITEMS_PER_PAGE
-        );
-        const processedList = pokemonApi.parseListToProcessed(listResponse);
-
-        setResults(processedList);
-        setTotalCount(listResponse.count);
-        setPage(page);
-      } catch (apiError) {
-        setError(getErrorMessage(apiError));
-        setResults([]);
-      } finally {
-        setIsLoading(false);
-      }
+    (page: number) => {
+      setPage(page);
     },
     [setPage]
   );
 
   const searchPokemon = useCallback(
-    async (query: string) => {
-      const trimmedQuery = query.trim();
-
-      setIsSearchInProgress(true);
-
-      setSelectedPokemon(null);
+    (query: string) => {
+      const trimmed = query.trim();
+      setSearchQuery(trimmed);
       setUrlSelectedPokemon(null);
-
-      setSearchQuery(trimmedQuery);
-
-      if (!trimmedQuery) {
-        await loadPage(1);
-        setIsSearchInProgress(false);
-        return;
+      setSelectedPokemon(null);
+      if (!trimmed) {
+        setListResetCount((c) => c + 1);
       }
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const pokemonDetails = await pokemonApi.searchPokemon(
-          trimmedQuery.toLowerCase()
-        );
-        const processedPokemon =
-          pokemonApi.parsePokemonToProcessed(pokemonDetails);
-
-        setResults([processedPokemon]);
-        setTotalCount(1);
-        setPage(1);
-      } catch (apiError) {
-        setError(getErrorMessage(apiError, trimmedQuery));
-        setResults([]);
-        setTotalCount(0);
-      } finally {
-        setIsLoading(false);
-        setIsSearchInProgress(false);
-      }
+      setPage(1);
     },
-    [loadPage, setPage, setUrlSelectedPokemon]
+    [setPage, setUrlSelectedPokemon]
   );
 
   const selectPokemon = useCallback(
-    async (pokemonName: string) => {
+    (pokemonName: string) => {
       if (selectedPokemon?.name.toLowerCase() === pokemonName.toLowerCase()) {
         setSelectedPokemon(null);
         setUrlSelectedPokemon(null);
         return;
       }
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const pokemonDetails: PokemonDetails =
-          await pokemonApi.getPokemonDetails(pokemonName);
-        const processedPokemon =
-          pokemonApi.parsePokemonToProcessed(pokemonDetails);
-
-        setSelectedPokemon(processedPokemon);
-        setUrlSelectedPokemon(pokemonName);
-      } catch (apiError) {
-        setError(getErrorMessage(apiError, pokemonName));
-        setSelectedPokemon(null);
-        setUrlSelectedPokemon(null);
-      } finally {
-        setIsLoading(false);
-      }
+      setUrlSelectedPokemon(pokemonName);
     },
     [selectedPokemon, setUrlSelectedPokemon]
   );
@@ -167,38 +104,81 @@ export function usePokemonData(): UsePokemonDataState {
     setResults([]);
     setTotalCount(0);
     setSearchQuery('');
-    setError(null);
   }, []);
 
-  useEffect(() => {
-    if (!results.length && !searchQuery) {
-      loadPage(currentPage);
-    }
-  }, [results.length, searchQuery, currentPage, loadPage]);
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  const {
+    data: listData,
+    isLoading: isListLoading,
+    error: listError,
+  } = useGetPokemonListQuery(
+    { offset, limit: ITEMS_PER_PAGE, listResetCount },
+    { skip: !!searchQuery.trim() }
+  );
+
+  const {
+    data: searchData,
+    isLoading: isSearchLoading,
+    error: searchError,
+  } = useSearchPokemonQuery(searchQuery.trim().toLowerCase(), {
+    skip: !searchQuery,
+  });
+
+  const {
+    data: detailsData,
+    isLoading: isDetailsLoading,
+    error: detailsError,
+  } = useGetPokemonDetailsQuery(selectedPokemonName ?? '', {
+    skip: !selectedPokemonName,
+  });
 
   useEffect(() => {
-    if (
-      selectedPokemonName &&
-      (!selectedPokemon ||
-        selectedPokemon.name.toLowerCase() !==
-          selectedPokemonName.toLowerCase())
-    ) {
-      (async (): Promise<void> => {
-        try {
-          const pokemonDetails =
-            await pokemonApi.getPokemonDetails(selectedPokemonName);
-          const processedPokemon =
-            pokemonApi.parsePokemonToProcessed(pokemonDetails);
-          setSelectedPokemon(processedPokemon);
-        } catch {
-          setSelectedPokemon(null);
-          clearSelectedPokemon();
-        }
-      })();
+    if (searchQuery && searchData) {
+      setResults([legacyApi.parsePokemonToProcessed(searchData)]);
+      setTotalCount(1);
+    } else if (!searchQuery && listData) {
+      setResults(legacyApi.parseListToProcessed(listData));
+      setTotalCount(listData.count);
+    }
+  }, [searchQuery, searchData, listData]);
+
+  useEffect(() => {
+    if (detailsData) {
+      setSelectedPokemon(legacyApi.parsePokemonToProcessed(detailsData));
     } else if (!selectedPokemonName) {
       setSelectedPokemon(null);
     }
-  }, [selectedPokemonName, selectedPokemon, clearSelectedPokemon]);
+  }, [detailsData, selectedPokemonName]);
+
+  const isLoading = isListLoading || isSearchLoading || isDetailsLoading;
+  function errorToString(err: unknown): string | null {
+    if (!err) {
+      return null;
+    }
+    if (typeof err === 'string') {
+      return err;
+    }
+    if (typeof err === 'object' && err !== null) {
+      // RTK Query FetchBaseQueryError
+      if ('data' in err && typeof err.data === 'object' && err.data !== null) {
+        if ('message' in err.data && typeof err.data.message === 'string') {
+          return err.data.message;
+        }
+        return JSON.stringify(err.data);
+      }
+      if ('error' in err && typeof err.error === 'string') {
+        return err.error;
+      }
+      if ('status' in err) {
+        return `Error status: ${err.status}`;
+      }
+    }
+    return 'Unknown error';
+  }
+  const error = errorToString(
+    (searchQuery ? searchError : listError) || detailsError
+  );
+  const isSearchInProgress = isSearchLoading;
 
   return {
     results,
@@ -209,9 +189,15 @@ export function usePokemonData(): UsePokemonDataState {
     totalPages,
     totalCount,
     isSearchInProgress,
-    searchPokemon,
-    loadPage,
-    selectPokemon,
+    searchPokemon: async (query: string): Promise<void> => {
+      searchPokemon(query);
+    },
+    loadPage: async (page: number): Promise<void> => {
+      loadPage(page);
+    },
+    selectPokemon: async (pokemonName: string): Promise<void> => {
+      selectPokemon(pokemonName);
+    },
     clearResults,
     clearSelection,
     clearSelectionSync,
