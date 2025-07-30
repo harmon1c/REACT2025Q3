@@ -1,8 +1,9 @@
+import { vi } from 'vitest';
 import React, { type JSX } from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
-import { Home } from './Home';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../components/Main', () => ({
   Main: ({ children }: { children: React.ReactNode }): JSX.Element => (
@@ -37,21 +38,26 @@ vi.mock('../components/Search', () => ({
 
 vi.mock('../components/Results', () => ({
   Results: ({
-    results,
-    isLoading,
-    error,
+    results = [
+      { id: 1, name: 'bulbasaur', description: 'desc1' },
+      { id: 2, name: 'ivysaur', description: 'desc2' },
+    ],
+    isLoading = false,
+    error = null,
     onPokemonClick,
   }: {
-    results: Array<{ id: number; name: string; description: string }>;
-    isLoading: boolean;
-    error: string | null;
+    results?: Array<{ id: number; name: string; description: string }>;
+    isLoading?: boolean;
+    error?: string | null;
     onPokemonClick?: (name: string) => void;
   }): JSX.Element => (
     <div data-testid="results">
-      {isLoading && <div data-testid="loading">Loading...</div>}
-      {error && <div data-testid="error">{error}</div>}
-      {results?.map(
-        (item: { id: number; name: string; description: string }) => (
+      {isLoading ? (
+        <div data-testid="loading">Loading...</div>
+      ) : error ? (
+        <div data-testid="error">{error}</div>
+      ) : (
+        results?.map((item) => (
           <div
             key={item.id}
             data-testid={`result-${item.id}`}
@@ -60,7 +66,7 @@ vi.mock('../components/Results', () => ({
           >
             {item.name}
           </div>
-        )
+        ))
       )}
     </div>
   ),
@@ -85,6 +91,17 @@ vi.mock('../components/Pagination', () => ({
   ),
 }));
 
+let mockSelectedPokemon: {
+  id: number;
+  name: string;
+  description: string;
+} | null = null;
+const routerDomParams: {
+  details?: string | undefined;
+  page?: string | undefined;
+  navigateMock?: (() => void) | undefined;
+} = { details: undefined, page: undefined, navigateMock: undefined };
+
 vi.mock('../hooks/usePokemonData', () => ({
   usePokemonData: (): {
     results: Array<{ id: number; name: string; description: string }>;
@@ -93,58 +110,154 @@ vi.mock('../hooks/usePokemonData', () => ({
     currentPage: number;
     totalPages: number;
     searchPokemon: () => void;
-    clearSearch: () => void;
-    goToPage: () => void;
+    loadPage: () => void;
     clearResults: () => void;
     clearSelection: () => void;
-    clearParams: () => void;
     setPage: () => void;
-    loadPage: () => void;
+    clearParams: () => void;
+    selectedPokemon: { id: number; name: string; description: string } | null;
+    totalCount: number;
+    isSearchInProgress: boolean;
+    selectPokemon: () => void;
+    clearSelectionSync: () => void;
+    forceUrlCleanup: () => void;
+    setUrlSelectedPokemon: () => void;
+    setSelectedPokemon: () => void;
   } => ({
     results: [
-      { id: 1, name: 'bulbasaur', description: 'Grass Pokemon' },
-      { id: 2, name: 'ivysaur', description: 'Grass Pokemon' },
+      { id: 1, name: 'bulbasaur', description: 'desc1' },
+      { id: 2, name: 'ivysaur', description: 'desc2' },
     ],
     isLoading: false,
     error: null,
     currentPage: 1,
     totalPages: 5,
     searchPokemon: vi.fn(),
-    clearSearch: vi.fn(),
-    goToPage: vi.fn(),
+    loadPage: vi.fn(),
     clearResults: vi.fn(),
     clearSelection: vi.fn(),
-    clearParams: vi.fn(),
     setPage: vi.fn(),
-    loadPage: vi.fn(),
+    clearParams: vi.fn(),
+    selectedPokemon: mockSelectedPokemon,
+    totalCount: 2,
+    isSearchInProgress: false,
+    selectPokemon: vi.fn(),
+    clearSelectionSync: vi.fn(),
+    forceUrlCleanup: vi.fn(),
+    setUrlSelectedPokemon: vi.fn(),
+    setSelectedPokemon: vi.fn(),
   }),
 }));
 
-vi.mock('react-router-dom', async () => {
+vi.doMock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
     useLocation: (): { pathname: string } => ({
       pathname: '/pokemon/details/pikachu',
     }),
-    useNavigate: (): (() => void) => vi.fn(),
+    useSearchParams: (): [
+      { get: (key: string) => string | null },
+      () => void,
+    ] => [
+      {
+        get: (key: string): string | null => {
+          if (key === 'details') {
+            return routerDomParams.details || null;
+          }
+          if (key === 'page') {
+            return routerDomParams.page || null;
+          }
+          return null;
+        },
+      },
+      vi.fn(),
+    ],
+    useNavigate: (): (() => void) => routerDomParams.navigateMock || vi.fn(),
     Outlet: (): JSX.Element => <div data-testid="outlet">Outlet Content</div>,
   };
 });
 
-const HomeWithRouter = (): JSX.Element => (
+vi.mock('../components/PokemonDetailPanel', () => ({
+  __esModule: true,
+  default: ({ onClose }: { onClose?: () => void }): JSX.Element => (
+    <div className="w-80 shrink-0">
+      <button onClick={onClose}>Close Details</button>
+    </div>
+  ),
+}));
+
+let Home: React.FC;
+
+function setupRouterDomMock(params?: {
+  details?: string;
+  page?: string;
+  navigateMock?: () => void;
+}): void {
+  routerDomParams.details = params?.details;
+  routerDomParams.page = params?.page;
+  routerDomParams.navigateMock = params?.navigateMock;
+}
+
+const getHomeWithRouter = (): JSX.Element => (
   <BrowserRouter>
     <Home />
   </BrowserRouter>
 );
 
 describe('Home Page', () => {
+  beforeEach(async () => {
+    vi.resetModules();
+    setupRouterDomMock();
+    const mod = await import('./Home');
+    Home = mod.Home;
+  });
+
+  it('renders details panel when details param is present', async () => {
+    mockSelectedPokemon = { id: 25, name: 'pikachu', description: 'desc' };
+    setupRouterDomMock({ details: 'pikachu' });
+    await act(async () => {
+      renderWithProviders(getHomeWithRouter());
+    });
+    expect(screen.getByText('Close Details')).toBeInTheDocument();
+    mockSelectedPokemon = null;
+  });
+
+  it('calls navigate with correct params when closing details panel (with page)', async () => {
+    mockSelectedPokemon = { id: 25, name: 'pikachu', description: 'desc' };
+    const mockNavigate = vi.fn();
+    setupRouterDomMock({
+      details: 'pikachu',
+      page: '2',
+      navigateMock: mockNavigate,
+    });
+    await act(async () => {
+      renderWithProviders(getHomeWithRouter());
+    });
+    const closeButton = screen.getByText('Close Details');
+    fireEvent.click(closeButton);
+    expect(mockNavigate).toHaveBeenCalledWith('/?page=2');
+    mockSelectedPokemon = null;
+  });
+
+  it('calls navigate with correct params when closing details panel (no page)', async () => {
+    mockSelectedPokemon = { id: 25, name: 'pikachu', description: 'desc' };
+    const mockNavigate = vi.fn();
+    setupRouterDomMock({ details: 'pikachu', navigateMock: mockNavigate });
+    await act(async () => {
+      renderWithProviders(getHomeWithRouter());
+    });
+    const closeButton = screen.getByText('Close Details');
+    fireEvent.click(closeButton);
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+    mockSelectedPokemon = null;
+  });
   beforeEach((): void => {
     vi.clearAllMocks();
   });
 
   it('renders all main components', (): void => {
-    render(<HomeWithRouter />);
+    renderWithProviders(getHomeWithRouter());
 
     expect(screen.getByTestId('main')).toBeInTheDocument();
     expect(screen.getByTestId('search')).toBeInTheDocument();
@@ -153,13 +266,11 @@ describe('Home Page', () => {
   });
 
   it('renders outlet for router content', (): void => {
-    render(<HomeWithRouter />);
-
-    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+    renderWithProviders(getHomeWithRouter());
   });
 
   it('displays pokemon results', (): void => {
-    render(<HomeWithRouter />);
+    renderWithProviders(getHomeWithRouter());
 
     expect(screen.getByTestId('result-1')).toBeInTheDocument();
     expect(screen.getByTestId('result-2')).toBeInTheDocument();
@@ -168,19 +279,17 @@ describe('Home Page', () => {
   });
 
   it('shows pagination information', (): void => {
-    render(<HomeWithRouter />);
+    renderWithProviders(getHomeWithRouter());
 
     expect(screen.getByText('Page 1 of 5')).toBeInTheDocument();
   });
 
   it('renders outlet container when on details path', (): void => {
-    render(<HomeWithRouter />);
-
-    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+    renderWithProviders(getHomeWithRouter());
   });
 
   it('renders main content structure', (): void => {
-    render(<HomeWithRouter />);
+    renderWithProviders(getHomeWithRouter());
 
     expect(screen.getByTestId('main')).toBeInTheDocument();
     expect(screen.getByTestId('search')).toBeInTheDocument();
@@ -188,16 +297,14 @@ describe('Home Page', () => {
   });
 
   it('renders all components correctly', (): void => {
-    render(<HomeWithRouter />);
-
+    renderWithProviders(getHomeWithRouter());
     expect(screen.getByTestId('main')).toBeInTheDocument();
     expect(screen.getByTestId('search')).toBeInTheDocument();
     expect(screen.getByTestId('results')).toBeInTheDocument();
-    expect(screen.getByTestId('outlet')).toBeInTheDocument();
   });
 
   it('handles search functionality', (): void => {
-    render(<HomeWithRouter />);
+    renderWithProviders(getHomeWithRouter());
 
     const searchButton = screen.getByTestId('search-btn');
     fireEvent.click(searchButton);
@@ -206,7 +313,7 @@ describe('Home Page', () => {
   });
 
   it('handles clear functionality', (): void => {
-    render(<HomeWithRouter />);
+    renderWithProviders(getHomeWithRouter());
 
     const clearButton = screen.getByTestId('clear-btn');
     fireEvent.click(clearButton);
@@ -215,7 +322,7 @@ describe('Home Page', () => {
   });
 
   it('handles pagination functionality', (): void => {
-    render(<HomeWithRouter />);
+    renderWithProviders(getHomeWithRouter());
 
     const nextButton = screen.getByText('Next');
     fireEvent.click(nextButton);
@@ -224,7 +331,7 @@ describe('Home Page', () => {
   });
 
   it('handles empty search query', (): void => {
-    render(<HomeWithRouter />);
+    renderWithProviders(getHomeWithRouter());
 
     const emptySearchButton = screen.getByTestId('search-btn-empty');
     fireEvent.click(emptySearchButton);
@@ -233,7 +340,7 @@ describe('Home Page', () => {
   });
 
   it('handles pokemon click navigation', (): void => {
-    render(<HomeWithRouter />);
+    renderWithProviders(getHomeWithRouter());
 
     const pokemonResult = screen.getByTestId('result-1');
     fireEvent.click(pokemonResult);

@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { parsePokemonDetails } from '../utils/pokemonUtils';
 import { pokemonApi } from '../api';
 import type { ProcessedPokemon, PokemonDetails } from '../api/types';
 
-const PokemonDetailPanel: React.FC = () => {
-  const { pokemonName } = useParams<{ pokemonName: string }>();
+interface PokemonDetailPanelProps {
+  onClose?: () => void;
+}
+
+const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({ onClose }) => {
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const pokemonName = searchParams.get('details');
   const [pokemon, setPokemon] = useState<ProcessedPokemon | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleClose = (): void => {
-    navigate('/');
+    if (onClose) {
+      onClose();
+    } else {
+      navigate('/');
+    }
   };
 
   useEffect(() => {

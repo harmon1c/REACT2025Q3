@@ -1,43 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import React from 'react';
 
 interface SearchProps {
+  value: string;
+  onChange: (value: string) => void;
   onSearch: (query: string) => void;
   onClear?: () => void;
-  initialQuery?: string;
 }
 
-export function Search({
-  onSearch,
-  onClear,
-  initialQuery = '',
-}: SearchProps): React.JSX.Element {
-  const [savedSearchTerm, setSavedSearchTerm] = useLocalStorage(
-    'searchTerm',
-    ''
-  );
-  const [searchTerm, setSearchTerm] = useState(initialQuery || savedSearchTerm);
-
-  useEffect(() => {
-    setSearchTerm(initialQuery || savedSearchTerm);
-  }, [initialQuery, savedSearchTerm]);
-
+export function Search(props: SearchProps): React.JSX.Element {
+  const { value, onChange, onSearch, onClear } = props;
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    setSearchTerm(event.target.value);
+    onChange(event.target.value);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    const trimmedQuery = searchTerm.trim();
-    setSavedSearchTerm(trimmedQuery);
-    onSearch(trimmedQuery);
+    onSearch(value.trim());
   };
 
   const handleClear = (): void => {
-    setSearchTerm('');
-    setSavedSearchTerm('');
+    onChange('');
     onClear?.();
   };
 
@@ -55,7 +39,7 @@ export function Search({
         <div className="flex-1">
           <input
             type="text"
-            value={searchTerm}
+            value={value}
             onChange={handleInputChange}
             placeholder="Enter Pokemon name (e.g., Pikachu)..."
             className="w-full px-4 py-2 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 shadow-sm hover:shadow-md hover:border-gray-300
