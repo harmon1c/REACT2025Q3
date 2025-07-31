@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderWithProviders } from './test-utils';
 import App from './App';
 
 vi.mock('./components/ErrorBoundary', () => ({
@@ -65,24 +66,24 @@ beforeEach(() => {
 
 describe('App Component', () => {
   it('renders without crashing', () => {
-    render(<App />);
+    renderWithProviders(<App />);
     expect(screen.getByTestId('error-boundary')).toBeInTheDocument();
   });
 
   it('renders BrowserRouter', () => {
-    render(<App />);
+    renderWithProviders(<App />);
     expect(screen.getByTestId('browser-router')).toBeInTheDocument();
   });
 
   it('renders main structure with routing components', () => {
-    render(<App />);
+    renderWithProviders(<App />);
     expect(screen.getByTestId('error-boundary')).toBeInTheDocument();
     expect(screen.getByTestId('browser-router')).toBeInTheDocument();
     expect(screen.getByTestId('routes')).toBeInTheDocument();
   });
 
   it('has proper CSS classes for background styling', () => {
-    const { container } = render(<App />);
+    const { container } = renderWithProviders(<App />);
     const mainDiv = container.querySelector('.min-h-screen.bg-gradient-to-br');
     expect(mainDiv).toBeInTheDocument();
     expect(mainDiv).toHaveClass(

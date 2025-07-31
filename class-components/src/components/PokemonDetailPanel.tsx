@@ -1,12 +1,19 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { parsePokemonDetails } from '../utils/pokemonUtils';
 import { useGetPokemonDetailsQuery } from '../api/pokemonApiSlice';
 import { pokemonApi as legacyApi } from '../api/pokemonApi';
+import type { ProcessedPokemon } from '../api/types';
 
-const PokemonDetailPanel: React.FC = () => {
-  const { pokemonName } = useParams<{ pokemonName: string }>();
+type PokemonDetailPanelProps = {
+  onClose?: () => void;
+};
+
+const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({ onClose }) => {
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const pokemonName = searchParams.get('details');
+
   const {
     data: detailsData,
     isLoading,
@@ -15,12 +22,17 @@ const PokemonDetailPanel: React.FC = () => {
     skip: !pokemonName,
   });
 
-  const pokemon = detailsData
-    ? legacyApi.parsePokemonToProcessed(detailsData)
-    : null;
+  let pokemon: ProcessedPokemon | null = null;
+  if (detailsData) {
+    pokemon = legacyApi.parsePokemonToProcessed(detailsData);
+  }
 
   const handleClose = (): void => {
-    navigate('/');
+    if (onClose) {
+      onClose();
+    } else {
+      navigate('/');
+    }
   };
 
   if (isLoading) {
@@ -31,25 +43,11 @@ const PokemonDetailPanel: React.FC = () => {
     );
   }
 
-  function errorToString(err: unknown): string {
-    if (typeof err === 'string') {
-      return err;
-    }
-    if (
-      typeof err === 'object' &&
-      err !== null &&
-      'status' in err &&
-      'data' in err
-    ) {
-      return `Error: ${JSON.stringify(err)}`;
-    }
-    return 'Unknown error';
-  }
   if (error || !pokemon) {
     return (
       <div className="sticky top-0 w-80 min-w-[320px] max-w-xs h-fit max-h-[600px] overflow-y-auto rounded-lg shadow-lg bg-white flex items-center justify-center p-6 border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-        <span className="text-red-600 dark:text-red-400">
-          {errorToString(error) || 'No details found'}
+        <span className="text-gray-700 dark:text-gray-200">
+          {error ? 'Failed to load details' : 'No details found'}
         </span>
         <button
           onClick={handleClose}
@@ -119,3 +117,7 @@ const PokemonDetailPanel: React.FC = () => {
 };
 
 export default PokemonDetailPanel;
+
+PokemonDetailPanel.propTypes = {
+  onClose: PropTypes.func,
+};

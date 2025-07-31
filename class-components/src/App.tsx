@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useAppSelector } from './store/hooks';
 import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Layout } from './components/Layout';
@@ -9,6 +10,12 @@ import { About } from './pages/About';
 import { NotFound } from './pages/NotFound';
 
 function App(): React.JSX.Element {
+  const selectedItems = useAppSelector((state) => state.selectedItems.items);
+
+  useEffect(() => {
+    window.localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+  }, [selectedItems]);
+
   return (
     <ThemeProvider>
       <ErrorBoundary>
@@ -22,7 +29,7 @@ function App(): React.JSX.Element {
                     element={<PokemonDetailPanel />}
                   />
                 </Route>
-                <Route path=":page" element={<Home />}>
+                <Route path=":page(\\d+)" element={<Home />}>
                   <Route
                     path="details/:pokemonName"
                     element={<PokemonDetailPanel />}

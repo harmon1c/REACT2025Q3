@@ -1,9 +1,32 @@
+import { useState, type FC } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Search } from './Search';
 
+type ControlledSearchTestWrapperProps = {
+  onSearch: (value: string) => void;
+  onClear?: () => void;
+  initialValue?: string;
+};
+const ControlledSearchTestWrapper: FC<ControlledSearchTestWrapperProps> = ({
+  onSearch,
+  onClear = (): void => {},
+  initialValue = '',
+}) => {
+  const [value, setValue] = useState(initialValue);
+  return (
+    <Search
+      value={value}
+      onChange={setValue}
+      onSearch={onSearch}
+      onClear={onClear}
+    />
+  );
+};
+
 const mockOnSearch = vi.fn();
+const mockOnChange = vi.fn();
 const mockOnClear = vi.fn();
 
 beforeEach(() => {
@@ -15,7 +38,9 @@ beforeEach(() => {
 describe('Search Component', () => {
   describe('Rendering Tests', () => {
     it('renders search input and search button', () => {
-      render(<Search onSearch={mockOnSearch} />);
+      render(
+        <Search onSearch={mockOnSearch} onChange={mockOnChange} value="" />
+      );
 
       expect(
         screen.getByPlaceholderText(/enter pokemon name/i)
@@ -27,7 +52,14 @@ describe('Search Component', () => {
     });
 
     it('renders clear button', () => {
-      render(<Search onSearch={mockOnSearch} onClear={mockOnClear} />);
+      render(
+        <Search
+          onSearch={mockOnSearch}
+          onChange={mockOnChange}
+          onClear={mockOnClear}
+          value=""
+        />
+      );
 
       expect(
         screen.getByRole('button', { name: /clear/i })
@@ -36,14 +68,22 @@ describe('Search Component', () => {
 
     it('displays initial query when provided', () => {
       const initialQuery = 'pikachu';
-      render(<Search onSearch={mockOnSearch} initialQuery={initialQuery} />);
+      render(
+        <Search
+          onSearch={mockOnSearch}
+          onChange={mockOnChange}
+          value={initialQuery}
+        />
+      );
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
       expect(input).toHaveValue(initialQuery);
     });
 
     it('shows empty input when no initial query is provided', () => {
-      render(<Search onSearch={mockOnSearch} />);
+      render(
+        <Search onSearch={mockOnSearch} onChange={mockOnChange} value="" />
+      );
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
       expect(input).toHaveValue('');
@@ -52,7 +92,13 @@ describe('Search Component', () => {
     it('displays previously saved search term from localStorage on mount', () => {
       vi.mocked(window.localStorage.getItem).mockReturnValue('savedPokemon');
 
-      render(<Search onSearch={mockOnSearch} initialQuery="savedPokemon" />);
+      render(
+        <Search
+          onSearch={mockOnSearch}
+          onChange={mockOnChange}
+          value="savedPokemon"
+        />
+      );
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
       expect(input).toHaveValue('savedPokemon');
@@ -62,7 +108,7 @@ describe('Search Component', () => {
   describe('User Interaction Tests', () => {
     it('updates input value when user types', async () => {
       const user = userEvent.setup();
-      render(<Search onSearch={mockOnSearch} />);
+      render(<ControlledSearchTestWrapper onSearch={mockOnSearch} />);
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
       await user.type(input, 'charizard');
@@ -72,7 +118,7 @@ describe('Search Component', () => {
 
     it('triggers search callback with correct parameters on form submit', async () => {
       const user = userEvent.setup();
-      render(<Search onSearch={mockOnSearch} />);
+      render(<ControlledSearchTestWrapper onSearch={mockOnSearch} />);
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
       const searchButton = screen.getByRole('button', { name: /search/i });
@@ -86,7 +132,7 @@ describe('Search Component', () => {
 
     it('triggers search callback when form is submitted via Enter key', async () => {
       const user = userEvent.setup();
-      render(<Search onSearch={mockOnSearch} />);
+      render(<ControlledSearchTestWrapper onSearch={mockOnSearch} />);
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
 
@@ -98,7 +144,7 @@ describe('Search Component', () => {
 
     it('trims whitespace from search input before calling onSearch', async () => {
       const user = userEvent.setup();
-      render(<Search onSearch={mockOnSearch} />);
+      render(<ControlledSearchTestWrapper onSearch={mockOnSearch} />);
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
       const searchButton = screen.getByRole('button', { name: /search/i });
@@ -113,7 +159,12 @@ describe('Search Component', () => {
   describe('Clear Functionality Tests', () => {
     it('clears input and calls onClear when clear button is clicked', async () => {
       const user = userEvent.setup();
-      render(<Search onSearch={mockOnSearch} onClear={mockOnClear} />);
+      render(
+        <ControlledSearchTestWrapper
+          onSearch={mockOnSearch}
+          onClear={mockOnClear}
+        />
+      );
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
       const clearButton = screen.getByRole('button', { name: /clear/i });
@@ -127,7 +178,7 @@ describe('Search Component', () => {
 
     it('clears input without calling onClear when onClear prop is not provided', async () => {
       const user = userEvent.setup();
-      render(<Search onSearch={mockOnSearch} />);
+      render(<ControlledSearchTestWrapper onSearch={mockOnSearch} />);
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
       const clearButton = screen.getByRole('button', { name: /clear/i });
@@ -142,7 +193,13 @@ describe('Search Component', () => {
   describe('LocalStorage Integration', () => {
     it('retrieves saved search term on component mount when initialQuery is provided', () => {
       const savedQuery = 'storedPokemon';
-      render(<Search onSearch={mockOnSearch} initialQuery={savedQuery} />);
+      render(
+        <Search
+          onSearch={mockOnSearch}
+          onChange={mockOnChange}
+          value={savedQuery}
+        />
+      );
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
       expect(input).toHaveValue(savedQuery);
