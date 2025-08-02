@@ -1,15 +1,17 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 interface MainProps {
   children: React.ReactNode;
 }
 
-export class Main extends Component<MainProps> {
-  public override render(): React.JSX.Element {
-    return (
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 px-4">
-        <div className="max-w-6xl mx-auto space-y-8">{this.props.children}</div>
-      </main>
-    );
-  }
-}
+export const Main: React.FC<MainProps> = ({ children }) => {
+  return (
+    <div className="w-full py-8">
+      <div className="w-full max-w-[1440px] mx-auto px-4">
+        <div className="bg-white shadow-xl rounded-2xl border border-gray-200 w-full p-8 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+          <div className="w-full">{children}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
