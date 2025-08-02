@@ -69,8 +69,17 @@ export function usePokemonSearch(): UsePokemonSearchState {
       return err;
     }
     if (typeof err === 'object' && err !== null) {
-      if ('status' in err && 'data' in err) {
-        return `Error: ${JSON.stringify(err)}`;
+      if ('data' in err && typeof err.data === 'object' && err.data !== null) {
+        if ('message' in err.data && typeof err.data.message === 'string') {
+          return err.data.message;
+        }
+        return JSON.stringify(err.data);
+      }
+      if ('error' in err && typeof err.error === 'string') {
+        return err.error;
+      }
+      if ('status' in err) {
+        return `Error status: ${err.status}`;
       }
     }
     return 'Unknown error';

@@ -106,4 +106,77 @@ describe('usePokemonSearch (smoke)', (): void => {
     });
     expect(Array.isArray(result.current.results)).toBe(true);
   });
+
+  it('caches list query results for the same params', (): void => {
+    vi.clearAllMocks();
+    renderHook(() => usePokemonSearch(), { wrapper });
+    renderHook(() => usePokemonSearch(), { wrapper });
+    expect(mockUseGetPokemonListQuery).toHaveBeenCalledTimes(4);
+  });
+
+  it('sets isLoading true when any query is loading', () => {
+    mockUseGetPokemonListQuery.mockImplementation(() => ({
+      ...listQueryResult,
+      isLoading: true,
+    }));
+    const { result } = renderHook(() => usePokemonSearch(), { wrapper });
+    expect(result.current.isLoading).toBe(true);
+  });
+
+  it('sets error from listError', () => {
+    mockUseGetPokemonListQuery.mockImplementation(() => ({
+      ...listQueryResult,
+      error: { error: 'fail' },
+    }));
+    const { result } = renderHook(() => usePokemonSearch(), { wrapper });
+    expect(result.current.error).toMatch(/fail|Error/);
+  });
+
+  it('sets error from searchError', () => {
+    mockUseSearchPokemonQuery.mockImplementation(() => ({
+      ...searchQueryResult,
+      error: { error: 'search fail' },
+    }));
+    const { result } = renderHook(() => usePokemonSearch(), { wrapper });
+    act(() => {
+      result.current.searchPokemon('pikachu');
+    });
+    expect(result.current.error).toMatch(/search fail|Error/);
+  });
+
+  it('sets error from detailsError', () => {
+    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
+      ...detailsQueryResult,
+      error: { error: 'details fail' },
+    }));
+    const { result } = renderHook(() => usePokemonSearch(), { wrapper });
+    expect(result.current.error).toMatch(/details fail|Error/);
+  });
+
+  it('sets selectedPokemon from detailsData', () => {
+    const details = {
+      id: 1,
+      name: 'bulbasaur',
+      height: 7,
+      weight: 69,
+      base_experience: 64,
+      types: [{ type: { name: 'grass', url: '' } }],
+      abilities: [
+        { ability: { name: 'overgrow', url: '' }, is_hidden: false, slot: 1 },
+      ],
+      sprites: {
+        front_default: null,
+        back_default: null,
+        front_shiny: null,
+        back_shiny: null,
+      },
+    };
+    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
+      ...detailsQueryResult,
+      data: details,
+    }));
+    const { result } = renderHook(() => usePokemonSearch(), { wrapper });
+    expect(result.current.selectedPokemon).toBeTruthy();
+    expect(result.current.selectedPokemon?.name).toMatch(/bulbasaur/i);
+  });
 });
