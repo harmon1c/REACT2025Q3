@@ -69,7 +69,9 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({ onClose }) => {
           Pokemon Details
         </h2>
         <button
-          onClick={() => refetch()}
+          onClick={() => {
+            void refetch();
+          }}
           disabled={isLoading}
           className="ml-2 px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-200"
           aria-label="Refresh details"

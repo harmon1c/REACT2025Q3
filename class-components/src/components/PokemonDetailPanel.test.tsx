@@ -1,283 +1,182 @@
 import { render, screen, act } from '@testing-library/react';
-import type { Mock } from 'vitest';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
-import type { JSX } from 'react';
+import { MemoryRouter, BrowserRouter } from 'react-router-dom';
+import { renderWithProviders } from '../test-utils';
+import * as pokemonApiSlice from '../api/pokemonApiSlice';
+import { pokemonApi } from '../api/pokemonApi';
 import PokemonDetailPanel from '../components/PokemonDetailPanel';
 
-vi.mock('../api', () => ({
-  pokemonApi: {
-    getPokemonDetails: vi.fn().mockResolvedValue({
-      id: 25,
-      name: 'pikachu',
-      sprites: { front_default: 'pikachu.png' },
-    }),
-    parsePokemonToProcessed: vi.fn().mockReturnValue({
-      id: 25,
-      name: 'pikachu',
-      image: 'pikachu.png',
-      description: 'Electric Pokemon',
-    }),
-  },
-}));
-
-vi.mock('../utils/pokemonUtils', () => ({
-  parsePokemonDetails: vi.fn().mockReturnValue([
-    { label: 'Type', value: 'Electric' },
-    { label: 'Height', value: '0.4 m' },
-  ]),
-}));
-
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useParams: (): { pokemonName: string } => ({ pokemonName: 'pikachu' }),
-    useNavigate: (): Mock => vi.fn(),
-  };
-});
-
-const PokemonDetailPanelWithRouter = (): JSX.Element => (
-  <BrowserRouter>
-    <PokemonDetailPanel />
-  </BrowserRouter>
+vi.mock(
+  '../api/pokemonApiSlice',
+  (): Record<string, unknown> => ({
+    useGetPokemonDetailsQuery: vi.fn(),
+    pokemonApi: {
+      reducerPath: 'pokemonApi',
+      reducer: (): Record<string, unknown> => ({}),
+      middleware:
+        () => (next: (action: unknown) => unknown) => (action: unknown) =>
+          next(action),
+    },
+  })
 );
 
-describe('PokemonDetailPanel Page', () => {
+const parsePokemonDetails = vi.fn();
+vi.mock(
+  '../utils/pokemonUtils',
+  (): Record<string, unknown> => ({
+    parsePokemonDetails: (...args: unknown[]) => parsePokemonDetails(...args),
+  })
+);
+
+const mockUseGetPokemonDetailsQuery = vi.mocked(
+  pokemonApiSlice.useGetPokemonDetailsQuery
+);
+
+const renderPanel = (
+  props: Record<string, unknown> = {}
+): ReturnType<typeof renderWithProviders> =>
+  renderWithProviders(
+    <MemoryRouter initialEntries={['/?details=pikachu']}>
+      <PokemonDetailPanel {...props} />
+    </MemoryRouter>
+  );
+
+describe('PokemonDetailPanel Page', (): void => {
   beforeEach((): void => {
     vi.clearAllMocks();
     vi.resetModules();
+    parsePokemonDetails.mockReturnValue([]);
+    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
+      data: {
+        id: 25,
+        name: 'pikachu',
+        height: 4,
+        weight: 60,
+        base_experience: 112,
+        types: [{ type: { name: 'electric', url: '' } }],
+        abilities: [
+          { ability: { name: 'static', url: '' }, is_hidden: false, slot: 1 },
+        ],
+        sprites: {
+          front_default: 'pikachu.png',
+          back_default: null,
+          front_shiny: null,
+          back_shiny: null,
+        },
+      },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    }));
   });
 
-  it('renders without crashing', async (): Promise<void> => {
-    render(<PokemonDetailPanelWithRouter />);
-
+  it('renders without crashing', (): void => {
+    renderPanel();
     expect(document.body).toBeInTheDocument();
   });
 
-  it('shows loading state', () => {
-    vi.doMock('../api', () => ({
-      pokemonApi: {
-        getPokemonDetails: vi.fn(() => new Promise(() => {})),
-        parsePokemonToProcessed: vi.fn(),
-      },
+  it('shows loading state', (): void => {
+    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
+      data: undefined,
+      isLoading: true,
+      error: null,
+      refetch: vi.fn(),
     }));
-    vi.doMock('react-router-dom', async () => {
-      const actual = await vi.importActual('react-router-dom');
-      return {
-        ...actual,
-        useParams: (): { pokemonName: string } => ({ pokemonName: 'pikachu' }),
-        useNavigate: (): (() => void) => vi.fn(),
-      };
-    });
-    const { unmount } = render(<PokemonDetailPanelWithRouter />);
-    expect(
-      screen.queryByText(/loading/i) || screen.queryByText(/no details found/i)
-    ).toBeInTheDocument();
-    unmount();
+    renderPanel();
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
-  it('shows error state', async () => {
-    vi.resetModules();
-    vi.doMock('../api', () => ({
-      pokemonApi: {
-        getPokemonDetails: vi.fn().mockRejectedValue(new Error('fail')),
-        parsePokemonToProcessed: vi.fn(),
-      },
+  it('shows error state', (): void => {
+    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
+      data: undefined,
+      isLoading: false,
+      error: { message: 'fail' },
+      refetch: vi.fn(),
     }));
-    vi.doMock('react-router-dom', async () => {
-      const actual = await vi.importActual('react-router-dom');
-      return {
-        ...actual,
-        useParams: (): { pokemonName: string } => ({ pokemonName: 'pikachu' }),
-        useNavigate: (): (() => void) => vi.fn(),
-      };
-    });
-    const { default: Panel } = await import('../components/PokemonDetailPanel');
-    const PanelWithRouter = (): JSX.Element => (
-      <BrowserRouter>
-        <Panel />
-      </BrowserRouter>
-    );
-    await act(async () => {
-      render(<PanelWithRouter />);
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
-    expect(
-      screen.queryByText(/failed to load details/i) ||
-        screen.queryByText(/no details found/i)
-    ).toBeInTheDocument();
+    renderPanel();
+    expect(screen.getByText(/failed to load details/i)).toBeInTheDocument();
   });
 
-  it('renders avatar fallback if no image', async () => {
-    vi.resetModules();
-    vi.doMock('../api', () => ({
-      pokemonApi: {
-        getPokemonDetails: vi.fn().mockResolvedValue({
-          id: 1,
-          name: 'bulbasaur',
-          sprites: {},
-        }),
-        parsePokemonToProcessed: vi.fn().mockReturnValue({
-          id: 1,
-          name: 'bulbasaur',
-          image: undefined,
-          description: 'Grass Pokemon',
-        }),
-      },
+  it('renders avatar fallback if no image', (): void => {
+    vi.spyOn(pokemonApi, 'parsePokemonToProcessed').mockReturnValue({
+      id: 1,
+      name: 'bulbasaur',
+      image: null,
+      description: 'A grass type',
+    });
+    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
+      data: { id: 1, name: 'bulbasaur' },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
     }));
-    vi.doMock('react-router-dom', async () => {
-      const actual = await vi.importActual('react-router-dom');
-      return {
-        ...actual,
-        useParams: (): { pokemonName: string } => ({
-          pokemonName: 'bulbasaur',
-        }),
-        useNavigate: (): (() => void) => vi.fn(),
-      };
-    });
-    const { default: Panel } = await import('../components/PokemonDetailPanel');
-    const PanelWithRouter = (): JSX.Element => (
-      <BrowserRouter>
-        <Panel />
-      </BrowserRouter>
-    );
-    await act(async () => {
-      render(<PanelWithRouter />);
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
+    renderPanel();
     const fallbackDiv = document.querySelector('.bg-gradient-to-br');
-    if (fallbackDiv) {
-      expect(fallbackDiv.textContent).toBe('B');
-    } else {
-      expect(screen.getByText(/no details found/i)).toBeInTheDocument();
-    }
+    expect(fallbackDiv?.textContent).toBe('B');
   });
 
-  it('renders image if pokemon.image is present', async () => {
-    vi.doMock('../api', () => ({
-      pokemonApi: {
-        getPokemonDetails: vi.fn().mockResolvedValue({
-          id: 25,
-          name: 'pikachu',
-          sprites: { front_default: 'pikachu.png' },
-        }),
-        parsePokemonToProcessed: vi.fn().mockReturnValue({
-          id: 25,
-          name: 'pikachu',
-          image: 'pikachu.png',
-          description: 'Electric Pokemon',
-        }),
-      },
+  it('renders image if pokemon.image is present', (): void => {
+    vi.spyOn(pokemonApi, 'parsePokemonToProcessed').mockReturnValue({
+      id: 25,
+      name: 'pikachu',
+      image: 'pikachu.png',
+      description: 'An electric type',
+    });
+    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
+      data: { id: 25, name: 'pikachu' },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
     }));
-    vi.doMock('react-router-dom', async () => {
-      const actual = await vi.importActual('react-router-dom');
-      return {
-        ...actual,
-        useParams: (): { pokemonName: string } => ({ pokemonName: 'pikachu' }),
-        useNavigate: (): (() => void) => vi.fn(),
-      };
-    });
-    await act(async () => {
-      render(<PokemonDetailPanelWithRouter />);
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
-    const img = screen.queryByRole('img', { name: /pikachu/i });
-    if (img) {
-      expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute('src', 'pikachu.png');
-    } else {
-      expect(screen.getByText(/no details found/i)).toBeInTheDocument();
-    }
+    renderPanel();
+    const img = screen.getByRole('img', { name: /pikachu/i });
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', 'pikachu.png');
   });
 
-  it('calls close handler when close button is clicked', async () => {
-    vi.resetModules();
-    const mockNavigate = vi.fn();
-    vi.doMock('react-router-dom', async () => {
-      const actual = await vi.importActual('react-router-dom');
-      return {
-        ...actual,
-        useParams: (): { pokemonName: string } => ({ pokemonName: 'pikachu' }),
-        useNavigate: (): Mock => mockNavigate,
-      };
-    });
-    const { default: Panel } = await import('../components/PokemonDetailPanel');
-    const PanelWithRouter = (): JSX.Element => (
-      <BrowserRouter>
-        <Panel />
-      </BrowserRouter>
-    );
-    await act(async () => {
-      render(<PanelWithRouter />);
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
-    const closeButton = screen.getByRole('button', {
-      name: /close details|close/i,
-    });
-    await act(async () => {
-      closeButton.click();
-    });
-    expect(mockNavigate).toHaveBeenCalled();
-  });
-
-  it('displays close button', async (): Promise<void> => {
-    render(<PokemonDetailPanelWithRouter />);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const closeButton =
-      screen.queryByText('Close Details') || screen.getByText('Close');
+  it('displays close button', (): void => {
+    renderPanel();
+    const closeButton = screen.getByText(/close details/i);
     expect(closeButton).toBeInTheDocument();
   });
 
-  it('renders pokemon details when loaded', async (): Promise<void> => {
-    render(<PokemonDetailPanelWithRouter />);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const closeButton =
-      screen.queryByText('Close Details') || screen.getByText('Close');
-    expect(closeButton).toBeInTheDocument();
-    expect(
-      screen.queryByText('Pikachu') || screen.getByText(/no details found/i)
-    ).toBeInTheDocument();
+  it('renders pokemon details when loaded', (): void => {
+    renderPanel();
+    expect(screen.getByText(/pikachu/i)).toBeInTheDocument();
+    expect(screen.getByText(/pokemon #25/i)).toBeInTheDocument();
   });
 
-  it('handles pokemon name from params', async (): Promise<void> => {
-    render(<PokemonDetailPanelWithRouter />);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const closeButton =
-      screen.queryByText('Close Details') || screen.getByText('Close');
-    expect(closeButton).toBeInTheDocument();
-  });
-
-  afterEach(() => {
-    vi.resetModules();
-    vi.clearAllMocks();
-  });
-
-  it('renders nothing or fallback if no pokemonName in search params', async () => {
-    vi.doMock(
-      'react-router-dom',
-      async (): Promise<Record<string, unknown>> => {
-        const actual = await vi.importActual('react-router-dom');
-        return {
-          ...actual,
-          useSearchParams: (): [URLSearchParams, () => void] => [
-            new URLSearchParams(),
-            vi.fn(),
-          ],
-          useNavigate: (): (() => void) => vi.fn(),
-        };
-      }
-    );
-    const { default: Panel } = await import('./PokemonDetailPanel');
-    render(
-      <BrowserRouter>
-        <Panel />
-      </BrowserRouter>
+  it('renders nothing or fallback if no pokemonName in search params', (): void => {
+    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
+      data: undefined,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    }));
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/']}>
+        <PokemonDetailPanel />
+      </MemoryRouter>
     );
     expect(screen.getByText(/no details found/i)).toBeInTheDocument();
   });
 
-  it('calls onClose prop if provided', async () => {
+  it('renders nothing or fallback if no pokemonName in search params (async)', async (): Promise<void> => {
+    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
+      data: undefined,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    }));
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/']}>
+        <PokemonDetailPanel />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/no details found/i)).toBeInTheDocument();
+  });
+
+  it('calls onClose prop if provided', async (): Promise<void> => {
     const mockOnClose = vi.fn();
     vi.doMock(
       'react-router-dom',
@@ -311,21 +210,14 @@ describe('PokemonDetailPanel Page', () => {
     expect(mockOnClose).toHaveBeenCalled();
   });
 
-  it('renders all details fields', async () => {
-    vi.doMock('../utils/pokemonUtils', () => ({
-      parsePokemonDetails: vi.fn().mockReturnValue([
-        { label: 'Type', value: 'Electric' },
-        { label: 'Height', value: '0.4 m' },
-        { label: 'Weight', value: '6.0 kg' },
-      ]),
-    }));
-    const { default: Panel } = await import('./PokemonDetailPanel');
+  it('renders all details fields', async (): Promise<void> => {
+    parsePokemonDetails.mockReturnValue([
+      { label: 'Type', value: 'Electric' },
+      { label: 'Height', value: '0.4 m' },
+      { label: 'Weight', value: '6.0 kg' },
+    ]);
+    renderPanel();
     await act(async () => {
-      render(
-        <BrowserRouter>
-          <Panel />
-        </BrowserRouter>
-      );
       await new Promise((resolve) => setTimeout(resolve, 100));
     });
     expect(screen.getByText(/type:/i)).toBeInTheDocument();
@@ -334,5 +226,34 @@ describe('PokemonDetailPanel Page', () => {
     expect(screen.getByText(/0.4 m/i)).toBeInTheDocument();
     expect(screen.getByText(/weight:/i)).toBeInTheDocument();
     expect(screen.getByText(/6.0 kg/i)).toBeInTheDocument();
+  });
+
+  it('displays close button', (): void => {
+    renderPanel();
+    const closeButton =
+      screen.queryByText('Close Details') || screen.getByText('Close');
+    expect(closeButton).toBeInTheDocument();
+  });
+
+  it('renders pokemon details when loaded', (): void => {
+    renderPanel();
+    const closeButton =
+      screen.queryByText('Close Details') || screen.getByText('Close');
+    expect(closeButton).toBeInTheDocument();
+    expect(
+      screen.queryByText('Pikachu') || screen.getByText(/no details found/i)
+    ).toBeInTheDocument();
+  });
+
+  it('handles pokemon name from params', (): void => {
+    renderPanel();
+    const closeButton =
+      screen.queryByText('Close Details') || screen.getByText('Close');
+    expect(closeButton).toBeInTheDocument();
+  });
+
+  afterEach((): void => {
+    vi.resetModules();
+    vi.clearAllMocks();
   });
 });

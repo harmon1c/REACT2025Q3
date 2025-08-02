@@ -45,7 +45,7 @@ export const PokemonCatalogueContainer: React.FC<
     if (trimmed) {
       searchPokemon(trimmed.toLowerCase());
     }
-  }, []);
+  }, [searchPokemon, searchTerm]);
 
   const handleSearch = (query: string): void => {
     const trimmed = query.trim();
