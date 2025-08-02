@@ -18,6 +18,7 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({ onClose }) => {
     data: detailsData,
     isLoading,
     error,
+    refetch,
   } = useGetPokemonDetailsQuery(pokemonName ?? '', {
     skip: !pokemonName,
   });
@@ -63,10 +64,18 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({ onClose }) => {
 
   return (
     <div className="sticky top-0 w-80 min-w-[320px] max-w-xs h-fit max-h-[600px] overflow-y-auto rounded-lg shadow-lg bg-white p-4 border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-      <div className="mb-3">
+      <div className="mb-3 flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
           Pokemon Details
         </h2>
+        <button
+          onClick={() => refetch()}
+          disabled={isLoading}
+          className="ml-2 px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-200"
+          aria-label="Refresh details"
+        >
+          Refetch
+        </button>
       </div>
       <div className="text-center mb-4">
         {pokemon.image ? (
