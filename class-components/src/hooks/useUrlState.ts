@@ -1,5 +1,5 @@
-import { useSearchParams, useParams } from 'react-router-dom';
 import { useCallback } from 'react';
+import { useSearchParams, useParams } from 'react-router-dom';
 
 interface UseUrlStateReturn {
   currentPage: number;

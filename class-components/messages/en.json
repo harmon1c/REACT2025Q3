@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "pokemon": "Pokemon"
+  },
+  "search": {
+    "placeholder": "Search Pokemon...",
+    "button": "Search",
+    "clear": "Clear",
+    "loading": "Loading Pokemon data...",
+    "noResults": "No Pokemon Found",
+    "noResultsDesc": "We couldn't find any Pokemon matching your search. Try a different name or browse the complete list."
+  },
+  "pokemon": {
+    "details": "Pokemon Details",
+    "height": "Height",
+    "weight": "Weight",
+    "types": "Types",
+    "abilities": "Abilities",
+    "baseExp": "Base Experience",
+    "close": "Close",
+    "refetch": "Refetch"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "goHome": "Go to Homepage",
+    "somethingWrong": "Something went wrong",
+    "tryAgain": "Try again"
+  },
+  "language": {
+    "switch": "Switch Language",
+    "en": "English",
+    "ru": "Russian"
+  }
+}

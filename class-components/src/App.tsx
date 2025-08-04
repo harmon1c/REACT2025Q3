@@ -4,10 +4,10 @@ import { useAppSelector } from './store/hooks';
 import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Layout } from './components/Layout';
-import { Home } from './pages/Home';
+import { Home } from './pages-old/Home';
 import PokemonDetailPanel from './components/PokemonDetailPanel';
-import { About } from './pages/About';
-import { NotFound } from './pages/NotFound';
+import { About } from './pages-old/About';
+import { NotFound } from './pages-old/NotFound';
 
 function App(): React.JSX.Element {
   const selectedItems = useAppSelector((state) => state.selectedItems.items);
