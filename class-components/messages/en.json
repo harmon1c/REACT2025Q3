@@ -37,5 +37,29 @@
     "switch": "Switch Language",
     "en": "English",
     "ru": "Russian"
+  },
+  "about": {
+    "title": "About This Application",
+    "authorInfo": {
+      "title": "Author Information",
+      "createdBy": "Created by",
+      "description": "Full-stack developer passionate about creating modern, performant web applications. This Pokemon catalog demonstrates the power of Next.js 15 with React 19 for building fast, SEO-friendly applications."
+    },
+    "techStack": {
+      "title": "Technology Stack"
+    },
+    "features": {
+      "title": "Features",
+      "search": "Pokemon search functionality",
+      "pagination": "Efficient pagination",
+      "details": "Detailed Pokemon information",
+      "selection": "Multiple Pokemon selection",
+      "themes": "Dark/Light theme support",
+      "i18n": "Internationalization (EN/RU)"
+    },
+    "api": {
+      "title": "Pokemon API",
+      "description": "This application uses the Pokemon API (PokeAPI) to fetch Pokemon data. PokeAPI is a free RESTful API that provides comprehensive Pokemon information including stats, types, abilities, and more."
+    }
   }
 }

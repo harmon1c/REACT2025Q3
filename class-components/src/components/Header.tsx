@@ -1,9 +1,14 @@
+'use client';
+
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useTheme } from '../context/useTheme';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useTheme } from '@/context/useTheme';
 
 export const Header: React.FC = () => {
-  const location = useLocation();
+  const pathname = usePathname();
+  const t = useTranslations('nav');
 
   const { theme, setTheme } = useTheme();
 
@@ -14,7 +19,7 @@ export const Header: React.FC = () => {
           <div className="flex items-center gap-8 flex-1 min-w-0">
             <div className="header__logo flex-shrink-0">
               <Link
-                to="/"
+                href="/"
                 className="text-2xl font-bold whitespace-nowrap dark:text-white dark:drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
               >
                 Pokemon Explorer
@@ -24,26 +29,28 @@ export const Header: React.FC = () => {
               <ul className="nav__list flex space-x-8">
                 <li className="nav__list-item">
                   <Link
-                    to="/"
+                    href="/"
                     className={`nav__list-link px-3 py-2 rounded-lg transition-colors duration-200 border border-transparent shadow-sm ${
-                      location.pathname === '/'
+                      pathname === '/' ||
+                      pathname.startsWith('/en') ||
+                      pathname.startsWith('/ru')
                         ? 'bg-white/40 text-white font-semibold dark:bg-white/20 dark:text-white dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
                         : 'text-white/80 hover:text-white hover:bg-white/20 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10 dark:hover:shadow-[0_2px_8px_rgba(0,0,0,0.18)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.10)]'
                     }`}
                   >
-                    Home
+                    {t('home')}
                   </Link>
                 </li>
                 <li className="nav__list-item">
                   <Link
-                    to="/about"
+                    href="/about"
                     className={`nav__list-link px-3 py-2 rounded-lg transition-colors duration-200 border border-transparent shadow-sm ${
-                      location.pathname === '/about'
+                      pathname.includes('/about')
                         ? 'bg-white/40 text-white font-semibold dark:bg-white/20 dark:text-white dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
                         : 'text-white/80 hover:text-white hover:bg-white/20 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10 dark:hover:shadow-[0_2px_8px_rgba(0,0,0,0.18)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.10)]'
                     }`}
                   >
-                    About
+                    {t('about')}
                   </Link>
                 </li>
               </ul>

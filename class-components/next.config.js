@@ -7,7 +7,7 @@ const nextConfig = {
   poweredByHeader: false,
 
   experimental: {
-    // typedRoutes: true, // Will re-enable in later commits
+    // typedRoutes: true, // Temporary disabled due to router issues
     optimizePackageImports: ['@reduxjs/toolkit', 'react-redux'],
   },
 

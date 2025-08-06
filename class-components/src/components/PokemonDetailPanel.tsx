@@ -1,18 +1,22 @@
+'use client';
+
 import PropTypes from 'prop-types';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { parsePokemonDetails } from '../utils/pokemonUtils';
-import { useGetPokemonDetailsQuery } from '../api/pokemonApiSlice';
-import { pokemonApi as legacyApi } from '../api/pokemonApi';
-import type { ProcessedPokemon } from '../api/types';
+import { useRouter } from 'next/navigation';
+import { parsePokemonDetails } from '@/utils/pokemonUtils';
+import { useGetPokemonDetailsQuery } from '@/api/pokemonApiSlice';
+import { pokemonApi as legacyApi } from '@/api/pokemonApi';
+import type { ProcessedPokemon } from '@/api/types';
 
 type PokemonDetailPanelProps = {
+  pokemonName: string;
   onClose?: () => void;
 };
 
-const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({ onClose }) => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const pokemonName = searchParams.get('details');
+const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
+  pokemonName,
+  onClose,
+}) => {
+  const router = useRouter();
 
   const {
     data: detailsData,
@@ -32,7 +36,7 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({ onClose }) => {
     if (onClose) {
       onClose();
     } else {
-      navigate('/');
+      router.push('/');
     }
   };
 
@@ -130,5 +134,6 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({ onClose }) => {
 export default PokemonDetailPanel;
 
 PokemonDetailPanel.propTypes = {
+  pokemonName: PropTypes.string.isRequired,
   onClose: PropTypes.func,
 };

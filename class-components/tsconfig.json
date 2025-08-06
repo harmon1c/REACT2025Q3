@@ -22,8 +22,7 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "react-router-dom": ["./src/lib/router-stub.tsx"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [

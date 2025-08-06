@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { usePokemonData } from '../hooks/usePokemonData';
+import { useRouter } from 'next/navigation';
+import { usePokemonData } from '@/hooks/usePokemonData';
 import { Main } from './Main';
 import { Search } from './Search';
 import { Results } from './Results';
@@ -10,6 +12,10 @@ interface PokemonCatalogueContainerProps {
   showDetailsPanel?: boolean;
   detailsPanel?: React.ReactElement<{ onClose: () => void }> | null;
   onPokemonClick?: (name: string) => void | Promise<void>;
+  selectedPokemonName?: string | null;
+  initialPage?: number;
+  initialSearchQuery?: string | null;
+  onPageChange?: (page: number) => void;
 }
 
 function getSavedSearchTerm(): string {
@@ -23,9 +29,19 @@ function getSavedSearchTerm(): string {
 
 export const PokemonCatalogueContainer: React.FC<
   PokemonCatalogueContainerProps
-> = ({ showDetailsPanel = false, detailsPanel = null, onPokemonClick }) => {
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState(() => getSavedSearchTerm());
+> = ({
+  showDetailsPanel = false,
+  detailsPanel = null,
+  onPokemonClick,
+  selectedPokemonName,
+  initialPage = 1,
+  initialSearchQuery,
+  onPageChange,
+}) => {
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState(
+    () => initialSearchQuery || getSavedSearchTerm()
+  );
   const {
     results,
     isLoading,
@@ -35,53 +51,61 @@ export const PokemonCatalogueContainer: React.FC<
     searchPokemon,
     loadPage,
     clearResults,
-    clearSelection,
-    setPage,
-    clearParams,
-  } = usePokemonData();
+  } = usePokemonData(selectedPokemonName, initialPage, onPageChange);
 
+  // Initial search if there's a search query from URL
   useEffect(() => {
-    const trimmed = searchTerm.trim();
-    if (trimmed) {
-      searchPokemon(trimmed.toLowerCase());
+    if (initialSearchQuery) {
+      const trimmed = initialSearchQuery.trim();
+      if (trimmed) {
+        searchPokemon(trimmed.toLowerCase());
+      }
     }
-  }, [searchPokemon, searchTerm]);
+  }, [initialSearchQuery, searchPokemon]);
 
   const handleSearch = (query: string): void => {
     const trimmed = query.trim();
     setSearchTerm(trimmed);
     window.localStorage.setItem('searchTerm', trimmed);
-    clearSelection();
-    if (!trimmed) {
-      clearParams(['page', 'details']);
-      setPage(1);
+
+    if (trimmed) {
+      searchPokemon(trimmed.toLowerCase());
+      // Update URL with search parameter
+      const params = new URLSearchParams(window.location.search);
+      params.set('search', trimmed);
+      params.delete('details'); // Clear details if searching
+      params.delete('page'); // Reset to first page
+      router.push(`/?${params.toString()}`);
     } else {
-      clearParams(['details']);
+      clearResults();
+      // Clear search parameter from URL
+      const params = new URLSearchParams(window.location.search);
+      params.delete('search');
+      const queryString = params.toString();
+      const url = queryString ? `/?${queryString}` : '/';
+      router.push(url);
     }
-    searchPokemon(trimmed.toLowerCase());
   };
 
   const handlePageChange = (page: number): void => {
-    clearParams(['details']);
-    clearSelection();
     loadPage(page);
   };
 
   const handleCloseDetails = (): void => {
-    clearSelection();
-    const params = new URLSearchParams(window.location.search);
-    const pageParam = params.get('page');
-    if (pageParam && Number(pageParam) > 1) {
-      navigate(`/?page=${pageParam}`);
-    } else {
-      navigate('/');
-    }
+    router.push('/');
   };
 
   const handlePokemonClick = async (pokemonName: string): Promise<void> => {
-    navigate(
-      `/details/${encodeURIComponent(pokemonName)}${currentPage > 1 ? `?page=${currentPage}` : ''}`
-    );
+    // Временно отключаем автоматическое открытие деталей во время поиска
+    // чтобы предотвратить бесконечный цикл запросов
+
+    // Показываем детали только если нет активного поиска
+    if (!searchTerm.trim()) {
+      const newParams = new URLSearchParams(window.location.search);
+      newParams.set('details', encodeURIComponent(pokemonName));
+      router.push(`?${newParams.toString()}`);
+    }
+
     if (onPokemonClick) {
       await onPokemonClick(pokemonName);
     }
@@ -95,7 +119,7 @@ export const PokemonCatalogueContainer: React.FC<
     setSearchTerm('');
     window.localStorage.setItem('searchTerm', '');
     clearResults();
-    clearSelection();
+    router.push('/');
   };
 
   return (

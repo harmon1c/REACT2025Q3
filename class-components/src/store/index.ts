@@ -3,11 +3,14 @@ import { pokemonApi } from '../api/pokemonApiSlice';
 import selectedItemsReducer from './selectedItemsSlice';
 
 let preloadedSelectedItems = [];
-const saved = window.localStorage.getItem('selectedItems');
-if (saved) {
-  const parsed = JSON.parse(saved);
-  if (Array.isArray(parsed)) {
-    preloadedSelectedItems = parsed;
+// Only access localStorage on client side
+if (typeof window !== 'undefined') {
+  const saved = window.localStorage.getItem('selectedItems');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    if (Array.isArray(parsed)) {
+      preloadedSelectedItems = parsed;
+    }
   }
 }
 
