@@ -2,15 +2,46 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useHasMounted } from '@/hooks/useHasMounted';
 import { useTheme } from '@/context/useTheme';
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const t = useTranslations('nav');
+  const hasMounted = useHasMounted();
 
   const { theme, setTheme } = useTheme();
+
+  const getCurrentLocale = (): string => {
+    const segments = pathname.split('/');
+    const localeSegment = segments[1];
+    return ['en', 'ru'].includes(localeSegment) ? localeSegment : 'en';
+  };
+
+  const getPathForLocale = (newLocale: string): string => {
+    const currentLocale = getCurrentLocale();
+
+    let cleanPath = pathname;
+    if (cleanPath.startsWith(`/${currentLocale}`)) {
+      cleanPath = cleanPath.substring(`/${currentLocale}`.length);
+    }
+
+    if (!cleanPath || cleanPath === '') {
+      cleanPath = '/';
+    }
+
+    const queryString = searchParams.toString();
+    const queryPart = queryString ? `?${queryString}` : '';
+
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+
+    const result = `/${newLocale}${cleanPath === '/' ? '' : cleanPath}${queryPart}${hash}`;
+
+    return result;
+  };
 
   return (
     <header className="header bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white w-screen dark:bg-gradient-to-r dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 dark:text-gray-100">
@@ -56,59 +87,85 @@ export const Header: React.FC = () => {
               </ul>
             </nav>
           </div>
-          <div className="flex items-center flex-shrink-0 ml-4">
-            <button
-              aria-label={
-                theme === 'light'
-                  ? 'Switch to dark theme'
-                  : 'Switch to light theme'
-              }
-              className="relative rounded focus:outline-none w-10 h-10 flex items-center justify-center"
-              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-              title={
-                theme === 'light'
-                  ? 'Switch to dark theme'
-                  : 'Switch to light theme'
-              }
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className={`absolute transition-all duration-300 text-yellow-300 ${theme === 'light' ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-0 opacity-0'}`}
+          <div className="flex items-center space-x-2 flex-shrink-0 ml-4">
+            {/* Locale Switcher */}
+            {hasMounted ? (
+              <Link
+                href={getPathForLocale(
+                  getCurrentLocale() === 'en' ? 'ru' : 'en'
+                )}
+                className="relative rounded focus:outline-none w-10 h-10 flex items-center justify-center hover:bg-white/10 transition-colors duration-200"
+                title={
+                  getCurrentLocale() === 'en'
+                    ? t('switchToRussian')
+                    : t('switchToEnglish')
+                }
               >
-                <circle cx="12" cy="12" r="4" />
-                <path d="M12 2v2" />
-                <path d="M12 20v2" />
-                <path d="m4.93 4.93 1.41 1.41" />
-                <path d="m17.66 17.66 1.41 1.41" />
-                <path d="M2 12h2" />
-                <path d="M20 12h2" />
-                <path d="m6.34 17.66-1.41 1.41" />
-                <path d="m19.07 4.93-1.41 1.41" />
-              </svg>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className={`absolute transition-all duration-300 text-blue-200 ${theme === 'dark' ? 'rotate-0 scale-100 opacity-100' : 'rotate-90 scale-0 opacity-0'}`}
+                <span className="text-sm font-bold text-white dark:text-gray-100">
+                  {getCurrentLocale() === 'en' ? 'RU' : 'EN'}
+                </span>
+              </Link>
+            ) : (
+              <div className="w-10 h-10" />
+            )}
+
+            {/* Theme Switcher */}
+            {hasMounted ? (
+              <button
+                aria-label={
+                  theme === 'light'
+                    ? 'Switch to dark theme'
+                    : 'Switch to light theme'
+                }
+                className="relative rounded focus:outline-none w-10 h-10 flex items-center justify-center"
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                title={
+                  theme === 'light'
+                    ? 'Switch to dark theme'
+                    : 'Switch to light theme'
+                }
               >
-                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-              </svg>
-              <span className="sr-only">Toggle theme</span>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`absolute transition-all duration-300 text-yellow-300 ${theme === 'light' ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-0 opacity-0'}`}
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2" />
+                  <path d="M12 20v2" />
+                  <path d="m4.93 4.93 1.41 1.41" />
+                  <path d="m17.66 17.66 1.41 1.41" />
+                  <path d="M2 12h2" />
+                  <path d="M20 12h2" />
+                  <path d="m6.34 17.66-1.41 1.41" />
+                  <path d="m19.07 4.93-1.41 1.41" />
+                </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`absolute transition-all duration-300 text-blue-200 ${theme === 'dark' ? 'rotate-0 scale-100 opacity-100' : 'rotate-90 scale-0 opacity-0'}`}
+                >
+                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                </svg>
+                <span className="sr-only">Toggle theme</span>
+              </button>
+            ) : (
+              <div className="w-10 h-10" />
+            )}
           </div>
         </div>
       </div>

@@ -2,7 +2,8 @@
 
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/navigation';
-import { parsePokemonDetails } from '@/utils/pokemonUtils';
+import { useTranslations } from 'next-intl';
+import { parsePokemonDetails, getLocalizedLabel } from '@/utils/pokemonUtils';
 import { useGetPokemonDetailsQuery } from '@/api/pokemonApiSlice';
 import { pokemonApi as legacyApi } from '@/api/pokemonApi';
 import type { ProcessedPokemon } from '@/api/types';
@@ -17,6 +18,7 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
   onClose,
 }) => {
   const router = useRouter();
+  const t = useTranslations();
 
   const {
     data: detailsData,
@@ -52,13 +54,13 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
     return (
       <div className="sticky top-0 w-80 min-w-[320px] max-w-xs h-fit max-h-[600px] overflow-y-auto rounded-lg shadow-lg bg-white flex items-center justify-center p-6 border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
         <span className="text-gray-700 dark:text-gray-200">
-          {error ? 'Failed to load details' : 'No details found'}
+          {error ? t('pokemon.failed_to_load') : t('pokemon.no_details')}
         </span>
         <button
           onClick={handleClose}
           className="ml-4 px-2 py-1 bg-gray-200 rounded dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
         >
-          Close
+          {t('pokemon.close')}
         </button>
       </div>
     );
@@ -70,7 +72,7 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
     <div className="sticky top-0 w-80 min-w-[320px] max-w-xs h-fit max-h-[600px] overflow-y-auto rounded-lg shadow-lg bg-white p-4 border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
-          Pokemon Details
+          {t('pokemon.details')}
         </h2>
         <button
           onClick={() => {
@@ -80,7 +82,7 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
           className="ml-2 px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-200"
           aria-label="Refresh details"
         >
-          Refetch
+          {t('pokemon.refresh')}
         </button>
       </div>
       <div className="text-center mb-4">
@@ -102,17 +104,17 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
           {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
         </h3>
         <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-          Pokemon #{pokemon.id}
+          {t('pokemon.number', { id: pokemon.id })}
         </p>
       </div>
       <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">
-        Information
+        {t('pokemon.information')}
       </h4>
       <div className="space-y-1 text-sm mb-2">
         {details.map((detail, index) => (
           <div key={index} className="flex justify-between items-center">
             <span className="text-blue-600 dark:text-blue-400 font-medium text-xs uppercase tracking-wide">
-              {detail.label}:
+              {getLocalizedLabel(detail.label, t)}:
             </span>
             <span className="text-gray-700 dark:text-gray-100 text-sm font-medium">
               {detail.value}
@@ -123,9 +125,9 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
       <button
         onClick={handleClose}
         className="w-full py-1.5 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors duration-200 flex items-center justify-center space-x-1.5 text-xs mt-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100"
-        aria-label="Close details"
+        aria-label={t('pokemon.close_details')}
       >
-        Close Details
+        {t('pokemon.close_details')}
       </button>
     </div>
   );

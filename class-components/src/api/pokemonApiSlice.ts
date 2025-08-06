@@ -6,14 +6,12 @@ export const pokemonApi = createApi({
   reducerPath: 'pokemonApi',
   baseQuery: fetchBaseQuery({ baseUrl: API_BASE_URL }),
   endpoints: (builder) => ({
-    // Accepts an optional dummy param for manual refetch (listResetCount)
     getPokemonList: builder.query<
       PokemonListResponse,
       { offset?: number; limit?: number; listResetCount?: number }
     >({
       query: ({ offset = 0, limit = 20 }) =>
         `pokemon?offset=${offset}&limit=${limit}`,
-      // Use listResetCount in providesTags for cache busting
       providesTags: (_result, _error, arg) => {
         const tags: { type: 'PokemonList'; id: string }[] = [
           { type: 'PokemonList', id: 'LIST' },

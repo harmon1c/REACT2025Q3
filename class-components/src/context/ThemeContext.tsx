@@ -1,4 +1,7 @@
+'use client';
+
 import { useEffect, useState } from 'react';
+import { useHasMounted } from '@/hooks/useHasMounted';
 import { ThemeContext } from './ThemeContextBase';
 import type { Theme } from './ThemeContextBase';
 
@@ -6,8 +9,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   // eslint-disable-next-line react/prop-types
   children,
 }) => {
+  const hasMounted = useHasMounted();
+
   function getSystemTheme(): Theme {
     if (
+      typeof window !== 'undefined' &&
       window.matchMedia &&
       window.matchMedia('(prefers-color-scheme: dark)').matches
     ) {
@@ -16,30 +22,36 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     return 'light';
   }
 
-  const [theme, setThemeState] = useState<Theme>(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'light' || saved === 'dark') {
-      return saved;
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [userSelected, setUserSelected] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (hasMounted && typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark') {
+        setThemeState(saved);
+        setUserSelected(true);
+      } else {
+        setThemeState(getSystemTheme());
+        setUserSelected(false);
+      }
     }
-    return getSystemTheme();
-  });
-  const [userSelected, setUserSelected] = useState<boolean>(() => {
-    const saved = localStorage.getItem('theme');
-    return saved === 'light' || saved === 'dark';
-  });
+  }, [hasMounted]);
 
   useEffect((): void => {
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(theme);
-    if (userSelected) {
-      localStorage.setItem('theme', theme);
-    } else {
-      localStorage.removeItem('theme');
+    if (typeof window !== 'undefined') {
+      document.documentElement.classList.remove('light', 'dark');
+      document.documentElement.classList.add(theme);
+      if (userSelected) {
+        localStorage.setItem('theme', theme);
+      } else {
+        localStorage.removeItem('theme');
+      }
     }
   }, [theme, userSelected]);
 
   useEffect(() => {
-    if (!userSelected) {
+    if (typeof window !== 'undefined' && !userSelected) {
       const mql = window.matchMedia('(prefers-color-scheme: dark)');
       const handler = (): void => setThemeState(getSystemTheme());
       mql.addEventListener('change', handler);

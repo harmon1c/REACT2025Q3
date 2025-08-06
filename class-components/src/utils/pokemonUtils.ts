@@ -14,3 +14,20 @@ export const parsePokemonDetails = (description: string): PokemonDetail[] => {
     };
   });
 };
+
+// Function to get localized Pokemon detail labels
+export const getLocalizedLabel = (
+  englishLabel: string,
+  t: (key: string) => string
+): string => {
+  const labelMap: Record<string, string> = {
+    TYPES: 'pokemon.labels.types',
+    HEIGHT: 'pokemon.labels.height',
+    WEIGHT: 'pokemon.labels.weight',
+    'BASE EXPERIENCE': 'pokemon.labels.base_experience',
+    ABILITIES: 'pokemon.labels.abilities',
+  };
+
+  const key = labelMap[englishLabel.toUpperCase()];
+  return key ? t(key) : englishLabel;
+};

@@ -53,7 +53,6 @@ export const PokemonCatalogueContainer: React.FC<
     clearResults,
   } = usePokemonData(selectedPokemonName, initialPage, onPageChange);
 
-  // Initial search if there's a search query from URL
   useEffect(() => {
     if (initialSearchQuery) {
       const trimmed = initialSearchQuery.trim();
@@ -70,15 +69,13 @@ export const PokemonCatalogueContainer: React.FC<
 
     if (trimmed) {
       searchPokemon(trimmed.toLowerCase());
-      // Update URL with search parameter
       const params = new URLSearchParams(window.location.search);
       params.set('search', trimmed);
-      params.delete('details'); // Clear details if searching
-      params.delete('page'); // Reset to first page
+      params.delete('details');
+      params.delete('page');
       router.push(`/?${params.toString()}`);
     } else {
       clearResults();
-      // Clear search parameter from URL
       const params = new URLSearchParams(window.location.search);
       params.delete('search');
       const queryString = params.toString();
@@ -96,10 +93,6 @@ export const PokemonCatalogueContainer: React.FC<
   };
 
   const handlePokemonClick = async (pokemonName: string): Promise<void> => {
-    // Временно отключаем автоматическое открытие деталей во время поиска
-    // чтобы предотвратить бесконечный цикл запросов
-
-    // Показываем детали только если нет активного поиска
     if (!searchTerm.trim()) {
       const newParams = new URLSearchParams(window.location.search);
       newParams.set('details', encodeURIComponent(pokemonName));

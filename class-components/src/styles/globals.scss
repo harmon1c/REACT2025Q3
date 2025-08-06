@@ -3,3 +3,7 @@
 @use 'fonts';
 @use 'common';
 @use 'mixins';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

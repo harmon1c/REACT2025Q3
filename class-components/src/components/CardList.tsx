@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAppSelector } from '../store/hooks';
+import { isPokemonListItem } from '../utils/pokemonDescriptions';
 import { Card } from './Card';
 import { type ResultItem } from './Results';
 
@@ -17,9 +18,7 @@ export function CardList({
     selectedItems.some((selected) => String(selected.id) === String(item.id));
 
   const hasDetailedCards =
-    items?.some(
-      (item) => !item.description.includes('Click to view details')
-    ) || false;
+    items?.some((item) => !isPokemonListItem(item.description)) || false;
 
   if (hasDetailedCards) {
     return (

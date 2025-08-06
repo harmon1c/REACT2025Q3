@@ -40,11 +40,11 @@ class PokemonApi {
     const abilities = pokemon.abilities.map((a) => a.ability.name).join(', ');
 
     const description = [
-      `Types: ${types}`,
-      `Height: ${pokemon.height}dm`,
-      `Weight: ${pokemon.weight}kg`,
-      `Base Experience: ${pokemon.base_experience}`,
-      `Abilities: ${abilities}`,
+      `TYPES: ${types}`,
+      `HEIGHT: ${pokemon.height}dm`,
+      `WEIGHT: ${pokemon.weight}kg`,
+      `BASE EXPERIENCE: ${pokemon.base_experience}`,
+      `ABILITIES: ${abilities}`,
     ].join(' | ');
 
     return {

@@ -1,5 +1,12 @@
+'use client';
+
 import React from 'react';
-import { parsePokemonDetails } from '../utils/pokemonUtils';
+import { useTranslations } from 'next-intl';
+import { parsePokemonDetails, getLocalizedLabel } from '../utils/pokemonUtils';
+import {
+  getPokemonDescription,
+  isPokemonListItem,
+} from '../utils/pokemonDescriptions';
 import { useAppDispatch } from '../store/hooks';
 import { addItem, removeItem } from '../store/selectedItemsSlice';
 import { type ResultItem } from './Results';
@@ -17,6 +24,8 @@ export function Card({
   isSelected,
 }: CardProps): React.JSX.Element {
   const dispatch = useAppDispatch();
+  const t = useTranslations();
+
   const capitalizeFirstLetter = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
@@ -44,7 +53,7 @@ export function Card({
   };
 
   const isListItem = (): boolean => {
-    return item.description.includes('Click to view details');
+    return isPokemonListItem(item.description);
   };
 
   const handleCheckboxChange = (
@@ -85,7 +94,7 @@ export function Card({
               onChange={handleCheckboxChange}
               onClick={(e) => e.stopPropagation()}
               className="form-checkbox h-5 w-5 text-blue-600 mr-2"
-              aria-label="Select Pokemon"
+              aria-label={t('pokemon.select')}
             />
             {item.image ? (
               <img
@@ -104,12 +113,12 @@ export function Card({
                 {capitalizeFirstLetter(item.name)}
               </h3>
               <p className="text-gray-500 dark:text-gray-400 text-xs">
-                Pokemon #{item.id}
+                {t('pokemon.number', { id: item.id })}
               </p>
             </div>
           </div>
           <p className="text-gray-600 dark:text-gray-300 text-xs mb-3 leading-relaxed line-clamp-2">
-            {item.description}
+            {getPokemonDescription(item.description, item.id, t)}
           </p>
           <div className="flex justify-center">
             <button
@@ -121,7 +130,7 @@ export function Card({
               className="px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-offset-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 focus:ring-blue-500
                 dark:from-blue-700 dark:to-purple-800 dark:hover:from-blue-800 dark:hover:to-purple-900"
             >
-              View Details
+              {t('pokemon.view_details')}
             </button>
           </div>
         </div>
@@ -160,7 +169,7 @@ export function Card({
                 {capitalizeFirstLetter(item.name)}
               </h3>
               <span className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 text-white px-2 py-0.5 rounded-full text-xs font-medium">
-                Pokemon #{item.id}
+                {t('pokemon.number', { id: item.id })}
               </span>
             </div>
             <div className="text-xl opacity-30 text-gray-400 dark:text-gray-600">
@@ -176,7 +185,7 @@ export function Card({
                   className="bg-white dark:bg-gray-800 rounded-md p-1.5 shadow-sm border border-gray-200 dark:border-gray-700"
                 >
                   <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-0.5">
-                    {detail.label}
+                    {getLocalizedLabel(detail.label, t)}
                   </p>
                   <p className="text-xs text-gray-800 dark:text-gray-100 font-medium">
                     {detail.value}
@@ -188,7 +197,7 @@ export function Card({
             {abilities && (
               <div className="bg-white dark:bg-gray-800 rounded-md p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
                 <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-0.5">
-                  {abilities.label}
+                  {getLocalizedLabel(abilities.label, t)}
                 </p>
                 <p className="text-xs text-gray-800 dark:text-gray-100 font-medium">
                   {abilities.value}

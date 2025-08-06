@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -11,6 +12,8 @@ export default function Error({
   error,
   reset,
 }: ErrorPageProps): React.JSX.Element {
+  const t = useTranslations('errors');
+
   React.useEffect(() => {
     console.error('🚨 Next.js Error Boundary caught:', error);
   }, [error]);
@@ -36,13 +39,10 @@ export default function Error({
         </div>
 
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Oops! Something went wrong
+          {t('somethingWrong')}
         </h2>
 
-        <p className="text-gray-600 mb-6">
-          We encountered an unexpected error. Our team has been notified and is
-          working on a fix.
-        </p>
+        <p className="text-gray-600 mb-6">{t('errorMessage')}</p>
 
         {error.digest && (
           <p className="text-xs text-gray-400 mb-4">Error ID: {error.digest}</p>
@@ -53,21 +53,19 @@ export default function Error({
             onClick={reset}
             className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 ease-in-out transform hover:scale-105"
           >
-            Try again
+            {t('tryAgain')}
           </button>
 
           <button
             onClick={() => (window.location.href = '/')}
             className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition duration-200 ease-in-out"
           >
-            Go to homepage
+            {t('goHome')}
           </button>
         </div>
 
         <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-xs text-gray-500">
-            If this problem persists, please contact our support team.
-          </p>
+          <p className="text-xs text-gray-500">{t('supportMessage')}</p>
         </div>
       </div>
     </div>

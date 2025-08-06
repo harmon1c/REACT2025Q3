@@ -2,39 +2,76 @@
   "nav": {
     "home": "Home",
     "about": "About",
-    "pokemon": "Pokemon"
+    "pokemon": "Pokemon",
+    "switchToEnglish": "Switch to English",
+    "switchToRussian": "Switch to Russian"
   },
   "search": {
-    "placeholder": "Search Pokemon...",
+    "title": "Search Pokemon",
+    "description": "Enter a Pokemon name to search for detailed information",
+    "placeholder": "Enter Pokemon name (e.g., Pikachu)...",
     "button": "Search",
-    "clear": "Clear",
+    "clear": "Clear"
+  },
+  "selection": {
+    "items_selected": "{count, plural, =0 {No items selected} =1 {# item selected} other {# items selected}}",
+    "unselect_all": "Unselect all",
+    "download": "Download"
+  },
+  "results": {
     "loading": "Loading Pokemon data...",
-    "noResults": "No Pokemon Found",
-    "noResultsDesc": "We couldn't find any Pokemon matching your search. Try a different name or browse the complete list."
+    "loading_description": "Please wait while we fetch the information",
+    "error_title": "Oops! Something went wrong",
+    "error_suggestion": "Please try searching for a different Pokemon",
+    "no_results_title": "No Pokemon Found",
+    "no_results_description": "We couldn't find any Pokemon matching your search. Try a different name or browse the complete list.",
+    "popular_searches": "Popular searches: pikachu, charizard, bulbasaur"
   },
   "pokemon": {
-    "details": "Pokemon Details",
-    "height": "Height",
-    "weight": "Weight",
-    "types": "Types",
+    "title": "Pokemon",
+    "description": "Pokemon Description",
     "abilities": "Abilities",
-    "baseExp": "Base Experience",
+    "types": "Types",
+    "stats": "Stats",
+    "weight": "Weight",
+    "height": "Height",
+    "base_experience": "Base Experience",
+    "order": "Order",
+    "is_default": "Is Default",
+    "select": "Select Pokemon",
+    "number": "Pokemon #{id}",
+    "view_details": "View Details",
+    "details": "Pokemon Details",
+    "failed_to_load": "Failed to load details",
+    "no_details": "No details found",
     "close": "Close",
-    "refetch": "Refetch"
+    "refresh": "Refresh",
+    "close_details": "Close Details",
+    "information": "Information",
+    "click_to_view_details": "Pokemon #{id} - Click to view details",
+    "labels": {
+      "types": "TYPES",
+      "height": "HEIGHT",
+      "weight": "WEIGHT",
+      "base_experience": "BASE EXPERIENCE",
+      "abilities": "ABILITIES"
+    }
   },
   "pagination": {
     "previous": "Previous",
     "next": "Next",
-    "page": "Page"
+    "page": "Page",
+    "of": "of",
+    "showing": "Showing",
+    "to": "to",
+    "results": "results"
   },
-  "errors": {
-    "notFound": "Page not found",
-    "goHome": "Go to Homepage",
-    "somethingWrong": "Something went wrong",
-    "tryAgain": "Try again"
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   },
   "language": {
-    "switch": "Switch Language",
     "en": "English",
     "ru": "Russian"
   },
@@ -61,5 +98,27 @@
       "title": "Pokemon API",
       "description": "This application uses the Pokemon API (PokeAPI) to fetch Pokemon data. PokeAPI is a free RESTful API that provides comprehensive Pokemon information including stats, types, abilities, and more."
     }
+  },
+  "footer": {
+    "school_link": "RS School Link",
+    "school_alt": "RS School",
+    "copyright": "© 2025",
+    "github_link": "GitHub Link",
+    "github_alt": "GitHub"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "goHome": "Go Home",
+    "somethingWrong": "Oops! Something went wrong",
+    "tryAgain": "Try Again",
+    "errorMessage": "An unexpected error occurred while rendering the application. Don't worry, we can fix this!",
+    "errorDetails": "Error details (click to expand)",
+    "supportMessage": "If this problem persists, please contact our support team."
+  },
+  "notFound": {
+    "title": "Oops! Page Not Found",
+    "description": "The page you are looking for seems to have vanished into the digital void.",
+    "goHome": "🏠 Go Home",
+    "popularSearches": "🔍 Popular searches:"
   }
 }
