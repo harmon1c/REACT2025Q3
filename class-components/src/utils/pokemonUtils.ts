@@ -15,7 +15,6 @@ export const parsePokemonDetails = (description: string): PokemonDetail[] => {
   });
 };
 
-// Function to get localized Pokemon detail labels
 export const getLocalizedLabel = (
   englishLabel: string,
   t: (key: string) => string

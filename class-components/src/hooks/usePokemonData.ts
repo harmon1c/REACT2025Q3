@@ -20,17 +20,35 @@ interface UsePokemonDataState {
   searchPokemon: (query: string) => void;
   loadPage: (page: number) => void;
   clearResults: () => void;
+  unlockHydration: () => void;
+}
+
+interface UsePokemonDataOptions {
+  selectedPokemonName?: string | null;
+  initialPage?: number;
+  onPageChange?: (page: number) => void;
+  initialResults?: ProcessedPokemon[];
+  initialTotalCount?: number;
+  hydrateOnly?: boolean;
 }
 
 export function usePokemonData(
   selectedPokemonName?: string | null,
   initialPage = 1,
-  onPageChange?: (page: number) => void
+  onPageChange?: (page: number) => void,
+  options?: Omit<
+    UsePokemonDataOptions,
+    'selectedPokemonName' | 'initialPage' | 'onPageChange'
+  >
 ): UsePokemonDataState {
-  const [results, setResults] = useState<ProcessedPokemon[]>([]);
+  const { initialResults, initialTotalCount, hydrateOnly } = options || {};
+  const [lockedHydration, setLockedHydration] = useState(!!hydrateOnly);
+  const [results, setResults] = useState<ProcessedPokemon[]>(
+    initialResults || []
+  );
   const [selectedPokemon, setSelectedPokemon] =
     useState<ProcessedPokemon | null>(null);
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(initialTotalCount || 0);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(initialPage);
 
@@ -40,24 +58,29 @@ export function usePokemonData(
     isLoading: isListLoading,
   } = useGetPokemonListQuery(
     { offset: (currentPage - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
-    { skip: !!searchQuery }
+    { skip: !!searchQuery || lockedHydration }
   );
 
   const {
     data: searchData,
     error: searchError,
     isLoading: isSearchLoading,
-  } = useSearchPokemonQuery(searchQuery, { skip: !searchQuery });
+  } = useSearchPokemonQuery(searchQuery, {
+    skip: !searchQuery || lockedHydration,
+  });
 
   const {
     data: detailsData,
     error: detailsError,
     isLoading: isDetailsLoading,
   } = useGetPokemonDetailsQuery(selectedPokemonName ?? '', {
-    skip: !selectedPokemonName,
+    skip: !selectedPokemonName || lockedHydration,
   });
 
   React.useEffect(() => {
+    if (lockedHydration) {
+      return;
+    }
     if (searchQuery && searchData) {
       setResults([legacyApi.parsePokemonToProcessed(searchData)]);
       setTotalCount(1);
@@ -65,7 +88,7 @@ export function usePokemonData(
       setResults(legacyApi.parseListToProcessed(listData));
       setTotalCount(listData.count);
     }
-  }, [searchQuery, searchData, listData]);
+  }, [searchQuery, searchData, listData, lockedHydration]);
 
   React.useEffect(() => {
     if (detailsData) {
@@ -107,10 +130,19 @@ export function usePokemonData(
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
-  const searchPokemon = useCallback((query: string): void => {
-    setSearchQuery(query.trim().toLowerCase());
-    setCurrentPage(1);
-  }, []);
+  const searchPokemon = useCallback(
+    (query: string): void => {
+      setLockedHydration(false);
+      const q = query.trim().toLowerCase();
+      setSearchQuery(q);
+      setCurrentPage(1);
+      if (!q && initialResults?.length) {
+        setResults(initialResults);
+        setTotalCount(initialTotalCount || initialResults.length);
+      }
+    },
+    [initialResults, initialTotalCount]
+  );
 
   const loadPage = useCallback(
     (page: number): void => {
@@ -121,9 +153,19 @@ export function usePokemonData(
   );
 
   const clearResults = useCallback((): void => {
-    setResults([]);
     setSearchQuery('');
     setCurrentPage(1);
+    if (initialResults?.length) {
+      setResults(initialResults);
+      setTotalCount(initialTotalCount || initialResults.length);
+    } else {
+      setResults([]);
+      setTotalCount(0);
+    }
+  }, [initialResults, initialTotalCount]);
+
+  const unlockHydration = useCallback((): void => {
+    setLockedHydration(false);
   }, []);
 
   return {
@@ -137,5 +179,6 @@ export function usePokemonData(
     searchPokemon,
     loadPage,
     clearResults,
+    unlockHydration,
   };
 }

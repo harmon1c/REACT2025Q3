@@ -2,10 +2,19 @@
 
 import React, { Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import type { ProcessedPokemon } from '@/api/types';
 import { PokemonCatalogueContainer } from '@/components/PokemonCatalogueContainer';
 import PokemonDetailPanel from '@/components/PokemonDetailPanel';
 
-function HomePageContent(): React.JSX.Element {
+interface HomePageClientProps {
+  initialResults?: ProcessedPokemon[];
+  initialTotalCount?: number;
+}
+
+function HomePageContent({
+  initialResults,
+  initialTotalCount,
+}: HomePageClientProps): React.JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
   const details = searchParams.get('details');
@@ -47,14 +56,18 @@ function HomePageContent(): React.JSX.Element {
       initialPage={initialPage}
       initialSearchQuery={searchQuery}
       onPageChange={handlePageChange}
+      initialResults={initialResults}
+      initialTotalCount={initialTotalCount}
     />
   );
 }
 
-export default function HomePageClient(): React.JSX.Element {
+export default function HomePageClient(
+  props: HomePageClientProps
+): React.JSX.Element {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <HomePageContent />
+      <HomePageContent {...props} />
     </Suspense>
   );
 }

@@ -2,16 +2,21 @@ import React from 'react';
 
 interface MainProps {
   children: React.ReactNode;
+  panel?: boolean;
 }
 
-export const Main: React.FC<MainProps> = ({ children }) => {
+export const Main: React.FC<MainProps> = ({ children, panel = true }) => {
   return (
-    <div className="w-full py-6">
-      <div className="w-full max-w-[1440px] mx-auto px-4">
-        <div className="bg-white shadow-xl rounded-2xl border border-gray-200 w-full p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-          <div className="w-full">{children}</div>
-        </div>
+    <section className="py-6 w-full">
+      <div className="mx-auto w-full max-w-[1440px] px-4">
+        {panel ? (
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xl dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+            {children}
+          </div>
+        ) : (
+          children
+        )}
       </div>
-    </div>
+    </section>
   );
 };

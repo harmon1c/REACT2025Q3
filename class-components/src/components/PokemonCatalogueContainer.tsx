@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { ProcessedPokemon } from '@/api/types';
 import { usePokemonData } from '@/hooks/usePokemonData';
 import { Main } from './Main';
+import { Panel } from './Panel';
 import { Search } from './Search';
 import { Results } from './Results';
 import { Pagination } from './Pagination';
@@ -16,6 +18,8 @@ interface PokemonCatalogueContainerProps {
   initialPage?: number;
   initialSearchQuery?: string | null;
   onPageChange?: (page: number) => void;
+  initialResults?: ProcessedPokemon[];
+  initialTotalCount?: number;
 }
 
 function getSavedSearchTerm(): string {
@@ -37,6 +41,8 @@ export const PokemonCatalogueContainer: React.FC<
   initialPage = 1,
   initialSearchQuery,
   onPageChange,
+  initialResults,
+  initialTotalCount,
 }) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState(
@@ -51,7 +57,11 @@ export const PokemonCatalogueContainer: React.FC<
     searchPokemon,
     loadPage,
     clearResults,
-  } = usePokemonData(selectedPokemonName, initialPage, onPageChange);
+  } = usePokemonData(selectedPokemonName, initialPage, onPageChange, {
+    initialResults,
+    initialTotalCount,
+    hydrateOnly: !!initialResults?.length,
+  });
 
   useEffect(() => {
     if (initialSearchQuery) {
@@ -116,8 +126,8 @@ export const PokemonCatalogueContainer: React.FC<
   };
 
   return (
-    <Main>
-      <div className={showDetailsPanel ? 'flex gap-6' : 'w-full'}>
+    <Main panel={false}>
+      <Panel className={showDetailsPanel ? 'flex gap-6' : 'w-full'}>
         <div className={showDetailsPanel ? 'flex-1' : 'w-full'}>
           <section className="search-section mb-4">
             <Search
@@ -146,7 +156,7 @@ export const PokemonCatalogueContainer: React.FC<
         {showDetailsPanel &&
           detailsPanel &&
           React.cloneElement(detailsPanel, { onClose: handleCloseDetails })}
-      </div>
+      </Panel>
     </Main>
   );
 };
