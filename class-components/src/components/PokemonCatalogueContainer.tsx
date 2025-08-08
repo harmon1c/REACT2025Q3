@@ -66,11 +66,11 @@ export const PokemonCatalogueContainer: React.FC<
   useEffect(() => {
     if (initialSearchQuery) {
       const trimmed = initialSearchQuery.trim();
-      if (trimmed) {
+      if (trimmed && (!initialResults || initialResults.length === 0)) {
         searchPokemon(trimmed.toLowerCase());
       }
     }
-  }, [initialSearchQuery, searchPokemon]);
+  }, [initialSearchQuery, initialResults, searchPokemon]);
 
   const handleSearch = (query: string): void => {
     const trimmed = query.trim();

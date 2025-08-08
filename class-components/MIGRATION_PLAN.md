@@ -41,13 +41,15 @@ This document tracks the phased migration and improvements. Each phase = one com
 - ☐ Error mapping helper + `notFound()` integration (later with dynamic routes)
 - Revalidation strategy (list=60s, details=300s) documented in code
 
-## Phase 6: Home Page SSR
+## Phase 6: Home Page SSR (In Progress)
 
-- Convert `[locale]/page.tsx` to Server Component performing initial list fetch
-- Accept `searchParams` (offset, search)
-- Conditional: if `search` -> fetch single details; else list
-- Pass initial data to client child (split interactive parts)
-- (⭐) Use Suspense + streaming skeleton
+- (✔) `[locale]/page.tsx` Server Component performing initial list fetch
+- (✔) Accepts `searchParams` (page, search)
+- (✔) Conditional server-side search fetch (single detail) hydration
+- (✔) Passes initial data to client child (interactive separated)
+- ( ) (⭐) Streaming Suspense skeleton refinement (optional enhancement)
+
+Notes: Client container now avoids duplicate search fetch when server supplied the result. Remaining optional work: introduce more granular Suspense boundaries & skeleton components.
 
 ## Phase 7: Dynamic Pokemon Route
 

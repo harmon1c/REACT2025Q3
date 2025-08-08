@@ -1,5 +1,5 @@
 import HomePageClient from '@/components/HomePageClient';
-import { fetchPokemonList } from '@/api/serverFetchers';
+import { fetchPokemonList, fetchPokemonDetails } from '@/api/serverFetchers';
 import { pokemonApi } from '@/api/pokemonApi';
 import type { ProcessedPokemon } from '@/api/types';
 
@@ -24,7 +24,15 @@ export default async function HomePage({
 
   let initialResults: ProcessedPokemon[] = [];
   let initialTotalCount = 0;
-  if (!searchQueryRaw) {
+  if (searchQueryRaw) {
+    try {
+      const details = await fetchPokemonDetails({ nameOrId: searchQueryRaw });
+      initialResults = [pokemonApi.parsePokemonToProcessed(details)];
+      initialTotalCount = 1;
+    } catch {
+      // ignore (likely not found)
+    }
+  } else {
     try {
       const list = await fetchPokemonList({
         offset: (page - 1) * 20,
@@ -33,7 +41,7 @@ export default async function HomePage({
       initialResults = pokemonApi.parseListToProcessed(list);
       initialTotalCount = list.count;
     } catch {
-      // silently fail
+      // silently fail (client will attempt later)
     }
   }
 
