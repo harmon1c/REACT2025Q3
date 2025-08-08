@@ -38,6 +38,8 @@
     "close_details": "Закрыть",
     "information": "Информация",
     "click_to_view_details": "Покемон №{id} - Нажмите для просмотра деталей",
+    "back_to_list": "Назад к списку",
+    "not_found": "Покемон не найден",
     "labels": {
       "types": "ТИПЫ",
       "height": "РОСТ",

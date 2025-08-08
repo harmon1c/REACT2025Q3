@@ -12,6 +12,7 @@ const ITEMS_PER_PAGE = 20;
 interface UsePokemonDataState {
   results: ProcessedPokemon[];
   error: string | null;
+  rawError: unknown;
   selectedPokemon: ProcessedPokemon | null;
   currentPage: number;
   totalPages: number;
@@ -124,9 +125,8 @@ export function usePokemonData(
     return 'Unknown error';
   }
 
-  const error = errorToString(
-    (searchQuery ? searchError : listError) || detailsError
-  );
+  const primaryRawError = (searchQuery ? searchError : listError) || null;
+  const error = errorToString(primaryRawError || detailsError);
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -169,16 +169,17 @@ export function usePokemonData(
   }, []);
 
   return {
-    results,
-    error,
-    selectedPokemon,
-    currentPage,
-    totalPages,
-    totalCount,
-    isLoading,
-    searchPokemon,
-    loadPage,
-    clearResults,
-    unlockHydration,
+    results: results,
+    error: error,
+    rawError: primaryRawError,
+    selectedPokemon: selectedPokemon,
+    currentPage: currentPage,
+    totalPages: totalPages,
+    totalCount: totalCount,
+    isLoading: isLoading,
+    searchPokemon: searchPokemon,
+    loadPage: loadPage,
+    clearResults: clearResults,
+    unlockHydration: unlockHydration,
   };
 }

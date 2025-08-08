@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import type { ProcessedPokemon } from '@/api/types';
 import { usePokemonData } from '@/hooks/usePokemonData';
+import { mapErrorToMessage } from '@/api/errorMap';
 import { Main } from './Main';
 import { Panel } from './Panel';
 import { Search } from './Search';
@@ -52,6 +54,7 @@ export const PokemonCatalogueContainer: React.FC<
     results,
     isLoading,
     error,
+    rawError,
     currentPage,
     totalPages,
     searchPokemon,
@@ -62,6 +65,7 @@ export const PokemonCatalogueContainer: React.FC<
     initialTotalCount,
     hydrateOnly: !!initialResults?.length,
   });
+  const t = useTranslations();
 
   useEffect(() => {
     if (initialSearchQuery) {
@@ -141,7 +145,19 @@ export const PokemonCatalogueContainer: React.FC<
             <Results
               results={results}
               isLoading={isLoading}
-              error={error}
+              error={
+                error
+                  ? ((): string => {
+                      const mapped = rawError
+                        ? mapErrorToMessage(rawError)
+                        : error;
+                      return typeof mapped === 'string' &&
+                        mapped.startsWith('pokemon.')
+                        ? t(mapped)
+                        : error;
+                    })()
+                  : null
+              }
               onPokemonClick={handlePokemonClick}
             />
             {results.length > 0 && !isLoading && (

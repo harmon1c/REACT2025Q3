@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { parsePokemonDetails, getLocalizedLabel } from '@/utils/pokemonUtils';
 import { useGetPokemonDetailsQuery } from '@/api/pokemonApiSlice';
+import { mapErrorToMessage } from '@/api/errorMap';
 import { pokemonApi as legacyApi } from '@/api/pokemonApi';
 import type { ProcessedPokemon } from '@/api/types';
+import { StickyPanel } from './StickyPanel';
 
 type PokemonDetailPanelProps = {
   pokemonName: string;
@@ -44,32 +46,32 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
 
   if (isLoading) {
     return (
-      <div className="sticky top-0 w-80 min-w-[320px] max-w-xs h-fit max-h-[600px] overflow-y-auto rounded-lg shadow-lg bg-white flex items-center justify-center p-6 border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+      <StickyPanel centered>
         <span className="text-gray-700 dark:text-gray-200">Loading...</span>
-      </div>
+      </StickyPanel>
     );
   }
 
   if (error || !pokemon) {
+    const mapped = error ? mapErrorToMessage(error) : 'pokemon.not_found';
+    const translated = mapped.startsWith('pokemon.') ? t(mapped) : mapped;
     return (
-      <div className="sticky top-0 w-80 min-w-[320px] max-w-xs h-fit max-h-[600px] overflow-y-auto rounded-lg shadow-lg bg-white flex items-center justify-center p-6 border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-        <span className="text-gray-700 dark:text-gray-200">
-          {error ? t('pokemon.failed_to_load') : t('pokemon.no_details')}
-        </span>
+      <StickyPanel centered>
+        <span className="text-gray-700 dark:text-gray-200">{translated}</span>
         <button
           onClick={handleClose}
           className="ml-4 px-2 py-1 bg-gray-200 rounded dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
         >
           {t('pokemon.close')}
         </button>
-      </div>
+      </StickyPanel>
     );
   }
 
   const details = parsePokemonDetails(pokemon.description);
 
   return (
-    <div className="sticky top-0 w-80 min-w-[320px] max-w-xs h-fit max-h-[600px] overflow-y-auto rounded-lg shadow-lg bg-white p-4 border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+    <StickyPanel>
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
           {t('pokemon.details')}
@@ -129,7 +131,7 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
       >
         {t('pokemon.close_details')}
       </button>
-    </div>
+    </StickyPanel>
   );
 };
 

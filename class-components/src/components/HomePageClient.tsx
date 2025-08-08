@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { ProcessedPokemon } from '@/api/types';
 import { PokemonCatalogueContainer } from '@/components/PokemonCatalogueContainer';
@@ -65,9 +65,5 @@ function HomePageContent({
 export default function HomePageClient(
   props: HomePageClientProps
 ): React.JSX.Element {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <HomePageContent {...props} />
-    </Suspense>
-  );
+  return <HomePageContent {...props} />;
 }

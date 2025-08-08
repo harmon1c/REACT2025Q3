@@ -49,6 +49,8 @@
     "close_details": "Close Details",
     "information": "Information",
     "click_to_view_details": "Pokemon #{id} - Click to view details",
+    "back_to_list": "Back to list",
+    "not_found": "Pokemon not found",
     "labels": {
       "types": "TYPES",
       "height": "HEIGHT",

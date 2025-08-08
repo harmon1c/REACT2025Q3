@@ -41,22 +41,26 @@ This document tracks the phased migration and improvements. Each phase = one com
 - ☐ Error mapping helper + `notFound()` integration (later with dynamic routes)
 - Revalidation strategy (list=60s, details=300s) documented in code
 
-## Phase 6: Home Page SSR (In Progress)
+## Phase 6: Home Page SSR (✔)
 
-- (✔) `[locale]/page.tsx` Server Component performing initial list fetch
+- (✔) `[locale]/page.tsx` Server Component performing initial list/search fetch
 - (✔) Accepts `searchParams` (page, search)
-- (✔) Conditional server-side search fetch (single detail) hydration
+- (✔) Conditional server-side search (single detail) hydration
 - (✔) Passes initial data to client child (interactive separated)
-- ( ) (⭐) Streaming Suspense skeleton refinement (optional enhancement)
+- (✔) Streaming Suspense skeleton (list + search placeholder)
 
-Notes: Client container now avoids duplicate search fetch when server supplied the result. Remaining optional work: introduce more granular Suspense boundaries & skeleton components.
+Notes: Suspense boundary moved to server component for faster first paint; client wrapper simplified.
 
-## Phase 7: Dynamic Pokemon Route
+## Phase 7: Dynamic Pokemon Route (✔ except tests)
 
-- `app/[locale]/pokemon/[name]/page.tsx` (Server)
-- `generateStaticParams` (limit first N names, e.g. 50) + runtime fallback
-- Handle 404 via `notFound()`
-- `generateMetadata` for SEO (title, description, OpenGraph sprite)
+- (✔) Basic dynamic route `app/[locale]/pokemon/[name]/page.tsx` (Server)
+- (✔) `generateStaticParams` with limited preload list (subset of popular names)
+- (✔) 404 handling via `notFound()` when pokemon missing
+- (✔) `generateMetadata` for SEO (title, description, OpenGraph image)
+- (✔) Initial error mapping helper `src/api/errorMap.ts`
+- (✔) Integrate shared error mapping in client detail panel
+- (✔) Sticky panel style extracted into `StickyPanel` (mini-refactor)
+- ( ) Tests: metadata + notFound behavior (deferred)
 
 ## Phase 8: Component Split & Image Optimization
 
@@ -96,13 +100,12 @@ Notes: Client container now avoids duplicate search fetch when server supplied t
 - Keep CSV export memory-safe: stream or chunk for large selections
 - Avoid double data fetching: separate server-provided initial data from client re-queries
 
-## Next Immediate Action (Phase 6 Prep)
+## Next Immediate Action (Begin Phase 8)
 
-1. Extend server handling for `search` (conditional fetch when query present) (optional if required by spec)
-2. Implement dynamic route `app/[locale]/pokemon/[name]/page.tsx`
-3. Add `notFound()` + basic error mapping helper (`src/api/errorMap.ts`)
-4. Add `generateMetadata` for dynamic pages
-5. Consider prefetching detail when `details` query param on home (minor UX win)
+1. Audit components for unnecessary `'use client'` directives
+2. Replace `<img>` with Next `<Image>` where beneficial
+3. Ensure no client-only modules imported in server components (tree-shake)
+4. Plan server action scaffolding for CSV export (Phase 9)
 
 ---
 
