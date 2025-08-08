@@ -100,7 +100,11 @@
   "selection": {
     "items_selected": "{count, plural, =0 {Не выбрано элементов} =1 {Выбран # элемент} few {Выбрано # элемента} many {Выбрано # элементов} other {Выбрано # элементов}}",
     "unselect_all": "Снять выделение",
-    "download": "Скачать"
+    "download": "Скачать",
+    "exporting": "Экспорт...",
+    "export_failed": "Ошибка экспорта",
+    "export_invalid": "Некорректный запрос",
+    "export_internal": "Внутренняя ошибка"
   },
   "results": {
     "loading": "Загружаем данные о покемонах...",

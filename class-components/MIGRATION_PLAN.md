@@ -26,7 +26,6 @@ This document tracks the phased migration and improvements. Each phase = one com
 - Root `[locale]/layout.tsx` with providers
 - `error.tsx`, `not-found.tsx`, `about/page.tsx`
 - Header/Footer/Layout components migrated
-- 🆕 FIX: Corrected `layout.tsx` params signature (removed Promise)
 
 ---
 
@@ -82,13 +81,17 @@ Notes: Suspense boundary moved to server component for faster first paint; clien
 - (⭐) CSV export server action (Phase 9 scope) might allow moving download logic server-side.
 - (⭐) Bundle & Lighthouse review to quantify JS reduction from lazy loading.
 
-## Phase 9: Server Actions & CSV Export
+## Phase 9: Server Actions & CSV Export (✔ except tests)
 
-- Server Action: `exportSelectedToCSV` (receives ids, fetches details in parallel)
-- Return streamed `text/csv` or force download via Response
-- Form or button posting `selectedItems`
-- (🆕) Validation (zod) + limit (#items) + error fallback UI
-- (⭐) Server Action to persist selections (cookie / signed token)
+- ✔ Server action `buildCsvAction` created (`src/actions/buildCsvAction.ts`)
+- ✔ Shared CSV builder util (`src/utils/pokemonCsv.ts`) to avoid duplication
+- ✔ API Route `/api/export-csv` refactored to delegate to server action (thin wrapper / backward compatibility)
+- ✔ `SelectedFlyout` now invokes server action directly (no fetch to API route)
+- ✔ i18n export status/error messages in place (en/ru)
+- ☐ Tests: server action invocation & error branches (deferred)
+- ☐ Consider streaming/chunking for very large datasets (not critical with current 200 cap)
+- ☐ (⭐) Persist selections server-side (cookie / token) later
+- ☐ (⭐) Partial success reporting if some ids fail
 
 ## Phase 10: Optimization & Final QA
 
@@ -120,13 +123,3 @@ Notes: Suspense boundary moved to server component for faster first paint; clien
 3. Consider moving non-interactive portions of `PokemonCatalogueContainer` to a server shell (potential Phase 8b)
 4. Replace remaining inline images if any new added (monitor)
 5. Plan server action scaffolding for CSV export (Phase 9)
-
----
-
-## Tracking TODO Markers
-
-Search for `MIGRATION_TODO` as they are added in future commits to ensure closure.
-
----
-
-Feel free to adjust phases if the scope shifts; keep commits narratively clean.

@@ -1,8 +1,7 @@
 'use client';
 import React from 'react';
-import Link from 'next/link';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
+import { Link, usePathname, useRouter, useSearchParams } from '@/navigation';
 import { useHasMounted } from '@/hooks/useHasMounted';
 import { useTheme } from '@/context/useTheme';
 
@@ -23,35 +22,18 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
   const searchParams = useSearchParams();
   const router = useRouter();
   const locale = useLocale();
-  const pathLocale = React.useMemo(() => {
-    const seg = pathname.split('/')[1];
-    return ['en', 'ru'].includes(seg) ? seg : locale;
-  }, [pathname, locale]);
+  const pathLocale = locale;
   const hasMounted = useHasMounted();
   const { theme, setTheme } = useTheme();
 
-  const buildLocalizedPath = (
-    targetLocale: string,
-    targetPath: string
-  ): string => {
-    const queryString = searchParams.toString();
-    const queryPart = queryString ? `?${queryString}` : '';
-    const hash = typeof window !== 'undefined' ? window.location.hash : '';
-    const normalized = targetPath.startsWith('/')
-      ? targetPath
-      : `/${targetPath}`;
-    return `/${targetLocale}${
-      normalized === '/' ? '' : normalized
-    }${queryPart}${hash}`;
-  };
-
   const switchLocale = (nextLocale: string): void => {
-    const pathSegments = pathname.split('/').filter(Boolean);
-    if (pathSegments.length && ['en', 'ru'].includes(pathSegments[0])) {
-      pathSegments.shift();
+    if (nextLocale === locale) {
+      return;
     }
-    const remaining = pathSegments.length ? `/${pathSegments.join('/')}` : '/';
-    router.push(buildLocalizedPath(nextLocale, remaining));
+    const qs = searchParams.toString();
+    const stripped = (pathname || '/').replace(/^\/(en|ru)(?=\/|$)/, '') || '/';
+    const target = qs ? `${stripped}?${qs}` : stripped;
+    router.push(target, { locale: nextLocale });
   };
 
   return (
@@ -59,7 +41,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
       <div className="flex items-center gap-8 flex-1 min-w-0">
         <div className="header__logo flex-shrink-0">
           <Link
-            href={buildLocalizedPath(pathLocale, '/')}
+            href="/"
+            locale={pathLocale}
             className="text-2xl font-bold whitespace-nowrap dark:text-white dark:drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
           >
             Pokemon Explorer
@@ -69,12 +52,13 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
           <ul className="nav__list flex space-x-8">
             <li className="nav__list-item">
               {((): React.ReactNode => {
-                const localeRoot = `/${pathLocale}`;
                 const isHome =
-                  pathname === localeRoot || pathname === `${localeRoot}/`;
+                  pathname === `/${pathLocale}` ||
+                  pathname === `/${pathLocale}/`;
                 return (
                   <Link
-                    href={localeRoot}
+                    href="/"
+                    locale={pathLocale}
                     className={`nav__list-link px-3 py-2 rounded-lg transition-colors duration-200 border border-transparent shadow-sm ${
                       isHome
                         ? 'bg-white/40 text-white font-semibold dark:bg-white/20 dark:text-white dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
@@ -89,11 +73,11 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
             <li className="nav__list-item">
               {((): React.ReactNode => {
                 const aboutPath = `/${pathLocale}/about`;
-                const isAbout =
-                  pathname === aboutPath || pathname === `${aboutPath}/`;
+                const isAbout = pathname.startsWith(aboutPath);
                 return (
                   <Link
-                    href={aboutPath}
+                    href="/about"
+                    locale={pathLocale}
                     className={`nav__list-link px-3 py-2 rounded-lg transition-colors duration-200 border border-transparent shadow-sm ${
                       isAbout
                         ? 'bg-white/40 text-white font-semibold dark:bg-white/20 dark:text-white dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'

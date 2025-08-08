@@ -14,14 +14,18 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }): Promise<React.JSX.Element> {
-  const { locale } = await params; // Next.js 15 async params
+  const { locale } = await params;
   const messages = await getMessages({ locale });
 
   return (
     <html lang={locale}>
       <body className="site-container min-h-screen flex flex-col overflow-x-hidden">
         <ErrorBoundary locale={locale}>
-          <NextIntlClientProvider messages={messages}>
+          <NextIntlClientProvider
+            locale={locale}
+            messages={messages}
+            key={locale}
+          >
             <ReduxProvider>
               <ThemeProvider>
                 <Header locale={locale} />

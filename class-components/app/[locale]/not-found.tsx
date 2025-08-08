@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/navigation';
 
 export default function NotFound(): React.JSX.Element {
   const t = useTranslations('notFound');

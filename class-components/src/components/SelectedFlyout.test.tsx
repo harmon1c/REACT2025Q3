@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { describe, it, expect, vi } from 'vitest';
@@ -70,7 +70,28 @@ describe('SelectedFlyout', () => {
     expect(store.getState().selectedItems.items).toHaveLength(0);
   });
 
-  it('triggers CSV download when Download CSV is clicked', () => {
+  it('triggers server CSV export when Download is clicked', async () => {
+    const blob = new Blob(['id,name'], { type: 'text/csv' });
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      blob: () => Promise.resolve(blob),
+      status: 200,
+    });
+    const createObjectURLSpy = vi
+      .spyOn(URL, 'createObjectURL')
+      .mockReturnValue('blob:url');
+    const revokeObjectURLSpy = vi
+      .spyOn(URL, 'revokeObjectURL')
+      .mockImplementation(() => {});
+    const anchor = document.createElement('a');
+    const clickSpy = vi.spyOn(anchor, 'click').mockImplementation(() => {});
+    const origCreate = document.createElement;
+    document.createElement = (tag: string): HTMLElement => {
+      if (tag === 'a') {
+        return anchor;
+      }
+      return origCreate.call(document, tag);
+    };
     renderWithStore([
       {
         id: '1',
@@ -79,20 +100,13 @@ describe('SelectedFlyout', () => {
         detailsUrl: undefined,
       },
     ]);
-    const createObjectURLSpy = vi
-      .spyOn(URL, 'createObjectURL')
-      .mockReturnValue('blob:url');
-    const revokeObjectURLSpy = vi
-      .spyOn(URL, 'revokeObjectURL')
-      .mockImplementation(() => {});
-    const clickSpy = vi
-      .spyOn(document.createElement('a'), 'click')
-      .mockImplementation(() => {});
     fireEvent.click(screen.getByRole('button', { name: /download/i }));
-    expect(createObjectURLSpy).toHaveBeenCalled();
+    await waitFor(() => expect(createObjectURLSpy).toHaveBeenCalled());
+    expect(clickSpy).toHaveBeenCalled();
     expect(revokeObjectURLSpy).toHaveBeenCalled();
-    clickSpy.mockRestore();
     createObjectURLSpy.mockRestore();
     revokeObjectURLSpy.mockRestore();
+    clickSpy.mockRestore();
+    document.createElement = origCreate;
   });
 });

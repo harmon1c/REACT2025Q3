@@ -16,7 +16,11 @@
   "selection": {
     "items_selected": "{count, plural, =0 {No items selected} =1 {# item selected} other {# items selected}}",
     "unselect_all": "Unselect all",
-    "download": "Download"
+    "download": "Download",
+    "exporting": "Exporting...",
+    "export_failed": "Export failed",
+    "export_invalid": "Invalid selection",
+    "export_internal": "Internal error"
   },
   "results": {
     "loading": "Loading Pokemon data...",
