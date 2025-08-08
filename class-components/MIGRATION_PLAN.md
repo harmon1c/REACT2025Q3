@@ -35,9 +35,9 @@ This document tracks the phased migration and improvements. Each phase = one com
 - ✔ Initial server list fetch in `[locale]/page.tsx` with `searchParams`
 - ✔ Hydration path: pass `initialResults`, `initialTotalCount` → client
 - ✔ Hook updated (`usePokemonData`) to accept initial data + `hydrateOnly`
-- ☐ Server-side search (deferred to Phase 6 or later)
-- ☐ Prefetch details for `details` param (optional)
-- ☐ Error mapping helper + `notFound()` integration (later with dynamic routes)
+- ✔ Server-side search (search query handled via server fetch in `[locale]/page.tsx`)
+- ✔ Prefetch details for `details` param (executed server-side when present)
+- ✔ Error mapping helper + `notFound()` integration (dynamic route + errorMap)
 - Revalidation strategy (list=60s, details=300s) documented in code
 
 ## Phase 6: Home Page SSR (✔)
