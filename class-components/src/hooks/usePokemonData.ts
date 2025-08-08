@@ -146,6 +146,7 @@ export function usePokemonData(
 
   const loadPage = useCallback(
     (page: number): void => {
+      setLockedHydration(false);
       setCurrentPage(page);
       onPageChange?.(page);
     },

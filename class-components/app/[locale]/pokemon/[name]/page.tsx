@@ -2,6 +2,7 @@
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { fetchPokemonDetails } from '@/api/serverFetchers';
 import { pokemonApi } from '@/api/pokemonApi';
 import { parsePokemonDetails, getLocalizedLabel } from '@/utils/pokemonUtils';
@@ -55,10 +56,14 @@ export default async function PokemonDetailPage({
         <h1 className="text-3xl font-bold mb-4">{processed.name}</h1>
         <div className="flex items-center gap-6 mb-6">
           {processed.image && (
-            <img
+            <Image
               src={processed.image}
               alt={processed.name}
+              width={128}
+              height={128}
               className="w-32 h-32 object-contain drop-shadow"
+              priority={false}
+              sizes="128px"
             />
           )}
           <div className="space-y-2">

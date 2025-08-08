@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { parsePokemonDetails, getLocalizedLabel } from '../utils/pokemonUtils';
 import {
@@ -97,11 +98,13 @@ export function Card({
               aria-label={t('pokemon.select')}
             />
             {item.image ? (
-              <img
+              <Image
                 src={item.image}
                 alt={item.name}
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-full object-contain"
-                loading="lazy"
+                sizes="40px"
               />
             ) : (
               <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -153,11 +156,13 @@ export function Card({
         <div className="flex gap-4">
           <div className="flex items-center gap-3">
             {item.image ? (
-              <img
+              <Image
                 src={item.image}
                 alt={item.name}
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-contain"
-                loading="lazy"
+                sizes="48px"
               />
             ) : (
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-xs">

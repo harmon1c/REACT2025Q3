@@ -78,9 +78,11 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
-
-      // Temporarily disable Next.js warnings for initial migration
-      '@next/next/no-img-element': 'off',
+      // Next.js specific hardening: enforce <Image> & <Link>
+      '@next/next/no-img-element': 'error',
+      '@next/next/no-html-link-for-pages': ['error', './app'],
+      '@next/next/no-document-import-in-page': 'error',
+      '@next/next/no-head-element': 'error',
       'react-refresh/only-export-components': 'warn',
       '@typescript-eslint/no-inferrable-types': 'error',
       '@typescript-eslint/no-misused-promises': [
@@ -92,8 +94,7 @@ export default tseslint.config(
         },
       ],
 
-      // Import rules - temporarily relaxed for migration
-      'import/extensions': 'off',
+      'import/extensions': 'error',
       'import/order': [
         'error',
         {

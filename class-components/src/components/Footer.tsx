@@ -1,10 +1,9 @@
-'use client';
-
 import React from 'react';
-import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import { getTranslations } from 'next-intl/server';
 
-export const Footer: React.FC = () => {
-  const t = useTranslations();
+export async function Footer(): Promise<React.JSX.Element> {
+  const t = await getTranslations();
 
   return (
     <footer className="footer bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white mt-auto w-screen dark:bg-gradient-to-r dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 dark:text-gray-100">
@@ -18,10 +17,13 @@ export const Footer: React.FC = () => {
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               title={t('footer.school_link')}
             >
-              <img
+              <Image
                 src="/img/svg/rsschool-logo.svg"
                 alt={t('footer.school_alt')}
+                width={64}
+                height={32}
                 className="w-16 h-8 dark:invert"
+                priority={false}
               />
             </a>
           </div>
@@ -38,9 +40,11 @@ export const Footer: React.FC = () => {
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               title={t('footer.github_link')}
             >
-              <img
+              <Image
                 src="/img/svg/github-logo.svg"
                 alt={t('footer.github_alt')}
+                width={40}
+                height={40}
                 className="w-10 h-10 filter brightness-0 invert"
               />
             </a>
@@ -49,4 +53,4 @@ export const Footer: React.FC = () => {
       </div>
     </footer>
   );
-};
+}

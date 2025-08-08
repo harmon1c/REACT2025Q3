@@ -1,18 +1,23 @@
 'use client';
 
 import React from 'react';
-import { useTranslations } from 'next-intl';
 
 interface SearchProps {
   value: string;
   onChange: (value: string) => void;
   onSearch: (query: string) => void;
   onClear?: () => void;
+  labels: {
+    title: string;
+    description: string;
+    placeholder: string;
+    button: string;
+    clear: string;
+  };
 }
 
 export function Search(props: SearchProps): React.JSX.Element {
-  const { value, onChange, onSearch, onClear } = props;
-  const t = useTranslations();
+  const { value, onChange, onSearch, onClear, labels } = props;
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -34,10 +39,10 @@ export function Search(props: SearchProps): React.JSX.Element {
     <div className="mb-4 w-full">
       <div className="text-center mb-4">
         <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-1">
-          {t('search.title')}
+          {labels.title}
         </h2>
         <p className="text-gray-600 dark:text-gray-400 text-sm">
-          {t('search.description')}
+          {labels.description}
         </p>
       </div>
       <form onSubmit={handleSubmit} className="flex gap-3 w-full">
@@ -46,7 +51,7 @@ export function Search(props: SearchProps): React.JSX.Element {
             type="text"
             value={value}
             onChange={handleInputChange}
-            placeholder={t('search.placeholder')}
+            placeholder={labels.placeholder}
             className="w-full px-4 py-2 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 shadow-sm hover:shadow-md hover:border-gray-300
               dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-blue-400 dark:focus:border-transparent"
           />
@@ -70,7 +75,7 @@ export function Search(props: SearchProps): React.JSX.Element {
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
-            {t('search.button')}
+            {labels.button}
           </button>
           <button
             type="button"
@@ -91,7 +96,7 @@ export function Search(props: SearchProps): React.JSX.Element {
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-            {t('search.clear')}
+            {labels.clear}
           </button>
         </div>
       </form>

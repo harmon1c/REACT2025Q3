@@ -24,7 +24,7 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={messages}>
             <ReduxProvider>
               <ThemeProvider>
-                <Header />
+                <Header locale={locale} />
                 <main className="w-screen flex-1 bg-white/80 dark:bg-blue-900/80 transition-colors duration-300">
                   {children}
                 </main>

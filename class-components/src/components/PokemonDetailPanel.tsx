@@ -3,6 +3,7 @@
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { parsePokemonDetails, getLocalizedLabel } from '@/utils/pokemonUtils';
 import { useGetPokemonDetailsQuery } from '@/api/pokemonApiSlice';
 import { mapErrorToMessage } from '@/api/errorMap';
@@ -89,11 +90,14 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
       </div>
       <div className="text-center mb-4">
         {pokemon.image ? (
-          <img
+          <Image
             src={pokemon.image}
             alt={pokemon.name}
+            width={96}
+            height={96}
             className="w-24 h-24 mx-auto mb-2 object-contain drop-shadow-lg rounded-full"
-            loading="lazy"
+            priority={false}
+            sizes="96px"
           />
         ) : (
           <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-2">

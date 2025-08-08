@@ -1,9 +1,15 @@
 'use client';
 
 import React from 'react';
-import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import { CardList } from './CardList';
-import { SelectedFlyout } from './SelectedFlyout';
+const SelectedFlyout = dynamic(
+  () => import('./SelectedFlyout').then((m) => m.SelectedFlyout),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+);
 
 export interface ResultItem {
   id: number;
@@ -18,6 +24,15 @@ interface ResultsProps {
   error: string | null;
   onPokemonClick?: ((pokemonName: string) => Promise<void>) | undefined;
   selectedPokemon?: ResultItem | null | undefined;
+  labels: {
+    loading: string;
+    loading_description: string;
+    error_title: string;
+    error_suggestion: string;
+    no_results_title: string;
+    no_results_description: string;
+    popular_searches: string;
+  };
 }
 
 export function Results({
@@ -25,9 +40,8 @@ export function Results({
   isLoading,
   error,
   onPokemonClick,
+  labels,
 }: ResultsProps): React.JSX.Element {
-  const t = useTranslations();
-
   const renderLoadingState = (): React.JSX.Element => {
     return (
       <div className="p-12 min-h-[400px]">
@@ -37,10 +51,10 @@ export function Results({
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent absolute top-0 left-0"></div>
           </div>
           <span className="mt-6 text-gray-600 text-xl font-medium">
-            {t('results.loading')}
+            {labels.loading}
           </span>
           <div className="mt-3 text-gray-400 text-sm">
-            {t('results.loading_description')}
+            {labels.loading_description}
           </div>
         </div>
       </div>
@@ -69,12 +83,10 @@ export function Results({
             </div>
           </div>
           <h3 className="text-2xl font-bold text-red-600 mb-3">
-            {t('results.error_title')}
+            {labels.error_title}
           </h3>
           <p className="text-gray-600 max-w-md leading-relaxed mb-4">{error}</p>
-          <div className="text-gray-400 text-sm">
-            {t('results.error_suggestion')}
-          </div>
+          <div className="text-gray-400 text-sm">{labels.error_suggestion}</div>
         </div>
       </div>
     );
@@ -102,14 +114,12 @@ export function Results({
             </div>
           </div>
           <h3 className="text-2xl font-bold text-gray-700 mb-3">
-            {t('results.no_results_title')}
+            {labels.no_results_title}
           </h3>
           <p className="text-gray-500 max-w-md leading-relaxed mb-4">
-            {t('results.no_results_description')}
+            {labels.no_results_description}
           </p>
-          <div className="text-gray-400 text-sm">
-            {t('results.popular_searches')}
-          </div>
+          <div className="text-gray-400 text-sm">{labels.popular_searches}</div>
         </div>
       </div>
     );

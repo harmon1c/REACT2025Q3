@@ -62,12 +62,25 @@ Notes: Suspense boundary moved to server component for faster first paint; clien
 - (✔) Sticky panel style extracted into `StickyPanel` (mini-refactor)
 - ( ) Tests: metadata + notFound behavior (deferred)
 
-## Phase 8: Component Split & Image Optimization
+## Phase 8: Component Split & Image Optimization (✔ Complete)
 
-- Audit components: mark only necessary with `'use client'`
-- Convert remaining `<img>` → `<Image>` with proper `alt` and sizes
-- Replace manual locale path manipulations with `useLocale()` & localized navigation utilities
-- (🆕) Ensure tree-shaking by avoiding unnecessary client imports in server components
+- ✔ Audit: only truly interactive components remain client: catalogue container, detail panel, selection flyout, search, pagination, header (theme + locale), error boundary.
+- ✔ All `<img>` replaced by `<Image>` (Card, Footer, PokemonDetailPanel). No raw `<img>` left.
+- ✔ Removed repeated client translation hooks; labels now fully server-supplied. Client fallback removed for strict typing.
+- ✔ `HomePageClient` removed.
+- ✔ Header refactored to use `useLocale` + router navigation.
+- ✔ Locale duplication bug fixed (path normalization in HeaderClient).
+- ✔ Inlined previous `PokemonCatalogueServer` logic directly into `[locale]/page.tsx` (component now removed).
+- ✔ Lazy load `SelectedFlyout` via dynamic import inside `Results` (reduced initial JS bundle).
+- ✔ Migration plan updated (English) to reflect final architecture.
+- ℹ Results component still client due to selection overlay & click handlers; deeper split deferred until bundle metrics justify.
+
+### Deferred / Optional (⭐)
+
+- (⭐) Portal + animation for SelectedFlyout (currently simple fixed element).
+- (⭐) Further split Results into server shell + small client overlay if bundle size analysis suggests gains.
+- (⭐) CSV export server action (Phase 9 scope) might allow moving download logic server-side.
+- (⭐) Bundle & Lighthouse review to quantify JS reduction from lazy loading.
 
 ## Phase 9: Server Actions & CSV Export
 
@@ -100,12 +113,13 @@ Notes: Suspense boundary moved to server component for faster first paint; clien
 - Keep CSV export memory-safe: stream or chunk for large selections
 - Avoid double data fetching: separate server-provided initial data from client re-queries
 
-## Next Immediate Action (Begin Phase 8)
+## Next Immediate Action (Phase 8 Ongoing)
 
-1. Audit components for unnecessary `'use client'` directives
-2. Replace `<img>` with Next `<Image>` where beneficial
-3. Ensure no client-only modules imported in server components (tree-shake)
-4. Plan server action scaffolding for CSV export (Phase 9)
+1. Evaluate removing 'use client' from Footer (likely can be server)
+2. Confirm no residual imports of removed `HomePageClient` (✅ done)
+3. Consider moving non-interactive portions of `PokemonCatalogueContainer` to a server shell (potential Phase 8b)
+4. Replace remaining inline images if any new added (monitor)
+5. Plan server action scaffolding for CSV export (Phase 9)
 
 ---
 

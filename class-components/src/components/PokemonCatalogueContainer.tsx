@@ -2,10 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 import type { ProcessedPokemon } from '@/api/types';
 import { usePokemonData } from '@/hooks/usePokemonData';
-import { mapErrorToMessage } from '@/api/errorMap';
 import { Main } from './Main';
 import { Panel } from './Panel';
 import { Search } from './Search';
@@ -22,6 +20,28 @@ interface PokemonCatalogueContainerProps {
   onPageChange?: (page: number) => void;
   initialResults?: ProcessedPokemon[];
   initialTotalCount?: number;
+  labels: {
+    search: {
+      title: string;
+      description: string;
+      placeholder: string;
+      button: string;
+      clear: string;
+    };
+    results: {
+      loading: string;
+      loading_description: string;
+      error_title: string;
+      error_suggestion: string;
+      no_results_title: string;
+      no_results_description: string;
+      popular_searches: string;
+    };
+    pagination: {
+      previous: string;
+      next: string;
+    };
+  };
 }
 
 function getSavedSearchTerm(): string {
@@ -45,6 +65,7 @@ export const PokemonCatalogueContainer: React.FC<
   onPageChange,
   initialResults,
   initialTotalCount,
+  labels,
 }) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState(
@@ -54,7 +75,6 @@ export const PokemonCatalogueContainer: React.FC<
     results,
     isLoading,
     error,
-    rawError,
     currentPage,
     totalPages,
     searchPokemon,
@@ -65,7 +85,7 @@ export const PokemonCatalogueContainer: React.FC<
     initialTotalCount,
     hydrateOnly: !!initialResults?.length,
   });
-  const t = useTranslations();
+  // labels are required now (server-provided)
 
   useEffect(() => {
     if (initialSearchQuery) {
@@ -100,6 +120,20 @@ export const PokemonCatalogueContainer: React.FC<
 
   const handlePageChange = (page: number): void => {
     loadPage(page);
+    onPageChange?.(page);
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (page > 1) {
+        params.set('page', page.toString());
+      } else {
+        params.delete('page');
+      }
+      const query = params.toString();
+      const url = query ? `/?${query}` : '/';
+      router.push(url);
+    } catch {
+      // ignore if window not available (SSR safety)
+    }
   };
 
   const handleCloseDetails = (): void => {
@@ -139,32 +173,23 @@ export const PokemonCatalogueContainer: React.FC<
               onChange={handleSearchInputChange}
               onSearch={handleSearch}
               onClear={handleClear}
+              labels={labels.search}
             />
           </section>
           <section className="results-section">
             <Results
               results={results}
               isLoading={isLoading}
-              error={
-                error
-                  ? ((): string => {
-                      const mapped = rawError
-                        ? mapErrorToMessage(rawError)
-                        : error;
-                      return typeof mapped === 'string' &&
-                        mapped.startsWith('pokemon.')
-                        ? t(mapped)
-                        : error;
-                    })()
-                  : null
-              }
+              error={error}
               onPokemonClick={handlePokemonClick}
+              labels={labels.results}
             />
             {results.length > 0 && !isLoading && (
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
+                labels={labels.pagination}
               />
             )}
           </section>

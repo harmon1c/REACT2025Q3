@@ -1,13 +1,16 @@
 'use client';
 
 import React from 'react';
-import { useTranslations } from 'next-intl';
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
   isLoading?: boolean;
+  labels: {
+    previous: string;
+    next: string;
+  };
 }
 
 export const Pagination: React.FC<PaginationProps> = ({
@@ -15,9 +18,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
   isLoading = false,
+  labels,
 }) => {
-  const t = useTranslations();
-
   const getPageNumbers = (): number[] => {
     const pages: number[] = [];
     const maxVisible = 5;
@@ -51,7 +53,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200
           dark:text-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
       >
-        {t('pagination.previous')}
+        {labels.previous}
       </button>
 
       {firstPage > 1 && (
@@ -113,7 +115,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200
           dark:text-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
       >
-        {t('pagination.next')}
+        {labels.next}
       </button>
     </div>
   );

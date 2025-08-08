@@ -1,5 +1,7 @@
 import React, { Suspense } from 'react';
-import HomePageClient from '@/components/HomePageClient';
+import { getTranslations } from 'next-intl/server';
+import { PokemonCatalogueContainer } from '@/components/PokemonCatalogueContainer';
+import PokemonDetailPanel from '@/components/PokemonDetailPanel';
 import { fetchPokemonList, fetchPokemonDetails } from '@/api/serverFetchers';
 import { pokemonApi } from '@/api/pokemonApi';
 import type { ProcessedPokemon } from '@/api/types';
@@ -25,6 +27,7 @@ function HomePageSkeleton(): React.JSX.Element {
 }
 
 interface PageProps {
+  params: { locale: string } | Promise<{ locale: string }>;
   searchParams?:
     | { [key: string]: string | string[] | undefined }
     | Promise<{ [key: string]: string | string[] | undefined }>;
@@ -32,7 +35,10 @@ interface PageProps {
 
 export default async function HomePage({
   searchParams,
+  params,
 }: PageProps): Promise<React.JSX.Element> {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
   const resolvedSearchParams = await searchParams;
   const pageParam = Array.isArray(resolvedSearchParams?.page)
     ? resolvedSearchParams?.page[0]
@@ -76,11 +82,50 @@ export default async function HomePage({
     }
   }
 
+  const showDetailsPanel = !!detailsParam;
+
+  const detailsPanel =
+    showDetailsPanel && detailsParam ? (
+      <div className="w-80 shrink-0">
+        <PokemonDetailPanel pokemonName={detailsParam} />
+      </div>
+    ) : null;
+
+  const t = await getTranslations({ locale });
+  const labels = {
+    search: {
+      title: t('search.title'),
+      description: t('search.description'),
+      placeholder: t('search.placeholder'),
+      button: t('search.button'),
+      clear: t('search.clear'),
+    },
+    results: {
+      loading: t('results.loading'),
+      loading_description: t('results.loading_description'),
+      error_title: t('results.error_title'),
+      error_suggestion: t('results.error_suggestion'),
+      no_results_title: t('results.no_results_title'),
+      no_results_description: t('results.no_results_description'),
+      popular_searches: t('results.popular_searches'),
+    },
+    pagination: {
+      previous: t('pagination.previous'),
+      next: t('pagination.next'),
+    },
+  } as const;
+
   return (
     <Suspense fallback={<HomePageSkeleton />}>
-      <HomePageClient
+      <PokemonCatalogueContainer
         initialResults={initialResults}
         initialTotalCount={initialTotalCount}
+        selectedPokemonName={detailsParam}
+        initialPage={page}
+        initialSearchQuery={searchQueryRaw}
+        showDetailsPanel={showDetailsPanel}
+        detailsPanel={detailsPanel}
+        labels={labels}
       />
     </Suspense>
   );
