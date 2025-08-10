@@ -27,19 +27,16 @@ function HomePageSkeleton(): React.JSX.Element {
 }
 
 interface PageProps {
-  params: { locale: string } | Promise<{ locale: string }>;
-  searchParams?:
-    | { [key: string]: string | string[] | undefined }
-    | Promise<{ [key: string]: string | string[] | undefined }>;
+  params: Promise<{ locale: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function HomePage({
   searchParams,
   params,
 }: PageProps): Promise<React.JSX.Element> {
-  const resolvedParams = await params;
-  const locale = resolvedParams.locale;
-  const resolvedSearchParams = await searchParams;
+  const { locale } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const pageParam = Array.isArray(resolvedSearchParams?.page)
     ? resolvedSearchParams?.page[0]
     : resolvedSearchParams?.page;

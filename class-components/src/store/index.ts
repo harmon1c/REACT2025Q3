@@ -1,29 +1,46 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, type EnhancedStore } from '@reduxjs/toolkit';
 import { pokemonApi } from '../api/pokemonApiSlice';
-import selectedItemsReducer from './selectedItemsSlice';
+import selectedItemsReducer, { type SelectedItem } from './selectedItemsSlice';
 
-let preloadedSelectedItems = [];
-if (typeof window !== 'undefined') {
-  const saved = window.localStorage.getItem('selectedItems');
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    if (Array.isArray(parsed)) {
-      preloadedSelectedItems = parsed;
+function initPreloadedSelectedItems(): SelectedItem[] {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+  try {
+    const saved = window.localStorage.getItem('selectedItems');
+    if (!saved) {
+      return [];
     }
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
   }
 }
 
-export const store = configureStore({
-  reducer: {
-    selectedItems: selectedItemsReducer,
-    [pokemonApi.reducerPath]: pokemonApi.reducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(pokemonApi.middleware),
-  preloadedState: {
-    selectedItems: { items: preloadedSelectedItems },
-  },
-});
+interface RootStateShape {
+  selectedItems: { items: SelectedItem[] };
+  [key: string]: unknown;
+}
+
+export function createAppStore(
+  preloadedItems?: SelectedItem[]
+): EnhancedStore<RootStateShape> {
+  const items = preloadedItems ?? initPreloadedSelectedItems();
+  return configureStore({
+    reducer: {
+      selectedItems: selectedItemsReducer,
+      [pokemonApi.reducerPath]: pokemonApi.reducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(pokemonApi.middleware),
+    preloadedState: {
+      selectedItems: { items },
+    },
+  });
+}
+
+export const store = createAppStore();
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

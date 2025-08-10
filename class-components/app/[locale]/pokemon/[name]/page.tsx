@@ -36,16 +36,13 @@ export async function generateMetadata({
 }
 
 interface PageParams {
-  params:
-    | { locale: string; name: string }
-    | Promise<{ locale: string; name: string }>;
+  params: Promise<{ locale: string; name: string }>;
 }
 
 export default async function PokemonDetailPage({
   params,
 }: PageParams): Promise<React.JSX.Element> {
-  const resolved = await params;
-  const { name, locale } = resolved;
+  const { name, locale } = await params;
   try {
     const details = await fetchPokemonDetails({ nameOrId: name });
     const processed = pokemonApi.parsePokemonToProcessed(details);

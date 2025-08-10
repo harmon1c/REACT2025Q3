@@ -1,4 +1,10 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  cleanup,
+} from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { describe, it, expect, vi } from 'vitest';
@@ -28,8 +34,35 @@ vi.mock('next-intl', () => ({
       return map[key] ?? key;
     },
 }));
+let exportScenario:
+  | 'ok'
+  | 'invalid'
+  | 'nodata'
+  | 'internal'
+  | 'other'
+  | 'pending' = 'ok';
+let pendingResolve: ((v: string) => void) | null = null;
 vi.mock('../actions/buildCsvAction', () => ({
-  buildCsvAction: vi.fn().mockResolvedValue('id,name\n1,Bulbasaur'),
+  buildCsvAction: vi.fn(async () => {
+    if (exportScenario === 'invalid') {
+      throw new Error('INVALID_PAYLOAD');
+    }
+    if (exportScenario === 'nodata') {
+      throw new Error('NO_DATA');
+    }
+    if (exportScenario === 'internal') {
+      throw new Error('INTERNAL_ERROR');
+    }
+    if (exportScenario === 'other') {
+      throw new Error('SOMETHING');
+    }
+    if (exportScenario === 'pending') {
+      return new Promise<string>((resolve) => {
+        pendingResolve = resolve;
+      });
+    }
+    return 'id,name\n1,Bulbasaur';
+  }),
 }));
 
 describe('SelectedFlyout', () => {
@@ -129,5 +162,59 @@ describe('SelectedFlyout', () => {
     revokeObjectURLSpy.mockRestore();
     clickSpy.mockRestore();
     document.createElement = origCreate;
+  });
+
+  it('shows error messages for various failure codes', async () => {
+    const { buildCsvAction } = await import('../actions/buildCsvAction');
+    const scenarios: Array<{
+      code: typeof exportScenario;
+      expectRegex: RegExp;
+    }> = [
+      { code: 'invalid', expectRegex: /Invalid selection/i },
+      { code: 'nodata', expectRegex: /Export failed/i },
+      { code: 'internal', expectRegex: /Internal error/i },
+      { code: 'other', expectRegex: /Export failed/i },
+    ];
+
+    for (const s of scenarios) {
+      cleanup();
+      exportScenario = s.code;
+      renderWithStore([
+        {
+          id: '1',
+          name: 'Bulbasaur',
+          description: 'Grass',
+          detailsUrl: undefined,
+        },
+      ]);
+      fireEvent.click(screen.getByRole('button', { name: /download/i }));
+      await waitFor(() => expect(buildCsvAction).toHaveBeenCalled());
+      expect(screen.getByText(s.expectRegex)).toBeInTheDocument();
+      if (
+        'mockClear' in buildCsvAction &&
+        typeof buildCsvAction.mockClear === 'function'
+      ) {
+        buildCsvAction.mockClear();
+      }
+    }
+  });
+
+  it('prevents duplicate export while loading', async () => {
+    const { buildCsvAction } = await import('../actions/buildCsvAction');
+    exportScenario = 'pending';
+    renderWithStore([
+      {
+        id: '1',
+        name: 'Bulbasaur',
+        description: 'Grass',
+        detailsUrl: undefined,
+      },
+    ]);
+    const btn = screen.getByRole('button', { name: /download/i });
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    expect(buildCsvAction).toHaveBeenCalledTimes(1);
+    pendingResolve?.('id,name\n1,Bulbasaur');
+    await waitFor(() => expect(buildCsvAction).toHaveBeenCalledTimes(1));
   });
 });

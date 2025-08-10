@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import type { JSX } from 'react';
 import { ThemeProvider } from './ThemeContext';
@@ -25,10 +26,10 @@ describe('ThemeProvider and useTheme', () => {
     );
     expect(screen.getByTestId('theme').textContent).toMatch(/light|dark/);
     expect(screen.getByTestId('userSelected').textContent).toBe('false');
-    await screen.getByText('Set Dark').click();
+    await userEvent.click(screen.getByText('Set Dark'));
     expect(await screen.findByTestId('theme')).toHaveTextContent('dark');
     expect(screen.getByTestId('userSelected').textContent).toBe('true');
-    await screen.getByText('Set Light').click();
+    await userEvent.click(screen.getByText('Set Light'));
     expect(await screen.findByTestId('theme')).toHaveTextContent('light');
     expect(screen.getByTestId('userSelected').textContent).toBe('true');
   });
