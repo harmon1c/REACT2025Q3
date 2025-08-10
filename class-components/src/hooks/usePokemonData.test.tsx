@@ -1,7 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
 import { store } from '../store';
 import * as pokemonApiSlice from '../api/pokemonApiSlice';
 import { usePokemonData } from './usePokemonData';
@@ -40,11 +39,7 @@ describe('usePokemonData (smoke)', () => {
     children,
   }: {
     children: React.ReactNode;
-  }): React.ReactElement => (
-    <MemoryRouter>
-      <Provider store={store}>{children}</Provider>
-    </MemoryRouter>
-  );
+  }): React.ReactElement => <Provider store={store}>{children}</Provider>;
 
   const listQueryResult = {
     data: {
@@ -81,6 +76,7 @@ describe('usePokemonData (smoke)', () => {
     mockUseGetPokemonListQuery.mockImplementation(() => listQueryResult);
     mockUseSearchPokemonQuery.mockImplementation(() => searchQueryResult);
     mockUseGetPokemonDetailsQuery.mockImplementation(() => detailsQueryResult);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   it('returns default results and functions', (): void => {
