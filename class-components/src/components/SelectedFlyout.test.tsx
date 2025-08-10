@@ -7,6 +7,31 @@ import selectedItemsReducer, {
 } from '../store/selectedItemsSlice';
 import { SelectedFlyout } from './SelectedFlyout';
 
+vi.mock('next-intl', () => ({
+  useTranslations:
+    () =>
+    (key: string, vars?: Record<string, unknown>): string => {
+      if (key === 'selection.items_selected') {
+        const countVal = typeof vars?.count === 'number' ? vars.count : 0;
+        return countVal === 1
+          ? '1 item selected'
+          : `${countVal} items selected`;
+      }
+      const map: Record<string, string> = {
+        'selection.unselect_all': 'Unselect all',
+        'selection.download': 'Download',
+        'selection.exporting': 'Exporting...',
+        'selection.export_failed': 'Export failed',
+        'selection.export_invalid': 'Invalid selection',
+        'selection.export_internal': 'Internal error',
+      };
+      return map[key] ?? key;
+    },
+}));
+vi.mock('../actions/buildCsvAction', () => ({
+  buildCsvAction: vi.fn().mockResolvedValue('id,name\n1,Bulbasaur'),
+}));
+
 describe('SelectedFlyout', () => {
   const renderWithStore = (
     items: SelectedItem[] = []
@@ -71,12 +96,7 @@ describe('SelectedFlyout', () => {
   });
 
   it('triggers server CSV export when Download is clicked', async () => {
-    const blob = new Blob(['id,name'], { type: 'text/csv' });
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      blob: () => Promise.resolve(blob),
-      status: 200,
-    });
+    const { buildCsvAction } = await import('../actions/buildCsvAction');
     const createObjectURLSpy = vi
       .spyOn(URL, 'createObjectURL')
       .mockReturnValue('blob:url');
@@ -101,7 +121,8 @@ describe('SelectedFlyout', () => {
       },
     ]);
     fireEvent.click(screen.getByRole('button', { name: /download/i }));
-    await waitFor(() => expect(createObjectURLSpy).toHaveBeenCalled());
+    await waitFor(() => expect(buildCsvAction).toHaveBeenCalled());
+    expect(createObjectURLSpy).toHaveBeenCalled();
     expect(clickSpy).toHaveBeenCalled();
     expect(revokeObjectURLSpy).toHaveBeenCalled();
     createObjectURLSpy.mockRestore();

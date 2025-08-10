@@ -1,9 +1,39 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+vi.mock('next-intl', () => ({
+  useTranslations:
+    () =>
+    (key: string, vars?: Record<string, unknown>): string => {
+      if (key === 'pokemon.number' && vars?.id) {
+        return `Pokemon #${vars.id}`;
+      }
+      const map: Record<string, string> = {
+        'pokemon.view_details': 'View Details',
+        'pokemon.select': 'Select Pokemon',
+        'pokemon.details': 'Pokemon Details',
+        'pokemon.labels.height': 'HEIGHT',
+        'pokemon.labels.weight': 'WEIGHT',
+        'pokemon.labels.abilities': 'ABILITIES',
+        'pokemon.labels.base_experience': 'BASE EXPERIENCE',
+        'pokemon.labels.types': 'TYPES',
+      };
+      return map[key] ?? key;
+    },
+}));
 import { Provider } from 'react-redux';
 import { store } from '../store';
 import { ThemeProvider } from '../context/ThemeContext';
 import { Results, type ResultItem } from './Results';
+const labels = {
+  loading: 'Loading Pokemon data...',
+  loading_description: 'Please wait while we fetch the information',
+  error_title: 'Oops! Something went wrong',
+  error_suggestion: 'Please try searching for a different Pokemon',
+  no_results_title: 'No Pokemon Found',
+  no_results_description:
+    "We couldn't find any Pokemon matching your search. Try a different name or browse the complete list.",
+  popular_searches: 'Popular searches: pikachu, charizard, bulbasaur',
+};
 
 const mockOnPokemonClick = vi.fn();
 
@@ -35,6 +65,7 @@ describe('Results Component', () => {
               isLoading={false}
               error={null}
               onPokemonClick={mockOnPokemonClick}
+              labels={labels}
             />
           </ThemeProvider>
         </Provider>
@@ -52,6 +83,7 @@ describe('Results Component', () => {
               isLoading={false}
               error={null}
               onPokemonClick={mockOnPokemonClick}
+              labels={labels}
             />
           </ThemeProvider>
         </Provider>
@@ -68,6 +100,7 @@ describe('Results Component', () => {
               isLoading={true}
               error={null}
               onPokemonClick={mockOnPokemonClick}
+              labels={labels}
             />
           </ThemeProvider>
         </Provider>
@@ -84,6 +117,7 @@ describe('Results Component', () => {
               isLoading={false}
               error="Network error"
               onPokemonClick={mockOnPokemonClick}
+              labels={labels}
             />
           </ThemeProvider>
         </Provider>

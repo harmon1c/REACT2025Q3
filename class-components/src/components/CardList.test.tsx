@@ -5,6 +5,19 @@ import { store } from '../store';
 import { ThemeProvider } from '../context/ThemeContext';
 import { type ResultItem } from './Results';
 import { CardList } from './CardList';
+vi.mock('next-intl', () => ({
+  useTranslations:
+    () =>
+    (key: string, vars?: Record<string, unknown>): string => {
+      if (key === 'pokemon.number' && vars?.id) {
+        return `Pokemon #${vars.id}`;
+      }
+      const map: Record<string, string> = {
+        'pokemon.view_details': 'View Details',
+      };
+      return map[key] ?? key;
+    },
+}));
 
 const mockOnPokemonClick = vi.fn();
 

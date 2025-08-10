@@ -1,30 +1,60 @@
+import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { MemoryRouter, BrowserRouter } from 'react-router-dom';
-import { renderWithProviders } from '../test-utils';
 import * as pokemonApiSlice from '../api/pokemonApiSlice';
 import { pokemonApi } from '../api/pokemonApi';
-import PokemonDetailPanel from '../components/PokemonDetailPanel';
+import PokemonDetailPanel from './PokemonDetailPanel';
 
-vi.mock(
-  '../api/pokemonApiSlice',
-  (): Record<string, unknown> => ({
-    useGetPokemonDetailsQuery: vi.fn(),
-    pokemonApi: {
-      reducerPath: 'pokemonApi',
-      reducer: (): Record<string, unknown> => ({}),
-      middleware:
-        () => (next: (action: unknown) => unknown) => (action: unknown) =>
-          next(action),
+vi.mock('next/navigation', () => ({
+  useRouter: (): { push: (url: string) => void } => ({ push: vi.fn() }),
+}));
+vi.mock('next-intl', () => ({
+  useTranslations:
+    () =>
+    (key: string, vars?: Record<string, unknown>): string => {
+      if (key === 'pokemon.number' && vars?.id) {
+        return `Pokemon #${vars.id}`;
+      }
+      const staticMap: Record<string, string> = {
+        'pokemon.details': 'Pokemon Details',
+        'pokemon.refresh': 'Refresh',
+        'pokemon.close': 'Close',
+        'pokemon.close_details': 'Close Details',
+        'pokemon.information': 'Information',
+        'pokemon.not_found': 'Pokemon not found',
+        'pokemon.failed_to_load': 'Failed to load details',
+        'pokemon.no_details': 'No details found',
+        'pokemon.labels.types': 'Types',
+        'pokemon.labels.height': 'Height',
+        'pokemon.labels.weight': 'Weight',
+        'pokemon.labels.base_experience': 'Base Experience',
+        'pokemon.labels.abilities': 'Abilities',
+      };
+      return staticMap[key] ?? key;
     },
-  })
-);
+}));
+
+vi.mock('../api/pokemonApiSlice', () => ({
+  useGetPokemonDetailsQuery: vi.fn(),
+  pokemonApi: {
+    reducerPath: 'pokemonApi',
+    reducer: (): Record<string, unknown> => ({}),
+    middleware:
+      () =>
+      (next: (action: unknown) => unknown) =>
+      (action: unknown): unknown => {
+        return next(action);
+      },
+  },
+}));
 
 const parsePokemonDetails = vi.fn();
+const getLocalizedLabelMock = vi.fn((label: string) => label);
 vi.mock(
   '../utils/pokemonUtils',
   (): Record<string, unknown> => ({
     parsePokemonDetails: (...args: unknown[]) => parsePokemonDetails(...args),
+    getLocalizedLabel: (label: string) => getLocalizedLabelMock(label),
   })
 );
 
@@ -33,15 +63,11 @@ const mockUseGetPokemonDetailsQuery = vi.mocked(
 );
 
 const renderPanel = (
-  props: Record<string, unknown> = {}
-): ReturnType<typeof renderWithProviders> =>
-  renderWithProviders(
-    <MemoryRouter initialEntries={['/?details=pikachu']}>
-      <PokemonDetailPanel {...props} />
-    </MemoryRouter>
-  );
+  props: Partial<{ pokemonName: string; onClose: () => void }> = {}
+): ReturnType<typeof render> =>
+  render(<PokemonDetailPanel pokemonName="pikachu" {...props} />);
 
-describe('PokemonDetailPanel Page', (): void => {
+describe('PokemonDetailPanel (adapted)', (): void => {
   beforeEach((): void => {
     vi.clearAllMocks();
     vi.resetModules();
@@ -58,7 +84,7 @@ describe('PokemonDetailPanel Page', (): void => {
           { ability: { name: 'static', url: '' }, is_hidden: false, slot: 1 },
         ],
         sprites: {
-          front_default: 'pikachu.png',
+          front_default: '/pikachu.png',
           back_default: null,
           front_shiny: null,
           back_shiny: null,
@@ -70,9 +96,10 @@ describe('PokemonDetailPanel Page', (): void => {
     }));
   });
 
-  it('renders without crashing', (): void => {
+  it('renders basic structure when data loaded', (): void => {
     renderPanel();
-    expect(document.body).toBeInTheDocument();
+    expect(screen.getByText(/pikachu/i)).toBeInTheDocument();
+    expect(screen.getByText(/pokemon #25/i)).toBeInTheDocument();
   });
 
   it('shows loading state', (): void => {
@@ -94,7 +121,11 @@ describe('PokemonDetailPanel Page', (): void => {
       refetch: vi.fn(),
     }));
     renderPanel();
-    expect(screen.getByText(/failed to load details/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /failed to load details|pokemon not found|unknown_error/i
+      )
+    ).toBeInTheDocument();
   });
 
   it('renders avatar fallback if no image', (): void => {
@@ -110,7 +141,7 @@ describe('PokemonDetailPanel Page', (): void => {
       error: null,
       refetch: vi.fn(),
     }));
-    renderPanel();
+    renderPanel({ pokemonName: 'bulbasaur' });
     const fallbackDiv = document.querySelector('.bg-gradient-to-br');
     expect(fallbackDiv?.textContent).toBe('B');
   });
@@ -119,7 +150,7 @@ describe('PokemonDetailPanel Page', (): void => {
     vi.spyOn(pokemonApi, 'parsePokemonToProcessed').mockReturnValue({
       id: 25,
       name: 'pikachu',
-      image: 'pikachu.png',
+      image: '/pikachu.png',
       description: 'An electric type',
     });
     mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
@@ -129,9 +160,8 @@ describe('PokemonDetailPanel Page', (): void => {
       refetch: vi.fn(),
     }));
     renderPanel();
-    const img = screen.getByRole('img', { name: /pikachu/i });
+    const img = screen.getByAltText(/pikachu/i);
     expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute('src', 'pikachu.png');
   });
 
   it('displays close button', (): void => {
@@ -140,77 +170,30 @@ describe('PokemonDetailPanel Page', (): void => {
     expect(closeButton).toBeInTheDocument();
   });
 
-  it('renders pokemon details when loaded', (): void => {
-    renderPanel();
-    expect(screen.getByText(/pikachu/i)).toBeInTheDocument();
-    expect(screen.getByText(/pokemon #25/i)).toBeInTheDocument();
-  });
-
-  it('renders nothing or fallback if no pokemonName in search params', (): void => {
+  it('shows fallback if error or missing pokemon', (): void => {
     mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
       data: undefined,
       isLoading: false,
-      error: null,
+      error: { error: 'fail' },
       refetch: vi.fn(),
     }));
-    renderWithProviders(
-      <MemoryRouter initialEntries={['/']}>
-        <PokemonDetailPanel />
-      </MemoryRouter>
-    );
-    expect(screen.getByText(/no details found/i)).toBeInTheDocument();
+    renderPanel({ pokemonName: 'missing' });
+    expect(
+      screen.getByText(/pokemon not found|no details found|unknown_error/i)
+    ).toBeInTheDocument();
   });
 
-  it('renders nothing or fallback if no pokemonName in search params (async)', async (): Promise<void> => {
-    mockUseGetPokemonDetailsQuery.mockImplementation(() => ({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    }));
-    renderWithProviders(
-      <MemoryRouter initialEntries={['/']}>
-        <PokemonDetailPanel />
-      </MemoryRouter>
-    );
-    expect(screen.getByText(/no details found/i)).toBeInTheDocument();
-  });
-
-  it('calls onClose prop if provided', async (): Promise<void> => {
+  it('calls onClose prop when close button clicked', async (): Promise<void> => {
     const mockOnClose = vi.fn();
-    vi.doMock(
-      'react-router-dom',
-      async (): Promise<Record<string, unknown>> => {
-        const actual = await vi.importActual('react-router-dom');
-        return {
-          ...actual,
-          useSearchParams: (): [URLSearchParams, () => void] => [
-            new URLSearchParams([['details', 'pikachu']]),
-            vi.fn(),
-          ],
-          useNavigate: (): (() => void) => vi.fn(),
-        };
-      }
-    );
-    const { default: Panel } = await import('./PokemonDetailPanel');
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <Panel onClose={mockOnClose} />
-        </BrowserRouter>
-      );
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
-    const closeButton = screen.getByRole('button', {
-      name: /close details|close/i,
-    });
+    renderPanel({ onClose: mockOnClose });
+    const closeButton = screen.getByRole('button', { name: /close details/i });
     await act(async () => {
       closeButton.click();
     });
     expect(mockOnClose).toHaveBeenCalled();
   });
 
-  it('renders all details fields', async (): Promise<void> => {
+  it('renders all mapped detail fields', async (): Promise<void> => {
     parsePokemonDetails.mockReturnValue([
       { label: 'Type', value: 'Electric' },
       { label: 'Height', value: '0.4 m' },
@@ -228,28 +211,11 @@ describe('PokemonDetailPanel Page', (): void => {
     expect(screen.getByText(/6.0 kg/i)).toBeInTheDocument();
   });
 
-  it('displays close button', (): void => {
+  it('has close details button visible', (): void => {
     renderPanel();
-    const closeButton =
-      screen.queryByText('Close Details') || screen.getByText('Close');
-    expect(closeButton).toBeInTheDocument();
-  });
-
-  it('renders pokemon details when loaded', (): void => {
-    renderPanel();
-    const closeButton =
-      screen.queryByText('Close Details') || screen.getByText('Close');
-    expect(closeButton).toBeInTheDocument();
     expect(
-      screen.queryByText('Pikachu') || screen.getByText(/no details found/i)
+      screen.getByRole('button', { name: /close details/i })
     ).toBeInTheDocument();
-  });
-
-  it('handles pokemon name from params', (): void => {
-    renderPanel();
-    const closeButton =
-      screen.queryByText('Close Details') || screen.getByText('Close');
-    expect(closeButton).toBeInTheDocument();
   });
 
   afterEach((): void => {

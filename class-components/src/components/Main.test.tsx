@@ -33,6 +33,7 @@ describe('Main Component', () => {
     );
 
     const outerDiv = container.firstChild;
-    expect(outerDiv).toHaveClass('w-full', 'py-8');
+    expect(outerDiv).toHaveClass('w-full');
+    expect(outerDiv).toHaveClass('py-6');
   });
 });

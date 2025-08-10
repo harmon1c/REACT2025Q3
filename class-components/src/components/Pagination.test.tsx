@@ -7,6 +7,7 @@ describe('Pagination Component', () => {
     currentPage: 1,
     totalPages: 5,
     onPageChange: vi.fn(),
+    labels: { previous: 'Previous', next: 'Next' },
   };
 
   beforeEach((): void => {

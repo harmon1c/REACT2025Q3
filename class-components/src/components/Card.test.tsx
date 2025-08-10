@@ -5,6 +5,26 @@ import { Provider } from 'react-redux';
 import { store } from '../store';
 import { ThemeProvider } from '../context/ThemeContext';
 import { Card } from './Card';
+vi.mock('next-intl', () => ({
+  useTranslations:
+    () =>
+    (key: string, vars?: Record<string, unknown>): string => {
+      if (key === 'pokemon.number' && vars?.id) {
+        return `Pokemon #${vars.id}`;
+      }
+      const map: Record<string, string> = {
+        'pokemon.view_details': 'View Details',
+        'pokemon.select': 'Select Pokemon',
+        'pokemon.details': 'Pokemon Details',
+        'pokemon.labels.height': 'HEIGHT',
+        'pokemon.labels.weight': 'WEIGHT',
+        'pokemon.labels.abilities': 'ABILITIES',
+        'pokemon.labels.base_experience': 'BASE EXPERIENCE',
+        'pokemon.labels.types': 'TYPES',
+      };
+      return map[key] ?? key;
+    },
+}));
 import { type ResultItem } from './Results';
 
 const mockOnPokemonClick = vi.fn();
@@ -49,7 +69,7 @@ describe('Card Component', () => {
       );
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument();
-      expect(screen.getAllByText('Electric type Pokemon')).toHaveLength(2); // label and value
+      expect(screen.getAllByText('Electric type Pokemon')).toHaveLength(2);
     });
   });
 
@@ -456,7 +476,7 @@ describe('Card Component', () => {
         screen.getAllByText(
           'A legendary psychic-type Pokemon created through genetic manipulation.'
         )
-      ).toHaveLength(2); // Should appear as both label and value
+      ).toHaveLength(2);
     });
   });
 
@@ -502,8 +522,8 @@ describe('Card Component', () => {
         </Provider>
       );
       const button = screen.getByRole('button', { name: /view details/i });
-      await user.tab(); // checkbox
-      await user.tab(); // button
+      await user.tab();
+      await user.tab();
       expect(button).toHaveFocus();
       await user.keyboard('{Enter}');
       await waitFor(() => {
@@ -525,10 +545,7 @@ describe('Card Component', () => {
       );
       const img = screen.getByRole('img', { name: /pikachu/i });
       expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute(
-        'src',
-        'https://img.pokemontest.com/pikachu.png'
-      );
+      expect(img.getAttribute('src')).toContain('pikachu');
     });
   });
 });

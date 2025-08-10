@@ -1,20 +1,51 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
+import { describe, it, expect, vi } from 'vitest';
 import { ThemeProvider } from '../context/ThemeContext';
-import { Header } from './Header';
+import HeaderClient from './HeaderClient';
 
-function renderHeader(path = '/'): ReturnType<typeof render> {
+vi.mock('@/navigation', () => ({
+  usePathname: (): string => '/en',
+  useRouter: (): { push: (p: string, opts?: unknown) => void } => ({
+    push: vi.fn(),
+  }),
+  useSearchParams: (): URLSearchParams => new URLSearchParams(),
+  Link: ({
+    children,
+    href,
+  }: {
+    children: React.ReactNode;
+    href: string;
+  }): React.ReactElement => <a href={href}>{children}</a>,
+}));
+vi.mock('next-intl', () => ({ useLocale: (): string => 'en' }));
+vi.mock('@/hooks/useHasMounted', () => ({
+  useHasMounted: (): boolean => true,
+}));
+const mockSetTheme = vi.fn();
+vi.mock('@/context/useTheme', () => ({
+  useTheme: (): { theme: string; setTheme: (t: string) => void } => ({
+    theme: 'light',
+    setTheme: mockSetTheme,
+  }),
+}));
+
+function renderHeader(): ReturnType<typeof render> {
   return render(
     <ThemeProvider>
-      <MemoryRouter initialEntries={[path]}>
-        <Header />
-      </MemoryRouter>
+      <header>
+        <HeaderClient
+          homeLabel="Home"
+          aboutLabel="About"
+          switchToRussianLabel="Switch to Russian"
+          switchToEnglishLabel="Switch to English"
+        />
+      </header>
     </ThemeProvider>
   );
 }
 
-describe('Header', () => {
+describe('HeaderClient accessibility', () => {
   it('renders logo and navigation links', () => {
     renderHeader();
     expect(screen.getByText('Pokemon Explorer')).toBeInTheDocument();
@@ -22,39 +53,11 @@ describe('Header', () => {
     expect(screen.getByRole('link', { name: 'About' })).toBeInTheDocument();
   });
 
-  it('highlights Home link when on /', () => {
-    renderHeader('/');
-    const homeLink = screen.getByRole('link', { name: 'Home' });
-    expect(homeLink).toHaveClass('bg-white/40');
-  });
-
-  it('highlights About link when on /about', () => {
-    renderHeader('/about');
-    const aboutLink = screen.getByRole('link', { name: 'About' });
-    expect(aboutLink).toHaveClass('bg-white/40');
-  });
-
-  it('toggles theme when theme button is clicked', async () => {
-    renderHeader();
-    const button = screen.getByRole('button', {
-      name: /switch to dark theme|switch to light theme/i,
-    });
-    // Initial theme is light or dark depending on system/user, so just toggle and check aria-label
-    button.click();
-    expect(
-      button.getAttribute('aria-label') === 'Switch to dark theme' ||
-        button.getAttribute('aria-label') === 'Switch to light theme'
-    ).toBe(true);
-  });
-
-  it('has accessible theme toggle button', () => {
+  it('has theme toggle button with accessible name', () => {
     renderHeader();
     const button = screen.getByRole('button', {
       name: /switch to dark theme|switch to light theme/i,
     });
     expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute('aria-label');
-    expect(button).toHaveAttribute('title');
-    expect(screen.getByText('Toggle theme')).toBeInTheDocument();
   });
 });

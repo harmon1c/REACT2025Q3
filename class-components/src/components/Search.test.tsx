@@ -4,6 +4,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Search } from './Search';
 
+const labels = {
+  title: 'Search Pokemon',
+  description: 'Enter a Pokemon name to search for detailed information',
+  placeholder: 'Enter Pokemon name (e.g., Pikachu)...',
+  button: 'Search',
+  clear: 'Clear',
+};
+
 type ControlledSearchTestWrapperProps = {
   onSearch: (value: string) => void;
   onClear?: () => void;
@@ -21,6 +29,7 @@ const ControlledSearchTestWrapper: FC<ControlledSearchTestWrapperProps> = ({
       onChange={setValue}
       onSearch={onSearch}
       onClear={onClear}
+      labels={labels}
     />
   );
 };
@@ -39,7 +48,12 @@ describe('Search Component', () => {
   describe('Rendering Tests', () => {
     it('renders search input and search button', () => {
       render(
-        <Search onSearch={mockOnSearch} onChange={mockOnChange} value="" />
+        <Search
+          onSearch={mockOnSearch}
+          onChange={mockOnChange}
+          value=""
+          labels={labels}
+        />
       );
 
       expect(
@@ -58,6 +72,7 @@ describe('Search Component', () => {
           onChange={mockOnChange}
           onClear={mockOnClear}
           value=""
+          labels={labels}
         />
       );
 
@@ -73,6 +88,7 @@ describe('Search Component', () => {
           onSearch={mockOnSearch}
           onChange={mockOnChange}
           value={initialQuery}
+          labels={labels}
         />
       );
 
@@ -82,7 +98,12 @@ describe('Search Component', () => {
 
     it('shows empty input when no initial query is provided', () => {
       render(
-        <Search onSearch={mockOnSearch} onChange={mockOnChange} value="" />
+        <Search
+          onSearch={mockOnSearch}
+          onChange={mockOnChange}
+          value=""
+          labels={labels}
+        />
       );
 
       const input = screen.getByPlaceholderText(/enter pokemon name/i);
@@ -97,6 +118,7 @@ describe('Search Component', () => {
           onSearch={mockOnSearch}
           onChange={mockOnChange}
           value="savedPokemon"
+          labels={labels}
         />
       );
 
@@ -198,6 +220,7 @@ describe('Search Component', () => {
           onSearch={mockOnSearch}
           onChange={mockOnChange}
           value={savedQuery}
+          labels={labels}
         />
       );
 
