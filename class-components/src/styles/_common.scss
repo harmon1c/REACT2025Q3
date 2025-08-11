@@ -1,3 +1,15 @@
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 0.3rem;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--honeycomb-light);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--honey-gold-600);
+    cursor: pointer;
+  }
+}
 * {
   box-sizing: border-box;
 }

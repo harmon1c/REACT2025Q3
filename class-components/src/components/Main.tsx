@@ -1,15 +1,22 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 interface MainProps {
   children: React.ReactNode;
+  panel?: boolean;
 }
 
-export class Main extends Component<MainProps> {
-  public override render(): React.JSX.Element {
-    return (
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 px-4">
-        <div className="max-w-6xl mx-auto space-y-8">{this.props.children}</div>
-      </main>
-    );
-  }
-}
+export const Main: React.FC<MainProps> = ({ children, panel = true }) => {
+  return (
+    <section className="py-6 w-full">
+      <div className="mx-auto w-full max-w-[1440px] px-4">
+        {panel ? (
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xl dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+            {children}
+          </div>
+        ) : (
+          children
+        )}
+      </div>
+    </section>
+  );
+};
