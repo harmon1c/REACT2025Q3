@@ -60,15 +60,16 @@ Commit: `forms: scaffold feature structure`
 
 ## Phase 2: Universal Accessible Modal + Portal (Score: 15 pts part 1 / + supports later state points)
 
-Commit: `forms: universal portal modal infra`
+Commit: `forms: universal portal modal infra` (✔)
 
-- Implement `<RootPortal />` using `createPortal` (DOM container appended to `document.body`).
-- Modal component responsibilities: focus trap, initial focus, ESC close, outside click close, aria attributes (`role="dialog"`, `aria-modal="true"`, labelled by heading id).
-- Provide a single modal component receiving `variant: 'uncontrolled' | 'rhf'` or children render prop.
-- Global modal open state held in local component state OR minimal slice (decide: local first). Later integrate Redux only for submitted data, not for ephemeral open state (unless needed for debugging).
-- Add keyboard trap utility & return focus to trigger button.
-- Add two buttons on main forms demo page: "Open Uncontrolled Form", "Open Hook Form".
-- Add integration smoke: placeholder form content only text.
+- ✔ Implement `<RootPortal />` using `createPortal` (DOM container appended to `document.body`).
+- ✔ Modal component responsibilities: focus trap, initial focus, ESC close, outside click close, aria attributes (`role="dialog"`, `aria-modal="true"`, labelled by heading id).
+- ✔ Provide a single modal component rendering arbitrary children (will host each form variant).
+- ✔ Local component state controls modality (Redux deferred for submission data only).
+- ✔ Keyboard trap utility & focus return implemented.
+- ✔ Two buttons on demo page open each variant.
+- ✔ Integration smoke with placeholders.
+- ✔ (Added) `aria-live="polite"` region placeholder inside modal body (for later form-level status/errors).
 
 ---
 
