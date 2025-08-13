@@ -102,6 +102,16 @@ npm run format:fix # Prettier
 - Potential streaming/chunk CSV for very large exports
 - Further server/client splitting if bundle metrics require
 
+## Forms Feature (Task Scaffold)
+
+Phase 1 scaffold for the React Forms task added:
+
+- Feature directory `src/features/forms/` with placeholders for both Uncontrolled and RHF forms
+- Demo route: `[locale]/forms-demo` displaying placeholders (no modal yet)
+- Plan file `FORMS_PLAN.md` details phased implementation mapped to scoring
+
+Subsequent phases will introduce the universal portal modal, validation (Zod), password strength, image upload (base64), autocomplete, accessibility, Redux submissions storage, and a final comprehensive test suite.
+
 ## Migration Phases
 
 See `MIGRATION_PLAN.md` for chronological detail (Phases 1–10).
