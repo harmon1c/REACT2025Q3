@@ -1,5 +1,8 @@
 'use client';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
+import { UserRegistrationSchema } from '../validation/userRegistrationSchema';
+import { StrengthMeter } from '../components/StrengthMeter';
+import { evaluatePasswordStrength } from '../utils/passwordStrength';
 
 interface FieldErrors {
   name?: string;
@@ -7,6 +10,8 @@ interface FieldErrors {
   email?: string;
   gender?: string;
   terms?: string;
+  password?: string;
+  confirmPassword?: string;
 }
 
 interface SubmissionPreview {
@@ -15,6 +20,7 @@ interface SubmissionPreview {
   email: string;
   gender: string;
   termsAccepted: boolean;
+  password?: string; // not displayed; kept here for completeness but avoid logging plain in prod
 }
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -24,6 +30,8 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitted, setSubmitted] = useState<SubmissionPreview | null>(null);
   const [status, setStatus] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
 
   const validate = useCallback((fd: FormData): FieldErrors => {
     const next: FieldErrors = {};
@@ -32,6 +40,8 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
     const rawEmail = fd.get('email');
     const rawGender = fd.get('gender');
     const terms = fd.get('terms');
+    const rawPassword = fd.get('password');
+    const rawConfirm = fd.get('confirmPassword');
 
     const name = typeof rawName === 'string' ? rawName.trim() : '';
     const ageRaw = typeof rawAge === 'string' ? rawAge.trim() : '';
@@ -66,6 +76,14 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
       next.terms = 'forms.errors.terms_required';
     }
 
+    // Preliminary manual checks (legacy) before Zod safeParse fallback
+    // We'll run Zod below for canonical messages including password rules
+    if (typeof rawPassword !== 'string' || rawPassword.trim() === '') {
+      next.password = 'forms.errors.password_required';
+    }
+    if (typeof rawConfirm !== 'string' || rawConfirm.trim() === '') {
+      next.confirmPassword = 'forms.errors.confirm_password_required';
+    }
     return next;
   }, []);
 
@@ -73,12 +91,42 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
     (e: React.FormEvent<HTMLFormElement>): void => {
       e.preventDefault();
       const fd = new FormData(e.currentTarget);
-      const validation = validate(fd);
-      setErrors(validation);
-      if (Object.keys(validation).length > 0) {
+      const manual = validate(fd);
+      // Compose object for Zod
+      const assembled = {
+        name: fd.get('name') || '',
+        age: fd.get('age') || '',
+        email: fd.get('email') || '',
+        gender: fd.get('gender') || '',
+        terms: fd.get('terms') === 'on',
+        password: fd.get('password') || '',
+        confirmPassword: fd.get('confirmPassword') || '',
+      };
+      const parsed = UserRegistrationSchema.safeParse(assembled);
+      if (!parsed.success) {
+        const zodErrors: FieldErrors = { ...manual };
+        const isFieldKey = (k: unknown): k is keyof FieldErrors =>
+          typeof k === 'string' &&
+          [
+            'name',
+            'age',
+            'email',
+            'gender',
+            'terms',
+            'password',
+            'confirmPassword',
+          ].includes(k);
+        for (const issue of parsed.error.issues) {
+          const key = issue.path[0];
+          if (isFieldKey(key)) {
+            zodErrors[key] = issue.message;
+          }
+        }
+        setErrors(zodErrors);
         setStatus('');
         return;
       }
+      setErrors({});
       const rawName = fd.get('name');
       const rawAge = fd.get('age');
       const rawEmail = fd.get('email');
@@ -89,11 +137,18 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
         email: typeof rawEmail === 'string' ? rawEmail.trim() : '',
         gender: typeof rawGender === 'string' ? rawGender : '',
         termsAccepted: fd.get('terms') === 'on',
+        password:
+          typeof assembled.password === 'string'
+            ? assembled.password
+            : undefined,
       };
       setSubmitted(preview);
       setStatus('forms.status.submitted_temp');
       // eslint-disable-next-line no-console
-      console.log('[Phase3] Uncontrolled submission preview', preview);
+      console.log('[Phase5] Uncontrolled submission preview', {
+        ...preview,
+        password: preview.password ? '***' : undefined,
+      });
     },
     [validate]
   );
@@ -101,19 +156,52 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
   const fieldError = (key: keyof FieldErrors): string | undefined =>
     errors[key];
 
+  const passwordStrengthScore = useMemo(
+    () => evaluatePasswordStrength(password).score,
+    [password]
+  );
+
+  const hasBlockingErrors = useMemo(() => {
+    if (Object.keys(errors).length > 0) {
+      return true;
+    }
+    if (password && passwordStrengthScore < 2) {
+      return true;
+    }
+    if (password && confirmPassword && password !== confirmPassword) {
+      return true;
+    }
+    return false;
+  }, [errors, password, confirmPassword, passwordStrengthScore]);
+
   return (
     <form
       ref={formRef}
       onSubmit={onSubmit}
       noValidate
-      className="space-y-4"
+      className="relative p-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/70 backdrop-blur-sm shadow-md space-y-6 text-gray-800 dark:text-gray-100"
       aria-describedby="modal-status-region"
     >
+      <div
+        className="absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 dark:from-blue-600 dark:via-indigo-600 dark:to-purple-700"
+        aria-hidden="true"
+      />
+      <header className="space-y-1">
+        <h2 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+          forms.titles.uncontrolled
+        </h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          forms.descriptions.uncontrolled_intro
+        </p>
+      </header>
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {status}
       </div>
       <div className="flex flex-col gap-1">
-        <label htmlFor="un_name" className="font-medium text-sm">
+        <label
+          htmlFor="un_name"
+          className="text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
           forms.labels.name
         </label>
         <input
@@ -121,34 +209,85 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           name="name"
           type="text"
           placeholder="forms.placeholders.name"
-          className="rounded border px-3 py-2 text-sm bg-white dark:bg-blue-900/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           aria-invalid={!!fieldError('name')}
           aria-describedby={fieldError('name') ? 'err-name' : undefined}
         />
         {fieldError('name') && (
-          <p id="err-name" className="text-xs text-red-600 min-h-4">
+          <p id="err-name" className="text-xs text-red-500 mt-1 min-h-4">
             {fieldError('name')}
           </p>
         )}
       </div>
       <div className="flex flex-col gap-1">
-        <label htmlFor="un_age" className="font-medium text-sm">
-          forms.labels.age
+        <label
+          htmlFor="un_password"
+          className="text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          forms.labels.password
         </label>
         <input
-          id="un_age"
-          name="age"
-          type="number"
-          min={0}
-          className="rounded border px-3 py-2 text-sm bg-white dark:bg-blue-900/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
-          aria-invalid={!!fieldError('age')}
-          aria-describedby={fieldError('age') ? 'err-age' : undefined}
+          id="un_password"
+          name="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          aria-invalid={!!fieldError('password')}
+          aria-describedby={
+            fieldError('password') ? 'err-password' : 'un-strength'
+          }
         />
-        {fieldError('age') && (
-          <p id="err-age" className="text-xs text-red-600 min-h-4">
-            {fieldError('age')}
-          </p>
-        )}
+        <p id="err-password" className="text-xs text-red-500 mt-1 min-h-4">
+          {fieldError('password')}
+        </p>
+        <StrengthMeter password={password} id="un-strength" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor="un_confirm_password"
+          className="text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          forms.labels.confirm_password
+        </label>
+        <input
+          id="un_confirm_password"
+          name="confirmPassword"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          aria-invalid={!!fieldError('confirmPassword')}
+          aria-describedby={
+            fieldError('confirmPassword') ? 'err-confirm-password' : undefined
+          }
+        />
+        <p
+          id="err-confirm-password"
+          className="text-xs text-red-500 mt-1 min-h-4"
+        >
+          {fieldError('confirmPassword')}
+        </p>
+      </div>
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor="un_name"
+          className="text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          forms.labels.name
+        </label>
+        <input
+          id="un_name"
+          name="name"
+          type="text"
+          placeholder="forms.placeholders.name"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          aria-invalid={!!fieldError('name')}
+          aria-describedby={fieldError('name') ? 'err-name' : undefined}
+        />
+        <p id="err-name" className="text-xs text-red-500 mt-1 min-h-4">
+          {fieldError('name')}
+        </p>
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="un_email" className="font-medium text-sm">
@@ -159,18 +298,20 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           name="email"
           type="email"
           placeholder="forms.placeholders.email"
-          className="rounded border px-3 py-2 text-sm bg-white dark:bg-blue-900/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           aria-invalid={!!fieldError('email')}
           aria-describedby={fieldError('email') ? 'err-email' : undefined}
         />
         {fieldError('email') && (
-          <p id="err-email" className="text-xs text-red-600 min-h-4">
+          <p id="err-email" className="text-xs text-red-500 mt-1 min-h-4">
             {fieldError('email')}
           </p>
         )}
       </div>
       <fieldset className="flex flex-col gap-2">
-        <legend className="font-medium text-sm">forms.labels.gender</legend>
+        <legend className="text-sm font-medium text-gray-700 dark:text-gray-200">
+          forms.labels.gender
+        </legend>
         <div className="flex flex-wrap gap-4 text-sm">
           <label className="flex items-center gap-1">
             <input type="radio" name="gender" value="male" />
@@ -186,7 +327,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           </label>
         </div>
         {fieldError('gender') && (
-          <p id="err-gender" className="text-xs text-red-600 min-h-4">
+          <p id="err-gender" className="text-xs text-red-500 mt-1 min-h-4">
             {fieldError('gender')}
           </p>
         )}
@@ -198,21 +339,22 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           type="checkbox"
           aria-invalid={!!fieldError('terms')}
           aria-describedby={fieldError('terms') ? 'err-terms' : undefined}
-          className="mt-0.5 h-4 w-4 rounded border text-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+          className="mt-0.5 h-4 w-4 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/60 text-blue-600 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
         />
         <label htmlFor="un_terms" className="text-sm leading-snug">
           forms.labels.terms
         </label>
       </div>
       {fieldError('terms') && (
-        <p id="err-terms" className="text-xs text-red-600 min-h-4">
+        <p id="err-terms" className="text-xs text-red-500 mt-1 min-h-4">
           {fieldError('terms')}
         </p>
       )}
       <div className="flex gap-3 pt-2">
         <button
           type="submit"
-          className="rounded bg-green-600 text-white px-4 py-2 text-sm font-medium shadow hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500"
+          disabled={hasBlockingErrors}
+          className="rounded-md bg-gradient-to-r from-green-600 to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 text-sm font-medium shadow hover:from-green-500 hover:to-emerald-500 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-900 transition-colors"
         >
           forms.labels.submit
         </button>
@@ -222,14 +364,16 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
             setErrors({});
             setStatus('');
             setSubmitted(null);
+            setPassword('');
+            setConfirmPassword('');
           }}
-          className="rounded bg-gray-200 dark:bg-blue-900/40 text-gray-900 dark:text-gray-100 px-4 py-2 text-sm font-medium shadow hover:bg-gray-300 dark:hover:bg-blue-800/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500"
+          className="rounded-md bg-gray-200/80 dark:bg-gray-800/60 text-gray-900 dark:text-gray-100 px-5 py-2 text-sm font-medium shadow hover:bg-gray-300 dark:hover:bg-gray-700 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-gray-900 transition-colors"
         >
           forms.labels.reset
         </button>
       </div>
       {submitted && (
-        <pre className="mt-4 max-h-40 overflow-auto rounded bg-gray-900/90 text-[10px] text-green-300 p-3">
+        <pre className="mt-4 max-h-40 overflow-auto rounded-lg bg-gray-900/90 ring-1 ring-gray-700 text-[10px] text-green-300 p-3">
           {JSON.stringify(submitted, null, 2)}
         </pre>
       )}

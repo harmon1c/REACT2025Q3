@@ -6,8 +6,8 @@ export async function Footer(): Promise<React.JSX.Element> {
   const t = await getTranslations();
 
   return (
-    <footer className="footer bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white mt-auto w-screen dark:bg-gradient-to-r dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 dark:text-gray-100">
-      <div className="w-full max-w-[1440px] mx-auto px-4 py-2">
+    <footer className="footer mt-auto w-screen bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white/90 backdrop-blur supports-[backdrop-filter]:bg-opacity-90 border-t border-white/10 dark:bg-gradient-to-r dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 dark:text-gray-200 dark:border-gray-800">
+      <div className="w-full max-w-[1440px] mx-auto px-4 py-3">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <a
@@ -28,7 +28,7 @@ export async function Footer(): Promise<React.JSX.Element> {
             </a>
           </div>
 
-          <div className="text-sm text-white/80 dark:text-gray-300">
+          <div className="text-sm text-white/80 dark:text-gray-400">
             {t('footer.copyright')}
           </div>
 
@@ -45,7 +45,7 @@ export async function Footer(): Promise<React.JSX.Element> {
                 alt={t('footer.github_alt')}
                 width={40}
                 height={40}
-                className="w-10 h-10 filter brightness-0 invert"
+                className="w-10 h-10 filter brightness-0 invert dark:brightness-100 dark:invert-0 dark:opacity-90"
               />
             </a>
           </div>

@@ -10,7 +10,7 @@ export async function Header({
 }: HeaderProps = {}): Promise<React.JSX.Element> {
   const t = await getTranslations({ locale: locale ?? 'en', namespace: 'nav' });
   return (
-    <header className="header bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white w-screen dark:bg-gradient-to-r dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 dark:text-gray-100">
+    <header className="header w-screen bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white/95 backdrop-blur supports-[backdrop-filter]:bg-opacity-90 shadow-sm border-b border-white/10 dark:bg-gradient-to-r dark:from-gray-900 dark:via-gray-850 dark:to-gray-950 dark:text-gray-100 dark:border-gray-800 dark:shadow-md">
       <div className="w-full max-w-[1440px] mx-auto px-4">
         <HeaderClient
           homeLabel={t('home')}

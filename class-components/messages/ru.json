@@ -123,6 +123,14 @@
     "github_alt": "GitHub"
   },
   "forms": {
+    "titles": {
+      "uncontrolled": "Неконтролируемая форма",
+      "rhf": "Форма RHF"
+    },
+    "descriptions": {
+      "uncontrolled_intro": "Пример неконтролируемой формы с ручной валидацией.",
+      "rhf_intro": "Вариант на React Hook Form c использованием библиотеки."
+    },
     "labels": {
       "name": "Имя",
       "age": "Возраст",
@@ -131,6 +139,8 @@
       "gender_male": "Мужской",
       "gender_female": "Женский",
       "gender_other": "Другое",
+      "password": "Пароль",
+      "confirm_password": "Подтвердите пароль",
       "terms": "Я принимаю временные условия использования",
       "submit": "Отправить",
       "reset": "Сбросить"
@@ -147,10 +157,19 @@
       "email_required": "Email обязателен",
       "email_invalid": "Некорректный формат email",
       "gender_required": "Пол обязателен",
-      "terms_required": "Вы должны принять условия"
+      "terms_required": "Вы должны принять условия",
+      "password_required": "Пароль обязателен",
+      "confirm_password_required": "Подтверждение пароля обязательно",
+      "passwords_mismatch": "Пароли не совпадают",
+      "password_weak": "Пароль должен быть ≥8 символов и содержать верхний, нижний регистр, цифру и спец. символ"
     },
     "status": {
-      "submitted_temp": "Форма отправлена (временный предпросмотр)."
+      "submitted_temp": "Форма отправлена (временный предпросмотр).",
+      "strength_0": "Очень слабый пароль",
+      "strength_1": "Слабый пароль",
+      "strength_2": "Средний пароль",
+      "strength_3": "Хороший пароль",
+      "strength_4": "Сильный пароль"
     }
   }
 }

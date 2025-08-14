@@ -128,6 +128,14 @@
     "popularSearches": "🔍 Popular searches:"
   },
   "forms": {
+    "titles": {
+      "uncontrolled": "Uncontrolled Registration",
+      "rhf": "RHF Registration"
+    },
+    "descriptions": {
+      "uncontrolled_intro": "Basic uncontrolled form example with manual validation.",
+      "rhf_intro": "React Hook Form variant leveraging library validation patterns."
+    },
     "labels": {
       "name": "Name",
       "age": "Age",
@@ -136,6 +144,8 @@
       "gender_male": "Male",
       "gender_female": "Female",
       "gender_other": "Other",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
       "terms": "I accept the temporary terms of use",
       "submit": "Submit",
       "reset": "Reset"
@@ -152,10 +162,19 @@
       "email_required": "Email is required",
       "email_invalid": "Email format is invalid",
       "gender_required": "Gender is required",
-      "terms_required": "You must accept the terms"
+      "terms_required": "You must accept the terms",
+      "password_required": "Password is required",
+      "confirm_password_required": "Confirm password is required",
+      "passwords_mismatch": "Passwords do not match",
+      "password_weak": "Password must be at least 8 chars incl. upper, lower, digit & special"
     },
     "status": {
-      "submitted_temp": "Form submitted (temporary preview)."
+      "submitted_temp": "Form submitted (temporary preview).",
+      "strength_0": "Very weak password",
+      "strength_1": "Weak password",
+      "strength_2": "Fair password",
+      "strength_3": "Good password",
+      "strength_4": "Strong password"
     }
   }
 }

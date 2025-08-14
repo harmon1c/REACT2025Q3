@@ -271,4 +271,9 @@ Commit: `tests: forms feature full coverage`
 
 ## Next Immediate Action
 
-Proceed with Phase 5 preparation: introduce Zod schema & password fields scaffolding, password strength utility, extend i18n keys, and non-breaking integration stubs in both forms (password + confirm placeholders, disabled submit logic not yet enforced until full validation commit).
+Finalize Phase 5 (validation + password strength) by:
+
+1. Verifying uncontrolled form JSX + disabled logic (now fixed) and ensuring both forms block weak / mismatched passwords and show consistent error keys.
+2. Quick manual regression pass (name, age, email, gender, terms, password strength) in both forms.
+
+Then begin Phase 6: Redux integration (create submissions slice, dispatch on successful submit, render tiles) per plan above.

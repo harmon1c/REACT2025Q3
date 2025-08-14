@@ -74,7 +74,7 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
   return (
     <StickyPanel>
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
+        <h2 className="text-lg font-bold text-gray-800 tracking-tight dark:text-gray-100">
           {t('pokemon.details')}
         </h2>
         <button
@@ -106,14 +106,14 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
             </span>
           </div>
         )}
-        <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 mb-1">
+        <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 mb-1 tracking-tight">
           {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
         </h3>
         <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
           {t('pokemon.number', { id: pokemon.id })}
         </p>
       </div>
-      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1">
+      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-1 uppercase tracking-wide">
         {t('pokemon.information')}
       </h4>
       <div className="space-y-1 text-sm mb-2">
@@ -122,7 +122,7 @@ const PokemonDetailPanel: React.FC<PokemonDetailPanelProps> = ({
             <span className="text-blue-600 dark:text-blue-400 font-medium text-xs uppercase tracking-wide">
               {getLocalizedLabel(detail.label, t)}:
             </span>
-            <span className="text-gray-700 dark:text-gray-100 text-sm font-medium">
+            <span className="text-gray-700 dark:text-gray-100 text-sm font-medium leading-snug">
               {detail.value}
             </span>
           </div>
