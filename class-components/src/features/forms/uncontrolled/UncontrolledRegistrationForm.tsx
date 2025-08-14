@@ -1,6 +1,8 @@
 'use client';
 import React, { useCallback, useRef, useState, useMemo } from 'react';
+import { useAppDispatch } from '@/store/hooks';
 import { UserRegistrationSchema } from '../validation/userRegistrationSchema';
+import { addUncontrolledSubmission } from '../state/formsSubmissionsSlice';
 import { StrengthMeter } from '../components/StrengthMeter';
 import { evaluatePasswordStrength } from '../utils/passwordStrength';
 
@@ -20,7 +22,7 @@ interface SubmissionPreview {
   email: string;
   gender: string;
   termsAccepted: boolean;
-  password?: string; // not displayed; kept here for completeness but avoid logging plain in prod
+  password?: string;
 }
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -32,6 +34,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
   const [status, setStatus] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const dispatch = useAppDispatch();
 
   const validate = useCallback((fd: FormData): FieldErrors => {
     const next: FieldErrors = {};
@@ -76,8 +79,6 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
       next.terms = 'forms.errors.terms_required';
     }
 
-    // Preliminary manual checks (legacy) before Zod safeParse fallback
-    // We'll run Zod below for canonical messages including password rules
     if (typeof rawPassword !== 'string' || rawPassword.trim() === '') {
       next.password = 'forms.errors.password_required';
     }
@@ -144,13 +145,21 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
       };
       setSubmitted(preview);
       setStatus('forms.status.submitted_temp');
+      dispatch(
+        addUncontrolledSubmission({
+          name: preview.name,
+          age: preview.age,
+          email: preview.email,
+          gender: preview.gender,
+        })
+      );
       // eslint-disable-next-line no-console
       console.log('[Phase5] Uncontrolled submission preview', {
         ...preview,
         password: preview.password ? '***' : undefined,
       });
     },
-    [validate]
+    [validate, dispatch]
   );
 
   const fieldError = (key: keyof FieldErrors): string | undefined =>

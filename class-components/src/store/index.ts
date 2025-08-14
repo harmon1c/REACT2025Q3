@@ -1,4 +1,7 @@
 import { configureStore, type EnhancedStore } from '@reduxjs/toolkit';
+import formsSubmissionsReducer, {
+  type FormsSubmissionsState,
+} from '@/features/forms/state/formsSubmissionsSlice';
 import { pokemonApi } from '../api/pokemonApiSlice';
 import selectedItemsReducer, { type SelectedItem } from './selectedItemsSlice';
 
@@ -20,6 +23,7 @@ function initPreloadedSelectedItems(): SelectedItem[] {
 
 interface RootStateShape {
   selectedItems: { items: SelectedItem[] };
+  formsSubmissions: FormsSubmissionsState;
   [key: string]: unknown;
 }
 
@@ -30,6 +34,7 @@ export function createAppStore(
   return configureStore({
     reducer: {
       selectedItems: selectedItemsReducer,
+      formsSubmissions: formsSubmissionsReducer,
       [pokemonApi.reducerPath]: pokemonApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>

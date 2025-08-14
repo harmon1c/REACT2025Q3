@@ -1,0 +1,111 @@
+'use client';
+import React, { useEffect, useState } from 'react';
+import { useAppSelector } from '@/store/hooks';
+
+function formatDate(ts: number): string {
+  try {
+    return new Date(ts).toLocaleTimeString();
+  } catch {
+    return '';
+  }
+}
+
+export function SubmissionsTiles(): React.JSX.Element {
+  const uncontrolled = useAppSelector(
+    (state) => state.formsSubmissions.uncontrolled
+  );
+  const rhf = useAppSelector((state) => state.formsSubmissions.rhf);
+  const [flashIds, setFlashIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const newestIds: string[] = [];
+    if (uncontrolled[0]) {
+      newestIds.push(uncontrolled[0].id);
+    }
+    if (rhf[0]) {
+      newestIds.push(rhf[0].id);
+    }
+    if (newestIds.length === 0) {
+      return;
+    }
+    setFlashIds((prev) => {
+      const next = new Set(prev);
+      newestIds.forEach((id) => next.add(id));
+      return next;
+    });
+    const handle = window.setTimeout(() => {
+      setFlashIds((prev) => {
+        const next = new Set(prev);
+        newestIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    }, 3000);
+    return (): void => {
+      window.clearTimeout(handle);
+    };
+  }, [uncontrolled, rhf]);
+  return (
+    <div className="grid md:grid-cols-2 gap-6">
+      <div>
+        <h3 className="text-sm font-semibold mb-2">Uncontrolled Submissions</h3>
+        <ul className="space-y-2">
+          {uncontrolled.slice(0, 5).map((s) => {
+            const flashing = flashIds.has(s.id);
+            return (
+              <li
+                key={s.id}
+                className={
+                  'p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs flex flex-col gap-1 transition-colors duration-700 ' +
+                  (flashing
+                    ? 'bg-green-100 dark:bg-green-900/40'
+                    : 'bg-white/80 dark:bg-gray-800/60')
+                }
+              >
+                <span className="font-medium">{s.name}</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {s.email} • {s.gender} • {s.age ?? '-'}
+                </span>
+                <span className="text-[10px] text-gray-400">
+                  {formatDate(s.createdAt)}
+                </span>
+              </li>
+            );
+          })}
+          {uncontrolled.length === 0 && (
+            <li className="text-xs text-gray-500">No submissions yet.</li>
+          )}
+        </ul>
+      </div>
+      <div>
+        <h3 className="text-sm font-semibold mb-2">RHF Submissions</h3>
+        <ul className="space-y-2">
+          {rhf.slice(0, 5).map((s) => {
+            const flashing = flashIds.has(s.id);
+            return (
+              <li
+                key={s.id}
+                className={
+                  'p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs flex flex-col gap-1 transition-colors duration-700 ' +
+                  (flashing
+                    ? 'bg-purple-100 dark:bg-purple-900/40'
+                    : 'bg-white/80 dark:bg-gray-800/60')
+                }
+              >
+                <span className="font-medium">{s.name}</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {s.email} • {s.gender} • {s.age ?? '-'}
+                </span>
+                <span className="text-[10px] text-gray-400">
+                  {formatDate(s.createdAt)}
+                </span>
+              </li>
+            );
+          })}
+          {rhf.length === 0 && (
+            <li className="text-xs text-gray-500">No submissions yet.</li>
+          )}
+        </ul>
+      </div>
+    </div>
+  );
+}

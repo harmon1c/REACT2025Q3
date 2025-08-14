@@ -2,6 +2,8 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useAppDispatch } from '@/store/hooks';
+import { addRHFSubmission } from '../state/formsSubmissionsSlice';
 import {
   UserRegistrationSchema,
   type UserRegistrationInput,
@@ -9,6 +11,7 @@ import {
 import { StrengthMeter } from '../components/StrengthMeter';
 
 export function RHFRegistrationForm(): React.JSX.Element {
+  const dispatch = useAppDispatch();
   const { register, handleSubmit, formState, reset, watch } =
     useForm<UserRegistrationInput>({
       resolver: zodResolver(UserRegistrationSchema),
@@ -25,8 +28,19 @@ export function RHFRegistrationForm(): React.JSX.Element {
     });
 
   const internalSubmit = handleSubmit((data) => {
+    dispatch(
+      addRHFSubmission({
+        name: data.name,
+        age: data.age ? Number(data.age) : null,
+        email: data.email,
+        gender: data.gender,
+      })
+    );
     // eslint-disable-next-line no-console
-    console.log('[Phase4] RHF submission preview', data);
+    console.log('[Phase6] RHF submission preview', {
+      ...data,
+      password: '***',
+    });
   });
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     void internalSubmit(e);

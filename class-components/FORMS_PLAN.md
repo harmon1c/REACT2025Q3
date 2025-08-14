@@ -96,9 +96,9 @@ Commit: `forms: rhf form core fields` (✔)
 
 ---
 
-## Phase 5: Full Validation & Password Strength (Score: 15 Validation + 15 Passwords)
+## Phase 5: Full Validation & Password Strength (Score: 15 Validation + 15 Passwords) (✔)
 
-Commit: `forms: validation + password strength (both forms)`
+Commit: `forms: validation + password strength (both forms)` (✔)
 
 - Introduce Zod schema `UserRegistrationSchema` with refinements:
   - name: first letter uppercase regex
@@ -271,9 +271,13 @@ Commit: `tests: forms feature full coverage`
 
 ## Next Immediate Action
 
-Finalize Phase 5 (validation + password strength) by:
+Complete remaining Phase 6 polish:
 
-1. Verifying uncontrolled form JSX + disabled logic (now fixed) and ensuring both forms block weak / mismatched passwords and show consistent error keys.
-2. Quick manual regression pass (name, age, email, gender, terms, password strength) in both forms.
+1. Add highlight + fade-out effect for newest submission tile (pending).
+2. Minor styling pass on tiles (icons / badge for newest) (optional).
+3. Then proceed to Phase 7 (image upload integration) once highlight behavior verified.
+
+4. Verifying uncontrolled form JSX + disabled logic (now fixed) and ensuring both forms block weak / mismatched passwords and show consistent error keys.
+5. Quick manual regression pass (name, age, email, gender, terms, password strength) in both forms.
 
 Then begin Phase 6: Redux integration (create submissions slice, dispatch on successful submit, render tiles) per plan above.

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { UncontrolledRegistrationForm } from '../uncontrolled/UncontrolledRegistrationForm';
 import { RHFRegistrationForm } from '../rhf/RHFRegistrationForm';
 import { Modal } from './Modal';
+import { SubmissionsTiles } from './SubmissionsTiles';
 
 export function FormsDemoClient(): React.JSX.Element {
   const [open, setOpen] = useState<null | 'uncontrolled' | 'rhf'>(null);
@@ -42,6 +43,7 @@ export function FormsDemoClient(): React.JSX.Element {
       >
         <RHFRegistrationForm />
       </Modal>
+      <SubmissionsTiles />
     </div>
   );
 }
