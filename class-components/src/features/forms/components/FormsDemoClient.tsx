@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { UncontrolledFormPlaceholder } from '../uncontrolled/UncontrolledFormPlaceholder';
+import { UncontrolledRegistrationForm } from '../uncontrolled/UncontrolledRegistrationForm';
 import { RHFFormPlaceholder } from '../rhf/RHFFormPlaceholder';
 import { Modal } from './Modal';
 
@@ -25,15 +25,15 @@ export function FormsDemoClient(): React.JSX.Element {
         </button>
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400">
-        Phase 2 provides infrastructure only. Real fields and validation will
-        arrive in later phases.
+        Phase 3: Uncontrolled form now has core fields (name, age, email,
+        gender, terms) with basic client validation.
       </p>
       <Modal
         open={open === 'uncontrolled'}
         onClose={() => setOpen(null)}
-        title="Uncontrolled Form (Scaffold)"
+        title="Uncontrolled Form"
       >
-        <UncontrolledFormPlaceholder />
+        <UncontrolledRegistrationForm />
       </Modal>
       <Modal
         open={open === 'rhf'}

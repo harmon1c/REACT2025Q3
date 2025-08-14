@@ -121,5 +121,36 @@
     "copyright": "© 2025",
     "github_link": "Ссылка на GitHub",
     "github_alt": "GitHub"
+  },
+  "forms": {
+    "labels": {
+      "name": "Имя",
+      "age": "Возраст",
+      "email": "Email",
+      "gender": "Пол",
+      "gender_male": "Мужской",
+      "gender_female": "Женский",
+      "gender_other": "Другое",
+      "terms": "Я принимаю временные условия использования",
+      "submit": "Отправить",
+      "reset": "Сбросить"
+    },
+    "placeholders": {
+      "name": "Ваше имя",
+      "email": "you@example.com"
+    },
+    "errors": {
+      "name_required": "Имя обязательно",
+      "name_capital": "Имя должно начинаться с заглавной буквы",
+      "age_required": "Возраст обязателен",
+      "age_number": "Возраст должен быть неотрицательным целым числом",
+      "email_required": "Email обязателен",
+      "email_invalid": "Некорректный формат email",
+      "gender_required": "Пол обязателен",
+      "terms_required": "Вы должны принять условия"
+    },
+    "status": {
+      "submitted_temp": "Форма отправлена (временный предпросмотр)."
+    }
   }
 }

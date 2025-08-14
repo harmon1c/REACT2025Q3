@@ -126,5 +126,36 @@
     "description": "The page you are looking for seems to have vanished into the digital void.",
     "goHome": "🏠 Go Home",
     "popularSearches": "🔍 Popular searches:"
+  },
+  "forms": {
+    "labels": {
+      "name": "Name",
+      "age": "Age",
+      "email": "Email",
+      "gender": "Gender",
+      "gender_male": "Male",
+      "gender_female": "Female",
+      "gender_other": "Other",
+      "terms": "I accept the temporary terms of use",
+      "submit": "Submit",
+      "reset": "Reset"
+    },
+    "placeholders": {
+      "name": "Your name",
+      "email": "you@example.com"
+    },
+    "errors": {
+      "name_required": "Name is required",
+      "name_capital": "Name should start with a capital letter",
+      "age_required": "Age is required",
+      "age_number": "Age must be a non-negative integer",
+      "email_required": "Email is required",
+      "email_invalid": "Email format is invalid",
+      "gender_required": "Gender is required",
+      "terms_required": "You must accept the terms"
+    },
+    "status": {
+      "submitted_temp": "Form submitted (temporary preview)."
+    }
   }
 }
