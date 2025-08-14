@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { UncontrolledRegistrationForm } from '../uncontrolled/UncontrolledRegistrationForm';
-import { RHFFormPlaceholder } from '../rhf/RHFFormPlaceholder';
+import { RHFRegistrationForm } from '../rhf/RHFRegistrationForm';
 import { Modal } from './Modal';
 
 export function FormsDemoClient(): React.JSX.Element {
@@ -25,8 +25,8 @@ export function FormsDemoClient(): React.JSX.Element {
         </button>
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400">
-        Phase 3: Uncontrolled form now has core fields (name, age, email,
-        gender, terms) with basic client validation.
+        Phase 4: Both forms now have core fields. RHF version uses basic inline
+        rules; full Zod + extra fields arrive in Phase 5.
       </p>
       <Modal
         open={open === 'uncontrolled'}
@@ -38,9 +38,9 @@ export function FormsDemoClient(): React.JSX.Element {
       <Modal
         open={open === 'rhf'}
         onClose={() => setOpen(null)}
-        title="RHF Form (Scaffold)"
+        title="RHF Form"
       >
-        <RHFFormPlaceholder />
+        <RHFRegistrationForm />
       </Modal>
     </div>
   );

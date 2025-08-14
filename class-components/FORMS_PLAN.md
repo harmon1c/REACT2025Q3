@@ -73,9 +73,9 @@ Commit: `forms: universal portal modal infra` (✔)
 
 ---
 
-## Phase 3: Uncontrolled Form (Core Fields Subset) (Part of 15 pts Core Fields)
+## Phase 3: Uncontrolled Form (Core Fields Subset) (Part of 15 pts Core Fields) (✔)
 
-Commit: `forms: uncontrolled form core fields`
+Commit: `forms: uncontrolled form core fields` (✔)
 
 - Add form markup using plain refs / `onSubmit` extraction.
 - Fields: name, age, email, gender (radio or select), T&C checkbox.
@@ -85,9 +85,9 @@ Commit: `forms: uncontrolled form core fields`
 
 ---
 
-## Phase 4: React Hook Form Version (Core Fields Mirror)
+## Phase 4: React Hook Form Version (Core Fields Mirror) (✔)
 
-Commit: `forms: rhf form core fields`
+Commit: `forms: rhf form core fields` (✔)
 
 - Install dependencies: `react-hook-form`, `@hookform/resolvers` (if not installed earlier).
 - Implement RHF form mirroring same fields with minimal required validation rules (still placeholder messages; final unify in Phase 5).
@@ -271,4 +271,4 @@ Commit: `tests: forms feature full coverage`
 
 ## Next Immediate Action
 
-Proceed with Phase 1 implementation (scaffold + placeholder page) and installation of `react-hook-form` / `@hookform/resolvers` (actual usage starts Phase 4). Mark phases completion by updating this file with ✔.
+Proceed with Phase 5 preparation: introduce Zod schema & password fields scaffolding, password strength utility, extend i18n keys, and non-breaking integration stubs in both forms (password + confirm placeholders, disabled submit logic not yet enforced until full validation commit).
