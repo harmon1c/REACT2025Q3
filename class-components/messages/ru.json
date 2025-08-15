@@ -142,12 +142,14 @@
       "password": "Пароль",
       "confirm_password": "Подтвердите пароль",
       "terms": "Я принимаю временные условия использования",
+      "country": "Страна",
       "submit": "Отправить",
       "reset": "Сбросить"
     },
     "placeholders": {
       "name": "Ваше имя",
-      "email": "you@example.com"
+      "email": "you@example.com",
+      "country": "Начните вводить страну..."
     },
     "errors": {
       "name_required": "Имя обязательно",
@@ -157,6 +159,8 @@
       "email_required": "Email обязателен",
       "email_invalid": "Некорректный формат email",
       "gender_required": "Пол обязателен",
+      "country_required": "Страна обязательна",
+      "country_invalid": "Выберите существующую страну",
       "terms_required": "Вы должны принять условия",
       "password_required": "Пароль обязателен",
       "confirm_password_required": "Подтверждение пароля обязательно",

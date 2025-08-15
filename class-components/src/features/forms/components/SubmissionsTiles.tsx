@@ -77,7 +77,7 @@ export function SubmissionsTiles(): React.JSX.Element {
                   {s.name}
                 </span>
                 <span className="text-gray-500 dark:text-gray-400">
-                  {s.email} • {s.gender} • {s.age ?? '-'}
+                  {s.email} • {s.gender} • {s.age ?? '-'} • {s.country || '-'}
                 </span>
                 <span className="text-[10px] text-gray-400">
                   {formatDate(s.createdAt)}
@@ -120,7 +120,7 @@ export function SubmissionsTiles(): React.JSX.Element {
                   {s.name}
                 </span>
                 <span className="text-gray-500 dark:text-gray-400">
-                  {s.email} • {s.gender} • {s.age ?? '-'}
+                  {s.email} • {s.gender} • {s.age ?? '-'} • {s.country || '-'}
                 </span>
                 <span className="text-[10px] text-gray-400">
                   {formatDate(s.createdAt)}

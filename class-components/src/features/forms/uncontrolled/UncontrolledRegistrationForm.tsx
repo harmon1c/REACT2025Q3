@@ -5,6 +5,7 @@ import { UserRegistrationSchema } from '../validation/userRegistrationSchema';
 import { addUncontrolledSubmission } from '../state/formsSubmissionsSlice';
 import { StrengthMeter } from '../components/StrengthMeter';
 import { ImageInput } from '../components/ImageInput';
+import { CountriesAutocomplete } from '../components/CountriesAutocomplete';
 import { evaluatePasswordStrength } from '../utils/passwordStrength';
 
 interface FieldErrors {
@@ -12,6 +13,7 @@ interface FieldErrors {
   age?: string;
   email?: string;
   gender?: string;
+  country?: string;
   terms?: string;
   password?: string;
   confirmPassword?: string;
@@ -22,6 +24,7 @@ interface SubmissionPreview {
   age: number | null;
   email: string;
   gender: string;
+  country: string;
   termsAccepted: boolean;
   password?: string;
 }
@@ -45,6 +48,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
     const rawEmail = fd.get('email');
     const rawGender = fd.get('gender');
     const terms = fd.get('terms');
+    const rawCountry = fd.get('country');
     const rawPassword = fd.get('password');
     const rawConfirm = fd.get('confirmPassword');
 
@@ -52,6 +56,10 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
     const ageRaw = typeof rawAge === 'string' ? rawAge.trim() : '';
     const email = typeof rawEmail === 'string' ? rawEmail.trim() : '';
     const gender = typeof rawGender === 'string' ? rawGender : '';
+    const country = typeof rawCountry === 'string' ? rawCountry.trim() : '';
+    if (!country) {
+      next.country = 'forms.errors.country_required';
+    }
 
     if (!name) {
       next.name = 'forms.errors.name_required';
@@ -100,6 +108,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
         age: fd.get('age') || '',
         email: fd.get('email') || '',
         gender: fd.get('gender') || '',
+        country: fd.get('country') || '',
         terms: fd.get('terms') === 'on',
         password: fd.get('password') || '',
         confirmPassword: fd.get('confirmPassword') || '',
@@ -114,6 +123,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
             'age',
             'email',
             'gender',
+            'country',
             'terms',
             'password',
             'confirmPassword',
@@ -138,6 +148,10 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
         age: typeof rawAge === 'string' ? Number(rawAge.trim()) : null,
         email: typeof rawEmail === 'string' ? rawEmail.trim() : '',
         gender: typeof rawGender === 'string' ? rawGender : '',
+        country: ((): string => {
+          const c = fd.get('country');
+          return typeof c === 'string' ? c.trim() : '';
+        })(),
         termsAccepted: fd.get('terms') === 'on',
         password:
           typeof assembled.password === 'string'
@@ -152,6 +166,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           age: preview.age,
           email: preview.email,
           gender: preview.gender,
+          country: preview.country,
           avatarBase64: avatarBase64 || undefined,
         })
       );
@@ -224,11 +239,9 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           aria-invalid={!!fieldError('name')}
           aria-describedby={fieldError('name') ? 'err-name' : undefined}
         />
-        {fieldError('name') && (
-          <p id="err-name" className="text-xs text-red-500 mt-1 min-h-4">
-            {fieldError('name')}
-          </p>
-        )}
+        <p id="err-name" className="text-xs text-red-500 mt-1 min-h-4">
+          {fieldError('name')}
+        </p>
       </div>
       <div className="flex flex-col gap-1">
         <label
@@ -282,22 +295,23 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
       </div>
       <div className="flex flex-col gap-1">
         <label
-          htmlFor="un_name"
+          htmlFor="un_country"
           className="text-sm font-medium text-gray-700 dark:text-gray-200"
         >
-          forms.labels.name
+          forms.labels.country
         </label>
-        <input
-          id="un_name"
-          name="name"
-          type="text"
-          placeholder="forms.placeholders.name"
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          aria-invalid={!!fieldError('name')}
-          aria-describedby={fieldError('name') ? 'err-name' : undefined}
+        <CountriesAutocomplete
+          value={''}
+          onChange={() => {
+            /* value read from form submit */
+          }}
+          id="un_country"
+          name="country"
+          placeholder="forms.placeholders.country"
+          error={fieldError('country')}
         />
-        <p id="err-name" className="text-xs text-red-500 mt-1 min-h-4">
-          {fieldError('name')}
+        <p id="err-country" className="text-xs text-red-500 mt-1 min-h-4">
+          {fieldError('country')}
         </p>
       </div>
       <div className="flex flex-col gap-1">

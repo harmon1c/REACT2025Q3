@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { evaluatePasswordStrength } from '../utils/passwordStrength';
+import { countriesSet } from '../utils/countriesList';
 
 export const UserRegistrationSchema = z
   .object({
@@ -22,6 +23,10 @@ export const UserRegistrationSchema = z
       .min(1, 'forms.errors.email_required')
       .email('forms.errors.email_invalid'),
     gender: z.string().min(1, 'forms.errors.gender_required'),
+    country: z
+      .string()
+      .min(1, 'forms.errors.country_required')
+      .refine((v) => countriesSet.has(v), 'forms.errors.country_invalid'),
     terms: z.literal(true, {
       errorMap: () => ({ message: 'forms.errors.terms_required' }),
     }),

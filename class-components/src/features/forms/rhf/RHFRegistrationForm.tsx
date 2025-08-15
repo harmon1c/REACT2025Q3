@@ -10,6 +10,7 @@ import {
 } from '../validation/userRegistrationSchema';
 import { StrengthMeter } from '../components/StrengthMeter';
 import { ImageInput } from '../components/ImageInput';
+import { CountriesAutocomplete } from '../components/CountriesAutocomplete';
 
 export function RHFRegistrationForm(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
         age: '',
         email: '',
         gender: '',
+        country: '',
         terms: true,
         password: '',
         confirmPassword: '',
@@ -36,6 +38,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
         age: data.age ? Number(data.age) : null,
         email: data.email,
         gender: data.gender,
+        country: data.country || undefined,
         avatarBase64: avatarBase64 || undefined,
       })
     );
@@ -52,6 +55,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
   const { errors, isSubmitting, isValid } = formState;
   const passwordValue = watch('password');
   const genderValue = watch('gender');
+  const countryValue = watch('country');
 
   return (
     <form
@@ -233,6 +237,42 @@ export function RHFRegistrationForm(): React.JSX.Element {
             : ''}
         </p>
       </fieldset>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="rhf_country" className="font-medium text-sm">
+          forms.labels.country
+        </label>
+        <CountriesAutocomplete
+          id="rhf_country"
+          name="country"
+          value={countryValue || ''}
+          onChange={(v) => {
+            // Manually set value since using custom component
+            const input =
+              document.querySelector<HTMLInputElement>('#rhf_country');
+            if (input) {
+              input.value = v;
+              const evt = new Event('input', { bubbles: true });
+              input.dispatchEvent(evt);
+            }
+          }}
+          placeholder="forms.placeholders.country"
+          error={
+            typeof errors.country?.message === 'string'
+              ? errors.country.message
+              : undefined
+          }
+        />
+        <p id="rhf-err-country" className="text-xs text-red-600 min-h-4">
+          {typeof errors.country?.message === 'string'
+            ? errors.country.message
+            : ''}
+        </p>
+        <input
+          type="hidden"
+          value={countryValue || ''}
+          {...register('country')}
+        />
+      </div>
       <div className="flex items-start gap-2">
         <input
           id="rhf_terms"

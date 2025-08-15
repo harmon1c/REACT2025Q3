@@ -147,12 +147,14 @@
       "password": "Password",
       "confirm_password": "Confirm Password",
       "terms": "I accept the temporary terms of use",
+      "country": "Country",
       "submit": "Submit",
       "reset": "Reset"
     },
     "placeholders": {
       "name": "Your name",
-      "email": "you@example.com"
+      "email": "you@example.com",
+      "country": "Start typing a country..."
     },
     "errors": {
       "name_required": "Name is required",
@@ -162,6 +164,8 @@
       "email_required": "Email is required",
       "email_invalid": "Email format is invalid",
       "gender_required": "Gender is required",
+      "country_required": "Country is required",
+      "country_invalid": "Please select a valid country",
       "terms_required": "You must accept the terms",
       "password_required": "Password is required",
       "confirm_password_required": "Confirm password is required",
