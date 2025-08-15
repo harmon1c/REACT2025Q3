@@ -118,7 +118,7 @@ export function ImageInput({
       <label className="font-medium">{label}</label>
       <div
         className={
-          'group flex items-center gap-3 rounded border p-2 transition-colors text-xs ' +
+          'group flex items-center gap-3 rounded border p-2 motion-safe:transition-colors text-xs ' +
           (dragActive
             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
             : 'border-dashed border-gray-300 dark:border-gray-600') +

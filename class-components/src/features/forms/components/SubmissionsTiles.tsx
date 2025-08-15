@@ -56,7 +56,7 @@ export function SubmissionsTiles(): React.JSX.Element {
               <li
                 key={s.id}
                 className={
-                  'p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs flex flex-col gap-1 transition-colors duration-700 ' +
+                  'p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs flex flex-col gap-1 motion-safe:transition-colors duration-700 ' +
                   (flashing
                     ? 'bg-green-100 dark:bg-green-900/40'
                     : 'bg-white/80 dark:bg-gray-800/60')
@@ -99,7 +99,7 @@ export function SubmissionsTiles(): React.JSX.Element {
               <li
                 key={s.id}
                 className={
-                  'p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs flex flex-col gap-1 transition-colors duration-700 ' +
+                  'p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs flex flex-col gap-1 motion-safe:transition-colors duration-700 ' +
                   (flashing
                     ? 'bg-purple-100 dark:bg-purple-900/40'
                     : 'bg-white/80 dark:bg-gray-800/60')

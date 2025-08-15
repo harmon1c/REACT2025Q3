@@ -170,11 +170,6 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           avatarBase64: avatarBase64 || undefined,
         })
       );
-      // eslint-disable-next-line no-console
-      console.log('[Phase5] Uncontrolled submission preview', {
-        ...preview,
-        password: preview.password ? '***' : undefined,
-      });
     },
     [validate, dispatch, avatarBase64]
   );
@@ -235,7 +230,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           name="name"
           type="text"
           placeholder="forms.placeholders.name"
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 motion-safe:transition-colors"
           aria-invalid={!!fieldError('name')}
           aria-describedby={fieldError('name') ? 'err-name' : undefined}
         />
@@ -256,7 +251,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 motion-safe:transition-colors"
           aria-invalid={!!fieldError('password')}
           aria-describedby={
             fieldError('password') ? 'err-password' : 'un-strength'
@@ -280,7 +275,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 motion-safe:transition-colors"
           aria-invalid={!!fieldError('confirmPassword')}
           aria-describedby={
             fieldError('confirmPassword') ? 'err-confirm-password' : undefined
@@ -323,7 +318,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           name="email"
           type="email"
           placeholder="forms.placeholders.email"
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 motion-safe:transition-colors"
           aria-invalid={!!fieldError('email')}
           aria-describedby={fieldError('email') ? 'err-email' : undefined}
         />
@@ -339,15 +334,30 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
         </legend>
         <div className="flex flex-wrap gap-4 text-sm">
           <label className="flex items-center gap-1">
-            <input type="radio" name="gender" value="male" />
+            <input
+              type="radio"
+              name="gender"
+              value="male"
+              className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+            />
             forms.labels.gender_male
           </label>
           <label className="flex items-center gap-1">
-            <input type="radio" name="gender" value="female" />
+            <input
+              type="radio"
+              name="gender"
+              value="female"
+              className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+            />
             forms.labels.gender_female
           </label>
           <label className="flex items-center gap-1">
-            <input type="radio" name="gender" value="other" />
+            <input
+              type="radio"
+              name="gender"
+              value="other"
+              className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+            />
             forms.labels.gender_other
           </label>
         </div>
@@ -379,7 +389,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
         <button
           type="submit"
           disabled={hasBlockingErrors}
-          className="rounded-md bg-gradient-to-r from-green-600 to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 text-sm font-medium shadow hover:from-green-500 hover:to-emerald-500 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-900 transition-colors"
+          className="rounded-md bg-gradient-to-r from-green-600 to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 text-sm font-medium shadow hover:from-green-500 hover:to-emerald-500 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-900 motion-safe:transition-colors"
         >
           forms.labels.submit
         </button>
@@ -393,7 +403,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
             setConfirmPassword('');
             setAvatarBase64(null);
           }}
-          className="rounded-md bg-gray-200/80 dark:bg-gray-800/60 text-gray-900 dark:text-gray-100 px-5 py-2 text-sm font-medium shadow hover:bg-gray-300 dark:hover:bg-gray-700 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-gray-900 transition-colors"
+          className="rounded-md bg-gray-200/80 dark:bg-gray-800/60 text-gray-900 dark:text-gray-100 px-5 py-2 text-sm font-medium shadow hover:bg-gray-300 dark:hover:bg-gray-700 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-gray-900 motion-safe:transition-colors"
         >
           forms.labels.reset
         </button>

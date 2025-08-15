@@ -142,9 +142,9 @@ Commit: `forms: image upload base64 for both forms` (✔)
 
 ---
 
-## Phase 8: Countries Autocomplete (Score: 10 Autocomplete)
+## Phase 8: Countries Autocomplete (Score: 10 Autocomplete) (✔)
 
-Commit: `forms: countries autocomplete both forms`
+Commit: `forms: countries autocomplete both forms` (✔)
 
 - Add countries static dataset (JSON) or fetch once; store normalized list in Redux slice `countriesSlice` (preloaded on first page load or in layout effect). Keep full English list.
 - Autocomplete component:
@@ -157,9 +157,9 @@ Commit: `forms: countries autocomplete both forms`
 
 ---
 
-## Phase 9: Accessibility & UX Polish (Completes Modal Behavior + UX)
+## Phase 9: Accessibility & UX Polish (Completes Modal Behavior + UX) (✔)
 
-Commit: `forms: accessibility and ux polish`
+Commit: `forms: accessibility and ux polish` (✔)
 
 - Verify modal focus loop (tab & shift+tab) with tests to follow later.
 - Screen reader labels: associate `<label htmlFor>` every input.
@@ -268,18 +268,16 @@ Commit: `tests: forms feature full coverage`
 
 ## Next Immediate Action
 
-Begin Phase 8: Countries Autocomplete.
+Begin Phase 10: Refactoring & Compliance Prep.
 
-Planned Task Breakdown:
+Planned Task Breakdown (Phase 10):
 
-1. Add countries dataset (static JSON) under `src/features/forms/data/countries.json`.
-2. Create countries slice (`countriesSlice`) to hold list + maybe loading flag.
-3. Build `CountriesAutocomplete` component (input + popover list + keyboard nav + selection).
-4. Integrate into both forms (Uncontrolled: local state + hidden field; RHF: register/Controller) placing field before submit buttons.
-5. Extend Zod schema with `country` field validated against set.
-6. Display selected country in submission tiles (optional for Phase 8 but include value in stored submission for future use).
-7. Basic accessibility: role="listbox"/"option", aria-activedescendant, id linkage.
+1. Remove any remaining incidental debug comments (confirm none left) and ensure no stray console usage.
+2. Centralize reusable validation messages / regex into `utils/validation.ts` (or similar) to avoid duplication.
+3. Add JSDoc to `passwordStrength`, `fileToBase64`, `focusTrap` utilities for reviewer clarity.
+4. Add README section summarizing forms feature & usage.
+5. Quick pass for implicit any (should be clean) & strict null checks.
+6. Prepare PR checklist mapping phases to scoring table.
+7. (Optional) Minor bundle size check / ensure tree-shaking unaffected.
 
-Assumption: Country list modest (<300) so simple in-memory filter OK; no async fetching required.
-
-After Phase 8, proceed to Phase 9 (accessibility & UX polish).
+After Phase 10, proceed to Phase 11 (testing suite).

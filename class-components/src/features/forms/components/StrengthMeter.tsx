@@ -32,7 +32,7 @@ export function StrengthMeter({
         {bars.map((b) => (
           <div
             key={b}
-            className={`h-1 flex-1 rounded transition-colors ${score >= b ? COLORS[score] : 'bg-gray-300 dark:bg-gray-700'}`}
+            className={`h-1 flex-1 rounded motion-safe:transition-colors ${score >= b ? COLORS[score] : 'bg-gray-300 dark:bg-gray-700'}`}
           />
         ))}
       </div>

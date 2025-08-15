@@ -42,11 +42,6 @@ export function RHFRegistrationForm(): React.JSX.Element {
         avatarBase64: avatarBase64 || undefined,
       })
     );
-    // eslint-disable-next-line no-console
-    console.log('[Phase6] RHF submission preview', {
-      ...data,
-      password: '***',
-    });
   });
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     void internalSubmit(e);
@@ -84,7 +79,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
           id="rhf_name"
           type="text"
           placeholder="forms.placeholders.name"
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 motion-safe:transition-colors"
           aria-invalid={!!errors.name}
           aria-describedby={errors.name ? 'rhf-err-name' : undefined}
           {...register('name', {
@@ -104,7 +99,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
         <input
           id="rhf_age"
           type="number"
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 motion-safe:transition-colors"
           aria-invalid={!!errors.age}
           aria-describedby={errors.age ? 'rhf-err-age' : undefined}
           {...register('age', {
@@ -133,7 +128,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
           id="rhf_email"
           type="email"
           placeholder="forms.placeholders.email"
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 motion-safe:transition-colors"
           aria-invalid={!!errors.email}
           aria-describedby={errors.email ? 'rhf-err-email' : undefined}
           {...register('email', {
@@ -157,7 +152,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
         <input
           id="rhf_password"
           type="password"
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 motion-safe:transition-colors"
           aria-invalid={!!errors.password}
           aria-describedby={
             errors.password ? 'rhf-err-password' : 'rhf-strength'
@@ -178,7 +173,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
         <input
           id="rhf_confirm_password"
           type="password"
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 motion-safe:transition-colors"
           aria-invalid={!!errors.confirmPassword}
           aria-describedby={
             errors.confirmPassword ? 'rhf-err-confirm' : undefined
@@ -202,6 +197,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
               type="radio"
               value="male"
               aria-checked={genderValue === 'male'}
+              className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
               {...register('gender', {
                 required: 'forms.errors.gender_required',
               })}
@@ -213,6 +209,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
               type="radio"
               value="female"
               aria-checked={genderValue === 'female'}
+              className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
               {...register('gender', {
                 required: 'forms.errors.gender_required',
               })}
@@ -224,6 +221,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
               type="radio"
               value="other"
               aria-checked={genderValue === 'other'}
+              className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
               {...register('gender', {
                 required: 'forms.errors.gender_required',
               })}
@@ -296,7 +294,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
         <button
           type="submit"
           disabled={isSubmitting || !isValid}
-          className="rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-2 text-sm font-medium shadow hover:from-purple-500 hover:to-fuchsia-500 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-900 transition-colors"
+          className="rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-2 text-sm font-medium shadow hover:from-purple-500 hover:to-fuchsia-500 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-900 motion-safe:transition-colors"
         >
           forms.labels.submit
         </button>
@@ -306,7 +304,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
             reset();
             setAvatarBase64(null);
           }}
-          className="rounded-md bg-gray-200/80 dark:bg-gray-800/60 text-gray-900 dark:text-gray-100 px-5 py-2 text-sm font-medium shadow hover:bg-gray-300 dark:hover:bg-gray-700 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-gray-900 transition-colors"
+          className="rounded-md bg-gray-200/80 dark:bg-gray-800/60 text-gray-900 dark:text-gray-100 px-5 py-2 text-sm font-medium shadow hover:bg-gray-300 dark:hover:bg-gray-700 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-gray-900 motion-safe:transition-colors"
         >
           forms.labels.reset
         </button>
