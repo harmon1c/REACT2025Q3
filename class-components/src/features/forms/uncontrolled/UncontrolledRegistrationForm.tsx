@@ -4,6 +4,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { UserRegistrationSchema } from '../validation/userRegistrationSchema';
 import { addUncontrolledSubmission } from '../state/formsSubmissionsSlice';
 import { StrengthMeter } from '../components/StrengthMeter';
+import { ImageInput } from '../components/ImageInput';
 import { evaluatePasswordStrength } from '../utils/passwordStrength';
 
 interface FieldErrors {
@@ -35,6 +36,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const dispatch = useAppDispatch();
+  const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
 
   const validate = useCallback((fd: FormData): FieldErrors => {
     const next: FieldErrors = {};
@@ -93,7 +95,6 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
       e.preventDefault();
       const fd = new FormData(e.currentTarget);
       const manual = validate(fd);
-      // Compose object for Zod
       const assembled = {
         name: fd.get('name') || '',
         age: fd.get('age') || '',
@@ -151,6 +152,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
           age: preview.age,
           email: preview.email,
           gender: preview.gender,
+          avatarBase64: avatarBase64 || undefined,
         })
       );
       // eslint-disable-next-line no-console
@@ -159,7 +161,7 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
         password: preview.password ? '***' : undefined,
       });
     },
-    [validate, dispatch]
+    [validate, dispatch, avatarBase64]
   );
 
   const fieldError = (key: keyof FieldErrors): string | undefined =>
@@ -375,11 +377,19 @@ export function UncontrolledRegistrationForm(): React.JSX.Element {
             setSubmitted(null);
             setPassword('');
             setConfirmPassword('');
+            setAvatarBase64(null);
           }}
           className="rounded-md bg-gray-200/80 dark:bg-gray-800/60 text-gray-900 dark:text-gray-100 px-5 py-2 text-sm font-medium shadow hover:bg-gray-300 dark:hover:bg-gray-700 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-gray-900 transition-colors"
         >
           forms.labels.reset
         </button>
+      </div>
+      <div>
+        <ImageInput
+          value={avatarBase64}
+          onChange={setAvatarBase64}
+          label="forms.labels.avatar"
+        />
       </div>
       {submitted && (
         <pre className="mt-4 max-h-40 overflow-auto rounded-lg bg-gray-900/90 ring-1 ring-gray-700 text-[10px] text-green-300 p-3">

@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppDispatch } from '@/store/hooks';
@@ -9,6 +9,7 @@ import {
   type UserRegistrationInput,
 } from '../validation/userRegistrationSchema';
 import { StrengthMeter } from '../components/StrengthMeter';
+import { ImageInput } from '../components/ImageInput';
 
 export function RHFRegistrationForm(): React.JSX.Element {
   const dispatch = useAppDispatch();
@@ -26,6 +27,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
         confirmPassword: '',
       },
     });
+  const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
 
   const internalSubmit = handleSubmit((data) => {
     dispatch(
@@ -34,6 +36,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
         age: data.age ? Number(data.age) : null,
         email: data.email,
         gender: data.gender,
+        avatarBase64: avatarBase64 || undefined,
       })
     );
     // eslint-disable-next-line no-console
@@ -259,11 +262,21 @@ export function RHFRegistrationForm(): React.JSX.Element {
         </button>
         <button
           type="reset"
-          onClick={() => reset()}
+          onClick={() => {
+            reset();
+            setAvatarBase64(null);
+          }}
           className="rounded-md bg-gray-200/80 dark:bg-gray-800/60 text-gray-900 dark:text-gray-100 px-5 py-2 text-sm font-medium shadow hover:bg-gray-300 dark:hover:bg-gray-700 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-gray-900 transition-colors"
         >
           forms.labels.reset
         </button>
+      </div>
+      <div>
+        <ImageInput
+          value={avatarBase64}
+          onChange={setAvatarBase64}
+          label="forms.labels.avatar"
+        />
       </div>
     </form>
   );

@@ -8,6 +8,7 @@ export interface FormSubmissionSafe {
   age: number | null;
   email: string;
   gender: string;
+  avatarBase64?: string;
   createdAt: number;
 }
 

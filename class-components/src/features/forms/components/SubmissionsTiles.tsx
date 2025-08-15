@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useAppSelector } from '@/store/hooks';
 
 function formatDate(ts: number): string {
@@ -61,7 +62,20 @@ export function SubmissionsTiles(): React.JSX.Element {
                     : 'bg-white/80 dark:bg-gray-800/60')
                 }
               >
-                <span className="font-medium">{s.name}</span>
+                <span className="font-medium flex items-center gap-2">
+                  {s.avatarBase64 && (
+                    <Image
+                      src={s.avatarBase64}
+                      alt={s.name + ' avatar'}
+                      width={24}
+                      height={24}
+                      unoptimized
+                      className="w-6 h-6 rounded object-cover ring-1 ring-gray-300 dark:ring-gray-600"
+                      sizes="24px"
+                    />
+                  )}
+                  {s.name}
+                </span>
                 <span className="text-gray-500 dark:text-gray-400">
                   {s.email} • {s.gender} • {s.age ?? '-'}
                 </span>
@@ -91,7 +105,20 @@ export function SubmissionsTiles(): React.JSX.Element {
                     : 'bg-white/80 dark:bg-gray-800/60')
                 }
               >
-                <span className="font-medium">{s.name}</span>
+                <span className="font-medium flex items-center gap-2">
+                  {s.avatarBase64 && (
+                    <Image
+                      src={s.avatarBase64}
+                      alt={s.name + ' avatar'}
+                      width={24}
+                      height={24}
+                      unoptimized
+                      className="w-6 h-6 rounded object-cover ring-1 ring-gray-300 dark:ring-gray-600"
+                      sizes="24px"
+                    />
+                  )}
+                  {s.name}
+                </span>
                 <span className="text-gray-500 dark:text-gray-400">
                   {s.email} • {s.gender} • {s.age ?? '-'}
                 </span>

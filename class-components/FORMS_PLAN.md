@@ -116,32 +116,29 @@ Commit: `forms: validation + password strength (both forms)` (✔)
 
 ---
 
-## Phase 6: Redux Integration & Data Tiles (Remaining part of State Management score)
+## Phase 6: Redux Integration & Data Tiles (Remaining part of State Management score) (✔)
 
-Commit: `forms: redux integration and data tiles`
+Commit: `forms: redux integration and data tiles` (✔)
 
-- Create slice `formsSubmissionsSlice`:
-  - state: `{ uncontrolledSubmissions: [], rhfSubmissions: [] }` (each item typed `UserRegistrationDTO` including base64 image placeholder field optional for now).
-  - actions: `addUncontrolledSubmission`, `addRHFSubmission`.
-  - selectors: `selectAllUncontrolled`, `selectAllRHF`.
-- Dispatch add actions on successful validated submit (Phase 5 forms updated).
-- Main page (forms demo) displays two tile grids (Uncontrolled / RHF) showing recent entries (exclude passwords from display; safe subset: name, age, email, gender, avatar thumbnail, submission timestamp).
-- Highlight newest submission: apply CSS class + fade after e.g. 3s (using `useEffect`).
+- ✔ Create slice `formsSubmissionsSlice` (uncontrolled + rhf arrays, safe submission object excludes passwords).
+- ✔ Wire dispatches from both forms after successful validation (passwords never stored).
+- ✔ Render submission tiles (two columns) showing name, age, email, gender, timestamp.
+- ✔ Implement highlight + timed fade (3s) for newest submission via `useEffect` + transient id Set.
+- ✔ Lint/type clean (no `any`).
+- (Optional styling polish deferred) Add badge/icon for newest (skipped for now; revisit in Phase 9 polish if time).
 
 ---
 
-## Phase 7: Image Upload (Score: 15 Image Input)
+## Phase 7: Image Upload (Score: 15 Image Input) (✔)
 
-Commit: `forms: image upload base64 for both forms`
+Commit: `forms: image upload base64 for both forms` (✔)
 
-- Shared component `ImageInput` supporting click + drag/drop.
-- Validate file type (`image/png`, `image/jpeg`) & size limit (e.g. ≤ 1MB configurable).
-- Convert to base64 (utility `fileToBase64(file)` returning Promise<string>), store in form state:
-  - RHF: controlled via `setValue`.
-  - Uncontrolled: ref + hidden input with base64 value OR local temp state merged before validation.
-- Display preview inside modal before submit.
-- On submit, include base64 string in submission slice; show thumbnail in tiles.
-- Error messaging for invalid file (type/size) integrated into existing error pattern.
+- ✔ Shared component `ImageInput` supporting click + drag/drop.
+- ✔ Validate file type (`image/png`, `image/jpeg`) & size limit (≤ 1MB default configurable).
+- ✔ Convert to base64 via utility `fileToBase64(file)`; stored in local state for both forms (RHF kept out of schema purposely).
+- ✔ Display preview before submit with remove control + keyboard / drag accessibility.
+- ✔ On submit, include `avatarBase64` in slice; tiles show thumbnail (using `next/image`).
+- ✔ Error messaging surfaced under control (size/type/read failures).
 
 ---
 
@@ -271,13 +268,18 @@ Commit: `tests: forms feature full coverage`
 
 ## Next Immediate Action
 
-Complete remaining Phase 6 polish:
+Begin Phase 8: Countries Autocomplete.
 
-1. Add highlight + fade-out effect for newest submission tile (pending).
-2. Minor styling pass on tiles (icons / badge for newest) (optional).
-3. Then proceed to Phase 7 (image upload integration) once highlight behavior verified.
+Planned Task Breakdown:
 
-4. Verifying uncontrolled form JSX + disabled logic (now fixed) and ensuring both forms block weak / mismatched passwords and show consistent error keys.
-5. Quick manual regression pass (name, age, email, gender, terms, password strength) in both forms.
+1. Add countries dataset (static JSON) under `src/features/forms/data/countries.json`.
+2. Create countries slice (`countriesSlice`) to hold list + maybe loading flag.
+3. Build `CountriesAutocomplete` component (input + popover list + keyboard nav + selection).
+4. Integrate into both forms (Uncontrolled: local state + hidden field; RHF: register/Controller) placing field before submit buttons.
+5. Extend Zod schema with `country` field validated against set.
+6. Display selected country in submission tiles (optional for Phase 8 but include value in stored submission for future use).
+7. Basic accessibility: role="listbox"/"option", aria-activedescendant, id linkage.
 
-Then begin Phase 6: Redux integration (create submissions slice, dispatch on successful submit, render tiles) per plan above.
+Assumption: Country list modest (<300) so simple in-memory filter OK; no async fetching required.
+
+After Phase 8, proceed to Phase 9 (accessibility & UX polish).
