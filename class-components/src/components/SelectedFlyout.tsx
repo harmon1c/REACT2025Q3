@@ -1,21 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { buildCsvAction } from '@/actions/buildCsvAction';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { clearItems } from '../store/selectedItemsSlice';
 
-export const SelectedFlyout: React.FC = () => {
+interface SelectedFlyoutProps {
+  inline?: boolean;
+  offsetX?: number;
+  offsetY?: number;
+}
+
+export const SelectedFlyout: React.FC<SelectedFlyoutProps> = ({
+  inline = false,
+  offsetX = 32,
+  offsetY = 24,
+}) => {
   const dispatch = useAppDispatch();
   const t = useTranslations();
   const selectedItems = useAppSelector((state) => state.selectedItems.items);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!selectedItems.length) {
-    return null;
-  }
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const shouldShow = selectedItems.length > 0;
 
   const handleDownload = async (): Promise<void> => {
     if (!selectedItems.length || loading) {
@@ -48,9 +62,18 @@ export const SelectedFlyout: React.FC = () => {
     }
   };
 
-  return (
-    <div className="fixed z-50 bottom-6 right-8 flex flex-col items-end gap-2">
-      <div className="bg-white dark:bg-gray-900/95 shadow-lg rounded-lg px-6 py-4 flex items-center gap-4 border border-blue-200 dark:border-gray-700 transition-colors duration-300">
+  const positioning = inline ? 'relative' : 'fixed z-[60] pointer-events-none';
+  const style: React.CSSProperties | undefined = inline
+    ? undefined
+    : { bottom: offsetY, right: offsetX };
+
+  const content = !shouldShow ? null : (
+    <div
+      className={`${positioning} flex flex-col items-end gap-2 transition-all duration-300 ease-out ${shouldShow ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'} pointer-events-none`}
+      style={style}
+      aria-live="polite"
+    >
+      <div className="pointer-events-auto bg-white dark:bg-gray-900/95 shadow-lg rounded-lg px-6 py-4 flex items-center gap-4 border border-blue-200 dark:border-gray-700 transition-colors duration-300">
         <span className="font-medium text-gray-800 dark:text-gray-100">
           {t('selection.items_selected', { count: selectedItems.length })}
         </span>
@@ -78,4 +101,11 @@ export const SelectedFlyout: React.FC = () => {
       )}
     </div>
   );
+  if (inline) {
+    return content;
+  }
+  if (!mounted) {
+    return null;
+  }
+  return createPortal(content, document.body);
 };

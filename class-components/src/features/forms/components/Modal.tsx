@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RootPortal } from './RootPortal';
 import { trapTabKey, getFocusable } from './focusTrap';
 
@@ -18,6 +18,9 @@ export function Modal({
   children,
   initialFocusRef,
 }: ModalProps): React.JSX.Element | null {
+  const [render, setRender] = useState(open);
+  const [exiting, setExiting] = useState(false);
+  const [entering, setEntering] = useState(false);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const prevFocusedRef = useRef<HTMLElement | null>(null);
 
@@ -45,6 +48,25 @@ export function Modal({
     },
     [onClose]
   );
+
+  useEffect(() => {
+    if (open) {
+      if (!render) {
+        setRender(true);
+        setEntering(true);
+        requestAnimationFrame(() => {
+          setEntering(false);
+        });
+      }
+    } else if (render) {
+      setExiting(true);
+      const id = setTimeout((): void => {
+        setExiting(false);
+        setRender(false);
+      }, 180);
+      return (): void => clearTimeout(id);
+    }
+  }, [open, render]);
 
   useEffect(() => {
     if (!open) {
@@ -75,7 +97,7 @@ export function Modal({
     }
   }, [open, initialFocusRef]);
 
-  if (!open) {
+  if (!render) {
     return null;
   }
 
@@ -87,10 +109,12 @@ export function Modal({
         aria-labelledby="modal-title"
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div
+          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-200 ${open && !exiting && !entering ? 'opacity-100' : 'opacity-0'}`}
+        />
         <div
           ref={dialogRef}
-          className="relative w-full max-w-lg rounded-lg border border-white/10 bg-white dark:bg-blue-950 shadow-xl focus:outline-none ring-1 ring-black/5 dark:ring-white/10 p-6"
+          className={`relative w-full max-w-lg rounded-lg border border-white/10 bg-white dark:bg-blue-950 shadow-xl focus:outline-none ring-1 ring-black/5 dark:ring-white/10 p-6 transform transition-all duration-200 motion-safe:will-change-transform motion-safe:animate-[none] ${open && !exiting && !entering ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}`}
         >
           <div className="flex items-start justify-between mb-4">
             <h2 id="modal-title" className="text-lg font-semibold">

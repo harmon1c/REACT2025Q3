@@ -15,10 +15,12 @@ import { CountriesAutocomplete } from '../components/CountriesAutocomplete';
 
 interface RHFRegistrationFormProps {
   onSuccess?: (id: string) => void;
+  open?: boolean;
 }
 
 export function RHFRegistrationForm({
   onSuccess,
+  open = true,
 }: RHFRegistrationFormProps): React.JSX.Element {
   const t = useTranslations();
   const dispatch = useAppDispatch();
@@ -72,7 +74,7 @@ export function RHFRegistrationForm({
     <form
       onSubmit={onSubmit}
       noValidate
-      className="relative p-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/70 backdrop-blur-sm shadow-md space-y-6 text-gray-800 dark:text-gray-100"
+      className={`relative p-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/70 backdrop-blur-sm shadow-md space-y-6 text-gray-800 dark:text-gray-100 transition-all duration-300 ease-out origin-top ${open ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-2 scale-[0.98] pointer-events-none'}`}
       aria-describedby="modal-status-region"
     >
       <div
