@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { evaluatePasswordStrength } from '../utils/passwordStrength';
 
 interface StrengthMeterProps {
@@ -18,6 +19,7 @@ export function StrengthMeter({
   password,
   id,
 }: StrengthMeterProps): React.JSX.Element {
+  const t = useTranslations();
   const { score } = evaluatePasswordStrength(password);
   const bars = [0, 1, 2, 3, 4];
   return (
@@ -37,7 +39,7 @@ export function StrengthMeter({
         ))}
       </div>
       <p className="text-[11px] text-gray-600 dark:text-gray-300">
-        {`forms.status.strength_${score}`}
+        {t(`forms.status.strength_${score}`)}
       </p>
     </div>
   );

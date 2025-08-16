@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppDispatch } from '@/store/hooks';
@@ -12,37 +13,52 @@ import { StrengthMeter } from '../components/StrengthMeter';
 import { ImageInput } from '../components/ImageInput';
 import { CountriesAutocomplete } from '../components/CountriesAutocomplete';
 
-export function RHFRegistrationForm(): React.JSX.Element {
+interface RHFRegistrationFormProps {
+  onSuccess?: (id: string) => void;
+}
+
+export function RHFRegistrationForm({
+  onSuccess,
+}: RHFRegistrationFormProps): React.JSX.Element {
+  const t = useTranslations();
   const dispatch = useAppDispatch();
-  const { register, handleSubmit, formState, reset, watch } =
+  const { register, handleSubmit, formState, reset, watch, setValue } =
     useForm<UserRegistrationInput>({
       resolver: zodResolver(UserRegistrationSchema),
       mode: 'onChange',
+      criteriaMode: 'all',
       defaultValues: {
         name: '',
         age: '',
         email: '',
         gender: '',
         country: '',
-        terms: true,
+        terms: false,
         password: '',
         confirmPassword: '',
       },
     });
   const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
 
-  const internalSubmit = handleSubmit((data) => {
-    dispatch(
-      addRHFSubmission({
+  const internalSubmit = handleSubmit(
+    (data) => {
+      const action = addRHFSubmission({
         name: data.name,
         age: data.age ? Number(data.age) : null,
         email: data.email,
         gender: data.gender,
         country: data.country || undefined,
         avatarBase64: avatarBase64 || undefined,
-      })
-    );
-  });
+      });
+      dispatch(action);
+      if (onSuccess) {
+        onSuccess(action.payload.id);
+      }
+    },
+    () => {
+      /* validation errors ignored silently in prod */
+    }
+  );
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     void internalSubmit(e);
   };
@@ -65,20 +81,20 @@ export function RHFRegistrationForm(): React.JSX.Element {
       />
       <header className="space-y-1">
         <h2 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">
-          forms.titles.rhf
+          {t('forms.titles.rhf')}
         </h2>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          forms.descriptions.rhf_intro
+          {t('forms.descriptions.rhf_intro')}
         </p>
       </header>
       <div className="flex flex-col gap-1">
         <label htmlFor="rhf_name" className="font-medium text-sm">
-          forms.labels.name
+          {t('forms.labels.name')}
         </label>
         <input
           id="rhf_name"
           type="text"
-          placeholder="forms.placeholders.name"
+          placeholder={t('forms.placeholders.name')}
           className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 motion-safe:transition-colors"
           aria-invalid={!!errors.name}
           aria-describedby={errors.name ? 'rhf-err-name' : undefined}
@@ -89,12 +105,14 @@ export function RHFRegistrationForm(): React.JSX.Element {
           })}
         />
         <p id="rhf-err-name" className="text-xs text-red-600 min-h-4">
-          {typeof errors.name?.message === 'string' ? errors.name.message : ''}
+          {typeof errors.name?.message === 'string'
+            ? t(errors.name.message)
+            : ''}
         </p>
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="rhf_age" className="font-medium text-sm">
-          forms.labels.age
+          {t('forms.labels.age')}
         </label>
         <input
           id="rhf_age"
@@ -117,17 +135,17 @@ export function RHFRegistrationForm(): React.JSX.Element {
           })}
         />
         <p id="rhf-err-age" className="text-xs text-red-600 min-h-4">
-          {typeof errors.age?.message === 'string' ? errors.age.message : ''}
+          {typeof errors.age?.message === 'string' ? t(errors.age.message) : ''}
         </p>
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="rhf_email" className="font-medium text-sm">
-          forms.labels.email
+          {t('forms.labels.email')}
         </label>
         <input
           id="rhf_email"
           type="email"
-          placeholder="forms.placeholders.email"
+          placeholder={t('forms.placeholders.email')}
           className="rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/60 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 motion-safe:transition-colors"
           aria-invalid={!!errors.email}
           aria-describedby={errors.email ? 'rhf-err-email' : undefined}
@@ -141,13 +159,13 @@ export function RHFRegistrationForm(): React.JSX.Element {
         />
         <p id="rhf-err-email" className="text-xs text-red-600 min-h-4">
           {typeof errors.email?.message === 'string'
-            ? errors.email.message
+            ? t(errors.email.message)
             : ''}
         </p>
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="rhf_password" className="font-medium text-sm">
-          forms.labels.password
+          {t('forms.labels.password')}
         </label>
         <input
           id="rhf_password"
@@ -161,14 +179,14 @@ export function RHFRegistrationForm(): React.JSX.Element {
         />
         <p id="rhf-err-password" className="text-xs text-red-600 min-h-4">
           {typeof errors.password?.message === 'string'
-            ? errors.password.message
+            ? t(errors.password.message)
             : ''}
         </p>
         <StrengthMeter password={passwordValue || ''} id="rhf-strength" />
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="rhf_confirm_password" className="font-medium text-sm">
-          forms.labels.confirm_password
+          {t('forms.labels.confirm_password')}
         </label>
         <input
           id="rhf_confirm_password"
@@ -182,12 +200,14 @@ export function RHFRegistrationForm(): React.JSX.Element {
         />
         <p id="rhf-err-confirm" className="text-xs text-red-600 min-h-4">
           {typeof errors.confirmPassword?.message === 'string'
-            ? errors.confirmPassword.message
+            ? t(errors.confirmPassword.message)
             : ''}
         </p>
       </div>
       <fieldset className="flex flex-col gap-2">
-        <legend className="font-medium text-sm">forms.labels.gender</legend>
+        <legend className="font-medium text-sm">
+          {t('forms.labels.gender')}
+        </legend>
         <div
           className="flex flex-wrap gap-4 text-sm"
           aria-describedby={errors.gender ? 'rhf-err-gender' : undefined}
@@ -202,7 +222,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
                 required: 'forms.errors.gender_required',
               })}
             />
-            forms.labels.gender_male
+            {t('forms.labels.gender_male')}
           </label>
           <label className="flex items-center gap-1">
             <input
@@ -214,7 +234,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
                 required: 'forms.errors.gender_required',
               })}
             />
-            forms.labels.gender_female
+            {t('forms.labels.gender_female')}
           </label>
           <label className="flex items-center gap-1">
             <input
@@ -226,56 +246,40 @@ export function RHFRegistrationForm(): React.JSX.Element {
                 required: 'forms.errors.gender_required',
               })}
             />
-            forms.labels.gender_other
+            {t('forms.labels.gender_other')}
           </label>
         </div>
         <p id="rhf-err-gender" className="text-xs text-red-600 min-h-4">
           {typeof errors.gender?.message === 'string'
-            ? errors.gender.message
+            ? t(errors.gender.message)
             : ''}
         </p>
       </fieldset>
       <div className="flex flex-col gap-1">
-        <label htmlFor="rhf_country" className="font-medium text-sm">
-          forms.labels.country
-        </label>
         <CountriesAutocomplete
           id="rhf_country"
           name="country"
           value={countryValue || ''}
           onChange={(v) => {
-            // Manually set value since using custom component
-            const input =
-              document.querySelector<HTMLInputElement>('#rhf_country');
-            if (input) {
-              input.value = v;
-              const evt = new Event('input', { bubbles: true });
-              input.dispatchEvent(evt);
-            }
+            setValue('country', v, {
+              shouldValidate: true,
+              shouldDirty: true,
+              shouldTouch: true,
+            });
           }}
-          placeholder="forms.placeholders.country"
+          placeholder={t('forms.placeholders.country')}
           error={
             typeof errors.country?.message === 'string'
-              ? errors.country.message
+              ? t(errors.country.message)
               : undefined
           }
-        />
-        <p id="rhf-err-country" className="text-xs text-red-600 min-h-4">
-          {typeof errors.country?.message === 'string'
-            ? errors.country.message
-            : ''}
-        </p>
-        <input
-          type="hidden"
-          value={countryValue || ''}
-          {...register('country')}
         />
       </div>
       <div className="flex items-start gap-2">
         <input
           id="rhf_terms"
           type="checkbox"
-          aria-describedby={errors.terms ? 'rhf-err-terms' : undefined}
+          aria-describedby={`${errors.terms ? 'rhf-err-terms ' : ''}rhf-terms-note`}
           aria-invalid={!!errors.terms}
           {...register('terms', {
             validate: (v: boolean) =>
@@ -284,11 +288,19 @@ export function RHFRegistrationForm(): React.JSX.Element {
           className="mt-0.5 h-4 w-4 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/60 text-purple-600 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-900"
         />
         <label htmlFor="rhf_terms" className="text-sm leading-snug">
-          forms.labels.terms
+          {t('forms.labels.terms')}
         </label>
       </div>
       <p id="rhf-err-terms" className="text-xs text-red-600 min-h-4">
-        {typeof errors.terms?.message === 'string' ? errors.terms.message : ''}
+        {typeof errors.terms?.message === 'string'
+          ? t(errors.terms.message)
+          : ''}
+      </p>
+      <p
+        id="rhf-terms-note"
+        className="text-[11px] text-gray-500 dark:text-gray-400 leading-snug"
+      >
+        {t('forms.descriptions.terms_notice')}
       </p>
       <div className="flex gap-3 pt-2">
         <button
@@ -296,7 +308,7 @@ export function RHFRegistrationForm(): React.JSX.Element {
           disabled={isSubmitting || !isValid}
           className="rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-2 text-sm font-medium shadow hover:from-purple-500 hover:to-fuchsia-500 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-900 motion-safe:transition-colors"
         >
-          forms.labels.submit
+          {t('forms.labels.submit')}
         </button>
         <button
           type="reset"
@@ -306,14 +318,14 @@ export function RHFRegistrationForm(): React.JSX.Element {
           }}
           className="rounded-md bg-gray-200/80 dark:bg-gray-800/60 text-gray-900 dark:text-gray-100 px-5 py-2 text-sm font-medium shadow hover:bg-gray-300 dark:hover:bg-gray-700 focus-visible:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-gray-900 motion-safe:transition-colors"
         >
-          forms.labels.reset
+          {t('forms.labels.reset')}
         </button>
       </div>
       <div>
         <ImageInput
           value={avatarBase64}
           onChange={setAvatarBase64}
-          label="forms.labels.avatar"
+          label={t('forms.labels.avatar')}
         />
       </div>
     </form>

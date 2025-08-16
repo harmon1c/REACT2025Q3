@@ -1,15 +1,20 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocale } from 'next-intl';
 import { Link, usePathname, useRouter, useSearchParams } from '@/navigation';
 import { useHasMounted } from '@/hooks/useHasMounted';
 import { useTheme } from '@/context/useTheme';
+import { Modal } from '@/features/forms/components/Modal';
+import { UncontrolledRegistrationForm } from '@/features/forms/uncontrolled/UncontrolledRegistrationForm';
+import { RHFRegistrationForm } from '@/features/forms/rhf/RHFRegistrationForm';
 
 interface HeaderClientProps {
   homeLabel: string;
   aboutLabel: string;
   switchToRussianLabel: string;
   switchToEnglishLabel: string;
+  uncontrolledBtnLabel?: string;
+  rhfBtnLabel?: string;
 }
 
 export const HeaderClient: React.FC<HeaderClientProps> = ({
@@ -17,6 +22,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
   aboutLabel,
   switchToRussianLabel,
   switchToEnglishLabel,
+  uncontrolledBtnLabel = 'Uncontrolled Form',
+  rhfBtnLabel = 'RHF Form',
 }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -25,6 +32,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
   const pathLocale = locale;
   const hasMounted = useHasMounted();
   const { theme, setTheme } = useTheme();
+  const [openForm, setOpenForm] = useState<null | 'uncontrolled' | 'rhf'>(null);
 
   const switchLocale = (nextLocale: string): void => {
     if (nextLocale === locale) {
@@ -49,7 +57,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
           </Link>
         </div>
         <nav className="nav flex-1 min-w-0">
-          <ul className="nav__list flex space-x-8">
+          <ul className="nav__list flex space-x-6 items-center">
             <li className="nav__list-item">
               {((): React.ReactNode => {
                 const isHome =
@@ -88,6 +96,24 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
                   </Link>
                 );
               })()}
+            </li>
+            <li className="nav__list-item flex items-center gap-2">
+              <button
+                type="button"
+                aria-haspopup="dialog"
+                onClick={() => setOpenForm('uncontrolled')}
+                className="px-3 py-2 rounded-md text-xs font-medium bg-blue-600 text-white shadow hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 motion-safe:transition-colors"
+              >
+                {uncontrolledBtnLabel}
+              </button>
+              <button
+                type="button"
+                aria-haspopup="dialog"
+                onClick={() => setOpenForm('rhf')}
+                className="px-3 py-2 rounded-md text-xs font-medium bg-purple-600 text-white shadow hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-400 motion-safe:transition-colors"
+              >
+                {rhfBtnLabel}
+              </button>
             </li>
           </ul>
         </nav>
@@ -174,6 +200,21 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
           <div className="w-10 h-10" />
         )}
       </div>
+      {/* Modals rendered via portal (accessible). */}
+      <Modal
+        open={openForm === 'uncontrolled'}
+        onClose={() => setOpenForm(null)}
+        title="Uncontrolled Form"
+      >
+        <UncontrolledRegistrationForm onSuccess={() => setOpenForm(null)} />
+      </Modal>
+      <Modal
+        open={openForm === 'rhf'}
+        onClose={() => setOpenForm(null)}
+        title="RHF Form"
+      >
+        <RHFRegistrationForm onSuccess={() => setOpenForm(null)} />
+      </Modal>
     </div>
   );
 };

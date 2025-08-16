@@ -1,12 +1,28 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { UncontrolledRegistrationForm } from '../uncontrolled/UncontrolledRegistrationForm';
 import { RHFRegistrationForm } from '../rhf/RHFRegistrationForm';
 import { Modal } from './Modal';
 import { SubmissionsTiles } from './SubmissionsTiles';
+import { SubmissionsList } from './SubmissionsList';
 
 export function FormsDemoClient(): React.JSX.Element {
   const [open, setOpen] = useState<null | 'uncontrolled' | 'rhf'>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [flashId, setFlashId] = useState<string | null>(null); // for counters
+  const [flashSubmissionId, setFlashSubmissionId] = useState<string | null>(
+    null
+  );
+  const t = useTranslations();
+
+  useEffect(() => {
+    if (!toast) {
+      return;
+    }
+    const id = setTimeout(() => setToast(null), 3500);
+    return (): void => clearTimeout(id);
+  }, [toast]);
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-4">
@@ -34,16 +50,50 @@ export function FormsDemoClient(): React.JSX.Element {
         onClose={() => setOpen(null)}
         title="Uncontrolled Form"
       >
-        <UncontrolledRegistrationForm />
+        <UncontrolledRegistrationForm
+          onSuccess={(newId) => {
+            setOpen(null);
+            setToast(t('forms.status.submitted_temp'));
+            setFlashId('uncontrolled');
+            setFlashSubmissionId(newId || null);
+            setTimeout(() => setFlashId(null), 2000);
+          }}
+        />
       </Modal>
       <Modal
         open={open === 'rhf'}
         onClose={() => setOpen(null)}
         title="RHF Form"
       >
-        <RHFRegistrationForm />
+        <RHFRegistrationForm
+          onSuccess={(newId) => {
+            setOpen(null);
+            setToast(t('forms.status.submitted_temp'));
+            setFlashId('rhf');
+            setFlashSubmissionId(newId || null);
+            setTimeout(() => setFlashId(null), 2000);
+          }}
+        />
       </Modal>
-      <SubmissionsTiles />
+      <div
+        className={
+          (flashId === 'uncontrolled'
+            ? 'ring-2 ring-green-400/70 rounded-md transition shadow '
+            : 'transition ') + 'inline-block'
+        }
+      >
+        <SubmissionsTiles />
+      </div>
+      <SubmissionsList flashSubmissionId={flashSubmissionId} />
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-4 right-4 z-50 px-4 py-3 rounded-lg bg-gray-900/90 text-white text-sm shadow-lg border border-gray-700 animate-fade-in"
+        >
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 /**
- * Convert a File (image) to a base64 data URL string.
- * Rejects if FileReader errors or file is empty.
+ * Convert a File (typically an image) into a base64 data URL string.
+ * Uses FileReader for broad browser support. Rejects on error.
  */
 export function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {

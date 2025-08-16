@@ -105,7 +105,7 @@ export function Modal({
               ✕
             </button>
           </div>
-          <div className="max-h-[70vh] overflow-y-auto pr-1 space-y-4">
+          <div className="max-h-[70vh] overflow-y-auto pr-1 space-y-4 custom-scrollbar">
             {/* Live region for form status / validation summary (populated in later phases). */}
             <div
               aria-live="polite"

@@ -134,7 +134,8 @@
     },
     "descriptions": {
       "uncontrolled_intro": "Basic uncontrolled form example with manual validation.",
-      "rhf_intro": "React Hook Form variant leveraging library validation patterns."
+      "rhf_intro": "React Hook Form variant leveraging library validation patterns.",
+      "terms_notice": "By checking this box you agree to the temporary demo terms of use and allow processing of the provided data purely for preview in the submissions list."
     },
     "labels": {
       "name": "Name",
@@ -148,6 +149,7 @@
       "confirm_password": "Confirm Password",
       "terms": "I accept the temporary terms of use",
       "country": "Country",
+      "avatar": "Avatar",
       "submit": "Submit",
       "reset": "Reset"
     },
@@ -179,6 +181,17 @@
       "strength_2": "Fair password",
       "strength_3": "Good password",
       "strength_4": "Strong password"
+    }
+  },
+  "ui": {
+    "recent_submissions": "Recent Form Submissions",
+    "open_uncontrolled": "Uncontrolled Form",
+    "open_rhf": "RHF Form",
+    "form_stats": {
+      "total": "Total: {count}",
+      "uncontrolled": "Uncontrolled: {count}",
+      "rhf": "RHF: {count}",
+      "aria": "Form submission statistics"
     }
   }
 }

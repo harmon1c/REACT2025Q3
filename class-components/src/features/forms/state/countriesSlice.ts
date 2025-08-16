@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import type { RootStateShape } from '@/store/types';
 import { countriesList } from '../utils/countriesList';
 
 export interface CountriesState {
@@ -14,6 +15,5 @@ const countriesSlice = createSlice({
 });
 
 export const countriesReducer = countriesSlice.reducer;
-export const selectCountries = <T extends { countries?: CountriesState }>(
-  state: T
-): string[] => state.countries?.list ?? [];
+export const selectCountries = (state: RootStateShape): string[] =>
+  state.countries.list;

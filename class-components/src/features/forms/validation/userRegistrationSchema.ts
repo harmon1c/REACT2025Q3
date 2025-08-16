@@ -1,13 +1,21 @@
 import { z } from 'zod';
 import { evaluatePasswordStrength } from '../utils/passwordStrength';
 import { countriesSet } from '../utils/countriesList';
+import {
+  NAME_CAPITAL_REGEX,
+  PASSWORD_LOWER_REGEX,
+  PASSWORD_UPPER_REGEX,
+  PASSWORD_DIGIT_REGEX,
+  PASSWORD_SPECIAL_REGEX,
+  PASSWORD_MIN_LENGTH,
+} from './validationConstants';
 
 export const UserRegistrationSchema = z
   .object({
     name: z
       .string()
       .min(1, 'forms.errors.name_required')
-      .regex(/^[A-ZА-Я].*/, 'forms.errors.name_capital'),
+      .regex(NAME_CAPITAL_REGEX, 'forms.errors.name_capital'),
     age: z
       .string()
       .min(1, 'forms.errors.age_required')
@@ -27,18 +35,16 @@ export const UserRegistrationSchema = z
       .string()
       .min(1, 'forms.errors.country_required')
       .refine((v) => countriesSet.has(v), 'forms.errors.country_invalid'),
-    terms: z.literal(true, {
-      errorMap: () => ({ message: 'forms.errors.terms_required' }),
-    }),
+    terms: z.boolean().refine((v) => v === true, 'forms.errors.terms_required'),
     password: z
       .string()
-      .min(8, 'forms.errors.password_weak')
+      .min(PASSWORD_MIN_LENGTH, 'forms.errors.password_weak')
       .refine(
         (v) =>
-          /[a-z]/.test(v) &&
-          /[A-Z]/.test(v) &&
-          /\d/.test(v) &&
-          /[^A-Za-z0-9]/.test(v),
+          PASSWORD_LOWER_REGEX.test(v) &&
+          PASSWORD_UPPER_REGEX.test(v) &&
+          PASSWORD_DIGIT_REGEX.test(v) &&
+          PASSWORD_SPECIAL_REGEX.test(v),
         'forms.errors.password_weak'
       ),
     confirmPassword: z

@@ -45,7 +45,7 @@ export async function Footer(): Promise<React.JSX.Element> {
                 alt={t('footer.github_alt')}
                 width={40}
                 height={40}
-                className="w-10 h-10 filter brightness-0 invert dark:brightness-100 dark:invert-0 dark:opacity-90"
+                className="w-10 h-10 filter brightness-0 invert dark:brightness-100 dark:invert dark:opacity-90"
               />
             </a>
           </div>

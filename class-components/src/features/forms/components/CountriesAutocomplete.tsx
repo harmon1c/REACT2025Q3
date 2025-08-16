@@ -8,6 +8,7 @@ import React, {
   useMemo,
   memo,
 } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppSelector } from '@/store/hooks';
 import { selectCountries } from '../state/countriesSlice';
 
@@ -86,6 +87,7 @@ export const CountriesAutocomplete = memo(function CountriesAutocomplete({
   className,
 }: CountriesAutocompleteProps): React.JSX.Element {
   const countries = useAppSelector(selectCountries);
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState(value);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
@@ -175,7 +177,7 @@ export const CountriesAutocomplete = memo(function CountriesAutocomplete({
   return (
     <div className={'flex flex-col gap-1 ' + (className || '')}>
       <label htmlFor={inputId} className="text-sm font-medium">
-        {label}
+        {label.startsWith('forms.') ? t(label) : label}
       </label>
       <div className="relative">
         <input
@@ -186,7 +188,9 @@ export const CountriesAutocomplete = memo(function CountriesAutocomplete({
           type="text"
           disabled={disabled}
           value={query}
-          placeholder={placeholder}
+          placeholder={
+            placeholder.startsWith('forms.') ? t(placeholder) : placeholder
+          }
           aria-autocomplete="list"
           aria-controls={open ? listboxId : undefined}
           aria-expanded={open}

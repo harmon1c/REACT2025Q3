@@ -1,4 +1,16 @@
-// Score 0-4 based on length & char variety.
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_UPPER_REGEX,
+  PASSWORD_LOWER_REGEX,
+  PASSWORD_DIGIT_REGEX,
+  PASSWORD_SPECIAL_REGEX,
+} from '../validation/validationConstants';
+
+/**
+ * Result returned by evaluatePasswordStrength.
+ * Score scale (0–4) loosely corresponds to how many requirement buckets pass:
+ * 0-1 buckets => 0, 2 => 1, 3 => 2, 4 => 3, all 5 => 4.
+ */
 export interface PasswordStrengthResult {
   score: 0 | 1 | 2 | 3 | 4;
   requirements: {
@@ -10,18 +22,17 @@ export interface PasswordStrengthResult {
   };
 }
 
-const UPPER = /[A-Z]/;
-const LOWER = /[a-z]/;
-const DIGIT = /\d/;
-const SPECIAL = /[^A-Za-z0-9]/;
-
+/**
+ * Evaluate password strength against minimal criteria (length + character classes).
+ * The function purposefully keeps logic simple while still encouraging variety.
+ */
 export function evaluatePasswordStrength(pw: string): PasswordStrengthResult {
   const requirements = {
-    length: pw.length >= 8,
-    upper: UPPER.test(pw),
-    lower: LOWER.test(pw),
-    digit: DIGIT.test(pw),
-    special: SPECIAL.test(pw),
+    length: pw.length >= PASSWORD_MIN_LENGTH,
+    upper: PASSWORD_UPPER_REGEX.test(pw),
+    lower: PASSWORD_LOWER_REGEX.test(pw),
+    digit: PASSWORD_DIGIT_REGEX.test(pw),
+    special: PASSWORD_SPECIAL_REGEX.test(pw),
   };
   const passed = Object.values(requirements).filter(Boolean).length;
   // Basic mapping: 0-1 => 0, 2 =>1, 3=>2, 4=>3, 5=>4

@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { PokemonCatalogueContainer } from '@/components/PokemonCatalogueContainer';
-import PokemonDetailPanel from '@/components/PokemonDetailPanel';
+import RecentSubmissionsClient from '@/features/forms/components/RecentSubmissionsClient';
 import { fetchPokemonList, fetchPokemonDetails } from '@/api/serverFetchers';
 import { pokemonApi } from '@/api/pokemonApi';
 import type { ProcessedPokemon } from '@/api/types';
@@ -80,15 +80,8 @@ export default async function HomePage({
   }
 
   const showDetailsPanel = !!detailsParam;
-
-  const detailsPanel =
-    showDetailsPanel && detailsParam ? (
-      <div className="w-80 shrink-0">
-        <PokemonDetailPanel pokemonName={detailsParam} />
-      </div>
-    ) : null;
-
   const t = await getTranslations({ locale });
+  const uiT = await getTranslations({ locale, namespace: 'ui' });
   const labels = {
     search: {
       title: t('search.title'),
@@ -114,16 +107,25 @@ export default async function HomePage({
 
   return (
     <Suspense fallback={<HomePageSkeleton />}>
-      <PokemonCatalogueContainer
-        initialResults={initialResults}
-        initialTotalCount={initialTotalCount}
-        selectedPokemonName={detailsParam}
-        initialPage={page}
-        initialSearchQuery={searchQueryRaw}
-        showDetailsPanel={showDetailsPanel}
-        detailsPanel={detailsPanel}
-        labels={labels}
-      />
+      <div className="space-y-2">
+        <section className="mx-auto max-w-5xl w-full px-4 pt-4">
+          <div className="flex flex-wrap items-center gap-4">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 m-0">
+              {uiT('recent_submissions')}
+            </h2>
+          </div>
+          <RecentSubmissionsClient />
+        </section>
+        <PokemonCatalogueContainer
+          initialResults={initialResults}
+          initialTotalCount={initialTotalCount}
+          selectedPokemonName={detailsParam}
+          initialPage={page}
+          initialSearchQuery={searchQueryRaw}
+          showDetailsPanel={showDetailsPanel}
+          labels={labels}
+        />
+      </div>
     </Suspense>
   );
 }

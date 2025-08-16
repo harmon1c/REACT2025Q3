@@ -9,10 +9,10 @@ import { Panel } from './Panel';
 import { Search } from './Search';
 import { Results } from './Results';
 import { Pagination } from './Pagination';
+import PokemonDetailPanel from './PokemonDetailPanel';
 
 interface PokemonCatalogueContainerProps {
   showDetailsPanel?: boolean;
-  detailsPanel?: React.ReactElement<{ onClose: () => void }> | null;
   onPokemonClick?: (name: string) => void | Promise<void>;
   selectedPokemonName?: string | null;
   initialPage?: number;
@@ -57,7 +57,6 @@ export const PokemonCatalogueContainer: React.FC<
   PokemonCatalogueContainerProps
 > = ({
   showDetailsPanel = false,
-  detailsPanel = null,
   onPokemonClick,
   selectedPokemonName,
   initialPage = 1,
@@ -194,9 +193,14 @@ export const PokemonCatalogueContainer: React.FC<
             )}
           </section>
         </div>
-        {showDetailsPanel &&
-          detailsPanel &&
-          React.cloneElement(detailsPanel, { onClose: handleCloseDetails })}
+        {showDetailsPanel && selectedPokemonName && (
+          <div className="w-80 shrink-0">
+            <PokemonDetailPanel
+              pokemonName={selectedPokemonName}
+              onClose={handleCloseDetails}
+            />
+          </div>
+        )}
       </Panel>
     </Main>
   );
