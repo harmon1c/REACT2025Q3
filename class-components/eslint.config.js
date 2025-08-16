@@ -117,6 +117,7 @@ export default tseslint.config(
       'no-restricted-globals': 'off',
       'no-shadow': 'off',
       'no-use-before-define': 'off',
+      'linebreak-style': 'off',
     },
     settings: {
       'import/resolver': {

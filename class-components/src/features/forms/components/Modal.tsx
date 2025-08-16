@@ -90,12 +90,12 @@ export function Modal({
   }, [open, handleKey, handleOutside]);
 
   useEffect(() => {
-    if (open && dialogRef.current) {
+    if (open && render && dialogRef.current) {
       const toFocus =
         initialFocusRef?.current || getFocusable(dialogRef.current)[0];
       toFocus?.focus();
     }
-  }, [open, initialFocusRef]);
+  }, [open, render, initialFocusRef]);
 
   if (!render) {
     return null;
@@ -130,7 +130,6 @@ export function Modal({
             </button>
           </div>
           <div className="max-h-[70vh] overflow-y-auto pr-1 space-y-4 custom-scrollbar">
-            {/* Live region for form status / validation summary (populated in later phases). */}
             <div
               aria-live="polite"
               aria-atomic="true"
