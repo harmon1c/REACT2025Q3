@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { store } from '@/store';
 import HomePage from '../[locale]/page';
+vi.mock('next-intl', () => ({
+  useTranslations:
+    (): ((key: string) => string) =>
+    (key: string): string =>
+      `t:${key}`,
+}));
 
 vi.mock('@/components/PokemonCatalogueContainer', () => ({
   PokemonCatalogueContainer: (
@@ -85,7 +93,7 @@ describe('HomePage (App Router)', () => {
       params: Promise.resolve({ locale: 'en' }),
       searchParams: Promise.resolve({}),
     });
-    render(Page);
+    render(<Provider store={store}>{Page}</Provider>);
     const cat = screen.getByTestId('catalogue');
     expect(cat).toBeInTheDocument();
     const props = JSON.parse(cat.getAttribute('data-props') || '{}');
@@ -98,7 +106,7 @@ describe('HomePage (App Router)', () => {
       params: Promise.resolve({ locale: 'en' }),
       searchParams: Promise.resolve({ details: 'pikachu' }),
     });
-    render(Page);
+    render(<Provider store={store}>{Page}</Provider>);
     expect(screen.getByTestId('catalogue')).toBeInTheDocument();
   });
 });

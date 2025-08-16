@@ -34,6 +34,6 @@ describe('Main Component', () => {
 
     const outerDiv = container.firstChild;
     expect(outerDiv).toHaveClass('w-full');
-    expect(outerDiv).toHaveClass('py-6');
+    expect(outerDiv).toHaveClass('pb-6');
   });
 });

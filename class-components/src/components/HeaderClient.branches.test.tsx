@@ -51,6 +51,7 @@ function renderHeader(): ReturnType<typeof render> {
 
 describe('HeaderClient branches', () => {
   it('switchLocale en -> ru', async () => {
+    hasMountedRef.current = true;
     localeRef.current = 'en';
     renderHeader();
     const localeBtn = screen.getByRole('button', { name: 'RU' });
@@ -60,6 +61,7 @@ describe('HeaderClient branches', () => {
 
   it('switchLocale ru -> en', async () => {
     pushMock.mockClear();
+    hasMountedRef.current = true;
     localeRef.current = 'ru';
     renderHeader();
     const localeBtn = screen.getByRole('button', { name: 'EN' });
@@ -70,11 +72,22 @@ describe('HeaderClient branches', () => {
   it('renders placeholders when not mounted', () => {
     hasMountedRef.current = false;
     renderHeader();
-    expect(screen.queryAllByRole('button').length).toBe(0);
+    expect(
+      screen.getByRole('button', { name: 'Uncontrolled Form' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'RHF Form' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /switch to dark theme/i })
+    ).toBeNull();
+    expect(screen.queryByRole('button', { name: 'RU' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'EN' })).toBeNull();
     hasMountedRef.current = true;
   });
 
   it('toggles theme dark then light', async () => {
+    hasMountedRef.current = true;
     const { rerender } = renderHeader();
     const themeBtn = screen.getByRole('button', {
       name: 'Switch to dark theme',

@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { store } from '@/store';
 import HomePage from '../[locale]/page';
+vi.mock('next-intl', () => ({
+  useTranslations:
+    (): ((key: string) => string) =>
+    (key: string): string =>
+      `t:${key}`,
+}));
 
 vi.mock('@/components/PokemonCatalogueContainer', () => ({
   PokemonCatalogueContainer: (
@@ -35,7 +43,6 @@ const detailOk = {
   sprites: { other: { 'official-artwork': { front_default: 'img.png' } } },
 };
 
-// Mutable mocks for different scenarios
 const fetchPokemonList = vi.fn();
 const fetchPokemonDetails = vi.fn();
 vi.mock('@/api/serverFetchers', () => ({
@@ -71,7 +78,7 @@ describe('HomePage branches', () => {
       params: Promise.resolve({ locale: 'en' }),
       searchParams: Promise.resolve({ search: 'bulbasaur' }),
     });
-    render(Page);
+    render(<Provider store={store}>{Page}</Provider>);
     const props = JSON.parse(
       screen.getByTestId('catalogue').getAttribute('data-props') || '{}'
     );
@@ -85,7 +92,7 @@ describe('HomePage branches', () => {
       params: Promise.resolve({ locale: 'en' }),
       searchParams: Promise.resolve({ search: 'missing' }),
     });
-    render(Page);
+    render(<Provider store={store}>{Page}</Provider>);
     const props = JSON.parse(
       screen.getByTestId('catalogue').getAttribute('data-props') || '{}'
     );
@@ -99,7 +106,7 @@ describe('HomePage branches', () => {
       params: Promise.resolve({ locale: 'en' }),
       searchParams: Promise.resolve({ page: '2' }),
     });
-    render(Page);
+    render(<Provider store={store}>{Page}</Provider>);
     const props = JSON.parse(
       screen.getByTestId('catalogue').getAttribute('data-props') || '{}'
     );
@@ -113,7 +120,7 @@ describe('HomePage branches', () => {
       params: Promise.resolve({ locale: 'en' }),
       searchParams: Promise.resolve({ details: 'bulbasaur' }),
     });
-    render(Page);
+    render(<Provider store={store}>{Page}</Provider>);
     const props = JSON.parse(
       screen.getByTestId('catalogue').getAttribute('data-props') || '{}'
     );
