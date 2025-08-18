@@ -1,226 +1,120 @@
-# React Class Components Project
+# Pokemon Explorer (Next.js 15 SSR + i18n)
 
-A project for learning React class components with TypeScript, Tailwind CSS, and modern development tools.
+Internationalized Pokemon catalogue built with Next.js App Router (v15), server components, server actions (CSV export), and selective client interactivity.
 
-## Description
+## High-Level Architecture
 
-This is a Pokemon search application built using React class components. The project demonstrates:
+| Concern                      | Approach                                                                                                   |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Routing                      | App Router with `[locale]` segment, dynamic detail route `/[locale]/pokemon/[name]`                        |
+| i18n                         | `next-intl` with middleware locale detection (`en`, `ru`, prefix always)                                   |
+| Data Fetching (list/details) | Server utilities (`serverFetchers.ts`) using Next.js fetch caching + `revalidate` timings                  |
+| Initial Page SSR             | `[locale]/page.tsx` performs list or single-item search fetch on server; hydrates client with initial data |
+| Dynamic Details              | Server route fetch + `generateStaticParams` subset + `notFound()` on 404                                   |
+| CSV Export                   | Server Action `buildCsvAction` (no client fetch round-trip)                                                |
+| State                        | Redux Toolkit (client) for selection + RTK Query for interactive refetches                                 |
+| Images                       | `next/image` everywhere (sprites + assets)                                                                 |
+| Error Handling               | ErrorBoundary + route-level `error.tsx` + `not-found.tsx`                                                  |
+| Theming                      | Custom context (light/dark)                                                                                |
 
-- Using React class components (no hooks)
-- TypeScript for type safety
-- Tailwind CSS for styling
-- Error Boundary for error handling
-- Local storage for data persistence
-- API integration (Pokemon API)
-- Modern development tooling (ESLint, Prettier, Husky)
+## SSR & Data Flow
 
-## Technologies
+1. Incoming request hits `middleware.ts` → locale extracted / defaulted.
+2. `[locale]/page.tsx` resolves `params` & `searchParams` (page, search, details).
+3. Server chooses path:
 
-- **React 19** - library for building user interfaces
-- **TypeScript** - typed JavaScript
-- **Vite** - fast build tool
-- **Tailwind CSS** - CSS framework
-- **SCSS** - CSS preprocessor
-- **ESLint** - code linting tool
-- **Prettier** - code formatter
-- **Husky** - git hooks
+- `search` present → fetch a single pokemon → hydrate list with one result.
+- otherwise → paginated list fetch (offset/limit) + optional prefetch for `details` param.
 
-## Installation and Setup
+4. Data transformed via `pokemonApi.parse*` helper into lightweight list items.
+5. Props passed to client container `PokemonCatalogueContainer` (only interactive UI + RTK Query for further actions).
+6. Optional side panel (detailsParam) rendered with `PokemonDetailPanel` using RTK Query (cached after SSR prefetch attempt).
 
-### Requirements
+## Revalidation Strategy
 
-- Node.js >= 20.19.0 (recommended 22.x)
-- npm >= 10.0.0
+Defined in `serverFetchers.ts`:
 
-### Install Dependencies
+```
+LIST: 60s, DETAILS: 300s
+```
+
+Uses `next: { revalidate: ... }` and cache mode to balance freshness/performance.
+
+## Internationalization
+
+- `middleware.ts` + `navigation.ts` unify locale handling (`localePrefix: 'always'`).
+- `NextIntlClientProvider` keyed by `locale` in layout for proper context updates.
+- All UI labels resolved server-side via `getTranslations` and passed as plain props (reduces client translation calls).
+- Locale switch rewrites path stripping existing locale and pushing with `{ locale }` option.
+
+## Server Action: CSV Export
+
+`buildCsvAction`:
+
+- Validates ID list with Zod (1..200 entries).
+- Fetches details in parallel with safe fallbacks.
+- Generates CSV (utility `buildPokemonCsv`).
+- Consumed by `SelectedFlyout` directly → no extra API round-trip.
+
+## Client vs Server Boundary
+
+Client components kept minimal:
+
+- Header (theme + locale switch)
+- Selection Flyout (CSV trigger, stateful UI)
+- Search, Pagination, Results presentation (interactivity)
+- PokemonDetailPanel (live refetch & RTK Query cache)
+- ErrorBoundary (must be client)
+
+Everything else (layout, pages, static shells, data fetching) is server.
+
+## Dynamic Pokemon Route
+
+`/[locale]/pokemon/[name]`:
+
+- `generateStaticParams`: small preload set.
+- `generateMetadata`: dynamic SEO (title, OG image) or fallback.
+- `notFound()` invoked when underlying fetch throws `POKEMON_NOT_FOUND`.
+
+## Error Mapping
+
+`errorMap.ts` standardizes messages (e.g., `POKEMON_NOT_FOUND`). Used in dynamic routes & client panels for consistent UX.
+
+## Scripts
 
 ```bash
-npm install
+npm run dev        # Start Next.js dev server
+npm run build      # Production build
+npm run start      # Start production server
+npm run lint       # ESLint
+npm run format:fix # Prettier
 ```
 
-### Setup Git Hooks (Important!)
+## Environment
 
-After installing dependencies, you need to initialize Husky if cloning from scratch:
+- Node >= 20.19.0 (22.x recommended)
+- TypeScript strict mode
+- Tailwind + SCSS hybrid styling
 
-```bash
-# Only if you cloned just this folder and don't have .git initialized
-git init
-npx husky install
-```
+## Pending / Deferred
 
-The pre-commit hooks are already configured and will run automatically on commit.
+- Tests for server action & dynamic route (metadata + notFound)
+- Potential streaming/chunk CSV for very large exports
+- Further server/client splitting if bundle metrics require
 
-### Commands
+## Forms Feature (Task Scaffold)
 
-```bash
-# Start development server
-npm run dev
+Phase 1 scaffold for the React Forms task added:
 
-# Build for production
-npm run build
+- Feature directory `src/features/forms/` with placeholders for both Uncontrolled and RHF forms
+- Demo route: `[locale]/forms-demo` displaying placeholders (no modal yet)
+- Plan file `FORMS_PLAN.md` details phased implementation mapped to scoring
 
-# Preview production build
-npm run preview
+Subsequent phases will introduce the universal portal modal, validation (Zod), password strength, image upload (base64), autocomplete, accessibility, Redux submissions storage, and a final comprehensive test suite.
 
-# Lint code with ESLint
-npm run lint
+## Migration Phases
 
-# Format code with Prettier
-npm run format:fix
-```
-
-## Project Structure
-
-```
-src/
-├── components/          # Components
-│   ├── ErrorBoundary.tsx    # Error Boundary
-│   ├── ErrorTester.tsx      # Component for testing errors
-│   ├── Results.tsx          # Display search results
-│   └── Search.tsx           # Search component
-├── styles/             # SCSS styles
-│   ├── globals.scss         # Global styles with Tailwind
-│   ├── _variables.scss      # SCSS variables
-│   ├── _mixins.scss         # SCSS mixins
-│   ├── _fonts.scss          # Font definitions
-│   ├── _common.scss         # Common styles
-│   └── _reset.scss          # CSS reset
-├── App.tsx             # Main component
-├── main.tsx            # Entry point
-└── index.css           # CSS entry file
-```
-
-## Features
-
-### Class Components
-
-All components in the project are implemented as React class components:
-
-```typescript
-class App extends Component<Record<string, never>, AppState> {
-  // State and lifecycle methods
-}
-```
-
-### Error Boundary
-
-The application is wrapped in an Error Boundary to catch errors:
-
-```typescript
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
-  }
-}
-```
-
-### Local Storage
-
-Search queries are saved to localStorage:
-
-```typescript
-// Save
-localStorage.setItem('searchTerm', trimmedQuery);
-
-// Load
-const savedSearchTerm = localStorage.getItem('searchTerm');
-```
-
-### API Integration
-
-The project uses Pokemon API for data fetching:
-
-```typescript
-const url = query
-  ? `https://pokeapi.co/api/v2/pokemon/${query.toLowerCase()}`
-  : 'https://pokeapi.co/api/v2/pokemon?limit=20';
-```
-
-## Development Tools Configuration
-
-### ESLint
-
-Configured for strict TypeScript code checking:
-
-```javascript
-export default tseslint.config({
-  extends: [
-    js.configs.recommended,
-    ...tseslint.configs.strict,
-    eslintPluginPrettier,
-  ],
-  // ...
-});
-```
-
-### Prettier
-
-Code formatting with settings:
-
-```json
-{
-  "trailingComma": "es5",
-  "tabWidth": 2,
-  "semi": true,
-  "singleQuote": true
-}
-```
-
-### Husky
-
-Pre-commit hook configured for automatic code checking:
-
-```bash
-npm run lint
-```
-
-### TypeScript
-
-Strict TypeScript configuration with path mapping:
-
-```json
-{
-  "compilerOptions": {
-    "strict": true,
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": ["*"],
-      "@/components/*": ["components/*"],
-      "@/styles/*": ["styles/*"]
-    }
-  }
-}
-```
-
-## Deployment
-
-For GitHub Pages deployment:
-
-1. Build the project:
-
-```bash
-npm run build
-```
-
-2. The `dist` folder contains the production-ready files
-
-## Assignment Requirements
-
-This project fulfills the following requirements:
-
-- ✅ Using class components
-- ✅ TypeScript without `any` usage
-- ✅ ESLint, Prettier, Husky setup
-- ✅ Component separation
-- ✅ Search with localStorage persistence
-- ✅ Loading indicators
-- ✅ Error handling
-- ✅ Error Boundary implementation
-- ✅ Error testing button
+See `MIGRATION_PLAN.md` for chronological detail (Phases 1–10).
 
 ## License
 

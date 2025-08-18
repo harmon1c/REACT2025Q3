@@ -7,9 +7,21 @@ import tseslint from 'typescript-eslint';
 import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
 import reactCompiler from 'eslint-plugin-react-compiler';
 import importPlugin from 'eslint-plugin-import';
+import { FlatCompat } from '@eslint/eslintrc';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+});
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules'] },
+  { ignores: ['dist', 'node_modules', '.next'] },
+  ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
     extends: [
       js.configs.recommended,
@@ -24,7 +36,7 @@ export default tseslint.config(
         ecmaFeatures: {
           jsx: true,
         },
-        project: ['./tsconfig.app.json'],
+        project: ['./tsconfig.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -37,6 +49,7 @@ export default tseslint.config(
     },
     rules: {
       // React rules
+      'react/prop-types': 'off',
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
@@ -65,6 +78,12 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
+      // Next.js specific hardening: enforce <Image> & <Link>
+      '@next/next/no-img-element': 'error',
+      '@next/next/no-html-link-for-pages': ['error', './app'],
+      '@next/next/no-document-import-in-page': 'error',
+      '@next/next/no-head-element': 'error',
+      'react-refresh/only-export-components': 'warn',
       '@typescript-eslint/no-inferrable-types': 'error',
       '@typescript-eslint/no-misused-promises': [
         'warn',
@@ -75,17 +94,7 @@ export default tseslint.config(
         },
       ],
 
-      // Import rules
-      'import/extensions': [
-        'error',
-        'ignorePackages',
-        {
-          js: 'never',
-          jsx: 'never',
-          ts: 'never',
-          tsx: 'never',
-        },
-      ],
+      'import/extensions': 'error',
       'import/order': [
         'error',
         {
@@ -104,20 +113,17 @@ export default tseslint.config(
       // General rules
       'class-methods-use-this': 'off',
       curly: ['error', 'all'],
-      'max-lines-per-function': [
-        'error',
-        { max: 500, skipBlankLines: true, skipComments: true },
-      ],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-restricted-globals': 'off',
       'no-shadow': 'off',
       'no-use-before-define': 'off',
+      'linebreak-style': 'off',
     },
     settings: {
       'import/resolver': {
         typescript: {
           alwaysTryTypes: true,
-          project: ['./tsconfig.app.json'],
+          project: ['./tsconfig.json'],
         },
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],

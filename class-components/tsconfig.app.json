@@ -37,5 +37,5 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src"]
+  "include": ["src", "app/**/*.ts", "app/**/*.tsx"]
 }

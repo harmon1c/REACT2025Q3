@@ -1,0 +1,197 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "pokemon": "Pokemon",
+    "switchToEnglish": "Switch to English",
+    "switchToRussian": "Switch to Russian"
+  },
+  "search": {
+    "title": "Search Pokemon",
+    "description": "Enter a Pokemon name to search for detailed information",
+    "placeholder": "Enter Pokemon name (e.g., Pikachu)...",
+    "button": "Search",
+    "clear": "Clear"
+  },
+  "selection": {
+    "items_selected": "{count, plural, =0 {No items selected} =1 {# item selected} other {# items selected}}",
+    "unselect_all": "Unselect all",
+    "download": "Download",
+    "exporting": "Exporting...",
+    "export_failed": "Export failed",
+    "export_invalid": "Invalid selection",
+    "export_internal": "Internal error"
+  },
+  "results": {
+    "loading": "Loading Pokemon data...",
+    "loading_description": "Please wait while we fetch the information",
+    "error_title": "Oops! Something went wrong",
+    "error_suggestion": "Please try searching for a different Pokemon",
+    "no_results_title": "No Pokemon Found",
+    "no_results_description": "We couldn't find any Pokemon matching your search. Try a different name or browse the complete list.",
+    "popular_searches": "Popular searches: pikachu, charizard, bulbasaur"
+  },
+  "pokemon": {
+    "title": "Pokemon",
+    "description": "Pokemon Description",
+    "abilities": "Abilities",
+    "types": "Types",
+    "stats": "Stats",
+    "weight": "Weight",
+    "height": "Height",
+    "base_experience": "Base Experience",
+    "order": "Order",
+    "is_default": "Is Default",
+    "select": "Select Pokemon",
+    "number": "Pokemon #{id}",
+    "view_details": "View Details",
+    "details": "Pokemon Details",
+    "failed_to_load": "Failed to load details",
+    "no_details": "No details found",
+    "close": "Close",
+    "refresh": "Refresh",
+    "close_details": "Close Details",
+    "information": "Information",
+    "click_to_view_details": "Pokemon #{id} - Click to view details",
+    "back_to_list": "Back to list",
+    "not_found": "Pokemon not found",
+    "labels": {
+      "types": "TYPES",
+      "height": "HEIGHT",
+      "weight": "WEIGHT",
+      "base_experience": "BASE EXPERIENCE",
+      "abilities": "ABILITIES"
+    }
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of",
+    "showing": "Showing",
+    "to": "to",
+    "results": "results"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "en": "English",
+    "ru": "Russian"
+  },
+  "about": {
+    "title": "About This Application",
+    "authorInfo": {
+      "title": "Author Information",
+      "createdBy": "Created by",
+      "description": "Full-stack developer passionate about creating modern, performant web applications. This Pokemon catalog demonstrates the power of Next.js 15 with React 19 for building fast, SEO-friendly applications."
+    },
+    "techStack": {
+      "title": "Technology Stack"
+    },
+    "features": {
+      "title": "Features",
+      "search": "Pokemon search functionality",
+      "pagination": "Efficient pagination",
+      "details": "Detailed Pokemon information",
+      "selection": "Multiple Pokemon selection",
+      "themes": "Dark/Light theme support",
+      "i18n": "Internationalization (EN/RU)"
+    },
+    "api": {
+      "title": "Pokemon API",
+      "description": "This application uses the Pokemon API (PokeAPI) to fetch Pokemon data. PokeAPI is a free RESTful API that provides comprehensive Pokemon information including stats, types, abilities, and more."
+    }
+  },
+  "footer": {
+    "school_link": "RS School Link",
+    "school_alt": "RS School",
+    "copyright": "© 2025",
+    "github_link": "GitHub Link",
+    "github_alt": "GitHub"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "goHome": "Go Home",
+    "somethingWrong": "Oops! Something went wrong",
+    "tryAgain": "Try Again",
+    "errorMessage": "An unexpected error occurred while rendering the application. Don't worry, we can fix this!",
+    "errorDetails": "Error details (click to expand)",
+    "supportMessage": "If this problem persists, please contact our support team."
+  },
+  "notFound": {
+    "title": "Oops! Page Not Found",
+    "description": "The page you are looking for seems to have vanished into the digital void.",
+    "goHome": "🏠 Go Home",
+    "popularSearches": "🔍 Popular searches:"
+  },
+  "forms": {
+    "titles": {
+      "uncontrolled": "Uncontrolled Registration",
+      "rhf": "RHF Registration"
+    },
+    "descriptions": {
+      "uncontrolled_intro": "Basic uncontrolled form example with manual validation.",
+      "rhf_intro": "React Hook Form variant leveraging library validation patterns.",
+      "terms_notice": "By checking this box you agree to the temporary demo terms of use and allow processing of the provided data purely for preview in the submissions list."
+    },
+    "labels": {
+      "name": "Name",
+      "age": "Age",
+      "email": "Email",
+      "gender": "Gender",
+      "gender_male": "Male",
+      "gender_female": "Female",
+      "gender_other": "Other",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "terms": "I accept the temporary terms of use",
+      "country": "Country",
+      "avatar": "Avatar",
+      "submit": "Submit",
+      "reset": "Reset"
+    },
+    "placeholders": {
+      "name": "Your name",
+      "email": "you@example.com",
+      "country": "Start typing a country..."
+    },
+    "errors": {
+      "name_required": "Name is required",
+      "name_capital": "Name should start with a capital letter",
+      "age_required": "Age is required",
+      "age_number": "Age must be a non-negative integer",
+      "email_required": "Email is required",
+      "email_invalid": "Email format is invalid",
+      "gender_required": "Gender is required",
+      "country_required": "Country is required",
+      "country_invalid": "Please select a valid country",
+      "terms_required": "You must accept the terms",
+      "password_required": "Password is required",
+      "confirm_password_required": "Confirm password is required",
+      "passwords_mismatch": "Passwords do not match",
+      "password_weak": "Password must be at least 8 chars incl. upper, lower, digit & special"
+    },
+    "status": {
+      "submitted_temp": "Form submitted (temporary preview).",
+      "strength_0": "Very weak password",
+      "strength_1": "Weak password",
+      "strength_2": "Fair password",
+      "strength_3": "Good password",
+      "strength_4": "Strong password"
+    }
+  },
+  "ui": {
+    "recent_submissions": "Recent Form Submissions",
+    "open_uncontrolled": "Uncontrolled Form",
+    "open_rhf": "RHF Form",
+    "form_stats": {
+      "total": "Total: {count}",
+      "uncontrolled": "Uncontrolled: {count}",
+      "rhf": "RHF: {count}",
+      "aria": "Form submission statistics"
+    }
+  }
+}

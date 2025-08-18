@@ -1,4 +1,15 @@
-import React, { Component } from 'react';
+'use client';
+
+import React from 'react';
+import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+import { parsePokemonDetails, getLocalizedLabel } from '../utils/pokemonUtils';
+import {
+  getPokemonDescription,
+  isPokemonListItem,
+} from '../utils/pokemonDescriptions';
+import { useAppDispatch } from '../store/hooks';
+import { addItem, removeItem } from '../store/selectedItemsSlice';
 import { type ResultItem } from './Results';
 
 interface CardProps {
@@ -8,203 +19,205 @@ interface CardProps {
   selectedPokemon?: ResultItem | null | undefined;
 }
 
-export class Card extends Component<CardProps> {
-  private capitalizeFirstLetter(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+export function Card({
+  item,
+  onPokemonClick,
+  isSelected,
+}: CardProps): React.JSX.Element {
+  const dispatch = useAppDispatch();
+  const t = useTranslations();
 
-  private handleClick = async (e?: React.MouseEvent): Promise<void> => {
+  const capitalizeFirstLetter = (str: string): string => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  const handleClick = async (e?: React.MouseEvent): Promise<void> => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    if (this.props.onPokemonClick) {
-      await this.props.onPokemonClick(this.props.item.name);
+
+    const scrollPosition = window.scrollY;
+
+    if (onPokemonClick) {
+      await onPokemonClick(item.name);
+
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: 'instant',
+          });
+        }
+      }, 10);
     }
   };
 
-  private isListItem(): boolean {
-    return this.props.item.description.includes('Click to view details');
-  }
+  const isListItem = (): boolean => {
+    return isPokemonListItem(item.description);
+  };
 
-  private renderListItemCard(): React.JSX.Element {
-    const { item, isSelected } = this.props;
-
-    return (
-      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 overflow-hidden">
-        <div className="flex">
-          {/* base card */}
-          <div
-            className={`flex-1 p-6 cursor-pointer transition-all duration-300 ${
-              isSelected
-                ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-l-blue-500'
-                : 'hover:bg-gray-50'
-            }`}
-            onClick={(e) => {
-              e.preventDefault();
-              void this.handleClick(e);
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                    {this.capitalizeFirstLetter(item.name)[0]}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800">
-                      {this.capitalizeFirstLetter(item.name)}
-                    </h3>
-                    <p className="text-gray-500 text-sm">Pokemon #{item.id}</p>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                  {item.description}
-                </p>
-                <div className="flex justify-center">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      void this.handleClick(e);
-                    }}
-                    className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                      isSelected
-                        ? 'bg-gradient-to-r from-red-500 to-pink-600 text-white hover:from-red-600 hover:to-pink-700 focus:ring-red-500 shadow-lg'
-                        : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 focus:ring-blue-500 shadow-lg'
-                    }`}
-                  >
-                    {isSelected ? 'Hide Details' : 'View Details'}
-                  </button>
-                </div>
-              </div>
-              <div className="text-4xl opacity-20 ml-4">
-                {isSelected ? '🔍' : '⚡'}
-              </div>
-            </div>
-          </div>
-
-          {/* details */}
-          {isSelected && (
-            <div className="w-80 bg-gradient-to-b from-blue-50 to-indigo-100 border-l border-blue-200">
-              {this.renderPokemonDetails()}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  private renderPokemonDetails(): React.JSX.Element {
-    const { selectedPokemon } = this.props;
-
-    if (!selectedPokemon) {
-      return <div></div>;
+  const handleCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    if (e.target.checked) {
+      dispatch(
+        addItem({
+          id: String(item.id),
+          name: item.name,
+          description: item.description,
+          detailsUrl: undefined,
+        })
+      );
+    } else {
+      dispatch(removeItem(String(item.id)));
     }
+  };
 
-    const details = selectedPokemon.description.split(' | ');
-
+  const renderListItemCard = (): React.JSX.Element => {
     return (
-      <div className="p-6">
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-3">
-            ⚡
+      <div className="bg-white dark:bg-gray-900/90 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div
+          className={`p-4 cursor-pointer transition-all duration-200 ${
+            isSelected
+              ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 border-l-4 border-l-blue-500 dark:border-l-blue-400'
+              : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+          }`}
+          onClick={(e) => {
+            e.preventDefault();
+            void handleClick(e);
+          }}
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <input
+              type="checkbox"
+              checked={!!isSelected}
+              onChange={handleCheckboxChange}
+              onClick={(e) => e.stopPropagation()}
+              className="form-checkbox h-5 w-5 text-blue-600 mr-2"
+              aria-label={t('pokemon.select')}
+            />
+            {item.image ? (
+              <Image
+                src={item.image}
+                alt={item.name}
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-contain"
+                sizes="40px"
+              />
+            ) : (
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                {capitalizeFirstLetter(item.name)[0]}
+              </div>
+            )}
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 truncate">
+                {capitalizeFirstLetter(item.name)}
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 text-xs">
+                {t('pokemon.number', { id: item.id })}
+              </p>
+            </div>
           </div>
-          <h4 className="text-xl font-bold text-gray-800 mb-1">
-            {this.capitalizeFirstLetter(selectedPokemon.name)}
-          </h4>
-          <p className="text-blue-600 font-medium text-sm">
-            Pokemon #{selectedPokemon.id}
+          <p className="text-gray-600 dark:text-gray-300 text-xs mb-3 leading-relaxed line-clamp-2">
+            {getPokemonDescription(item.description, item.id, t)}
           </p>
-        </div>
-
-        <div className="space-y-3">
-          {details.map((detail, index) => {
-            const [label, value] = detail.split(':');
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-lg p-3 border border-blue-200 hover:border-blue-300 transition-colors duration-200"
-              >
-                {label && value ? (
-                  <div>
-                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
-                      {label.trim()}
-                    </p>
-                    <p className="text-sm text-gray-800 font-medium">
-                      {value.trim()}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-700">{detail}</p>
-                )}
-              </div>
-            );
-          })}
+          <div className="flex justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                void handleClick(e);
+              }}
+              className="px-4 py-2 text-xs font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-offset-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 focus:ring-blue-500
+                dark:from-blue-700 dark:to-purple-800 dark:hover:from-blue-800 dark:hover:to-purple-900"
+            >
+              {t('pokemon.view_details')}
+            </button>
+          </div>
         </div>
       </div>
     );
-  }
+  };
 
-  private renderDetailedView(): React.JSX.Element {
-    const { item } = this.props;
+  const renderDetailedView = (): React.JSX.Element => {
+    const details = parsePokemonDetails(item.description);
+
+    const abilities = details.find(
+      (detail) => detail.label.toLowerCase() === 'abilities'
+    );
+    const otherDetails = details.filter(
+      (detail) => detail.label.toLowerCase() !== 'abilities'
+    );
 
     return (
-      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl shadow-xl p-8 border border-blue-200 hover:shadow-2xl transition-shadow duration-300">
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-2xl">
-                {this.capitalizeFirstLetter(item.name)[0]}
+      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 rounded-lg shadow-md p-3 border border-blue-200 dark:border-blue-900 hover:shadow-lg transition-shadow duration-300">
+        <div className="flex gap-4">
+          <div className="flex items-center gap-3">
+            {item.image ? (
+              <Image
+                src={item.image}
+                alt={item.name}
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-full object-contain"
+                sizes="48px"
+              />
+            ) : (
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                {capitalizeFirstLetter(item.name)[0]}
               </div>
-              <div>
-                <h3 className="text-3xl font-bold text-gray-800 mb-2">
-                  {this.capitalizeFirstLetter(item.name)}
-                </h3>
-                <span className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">
-                  Pokemon #{item.id}
-                </span>
-              </div>
+            )}
+            <div>
+              <h3 className="text-base font-bold text-gray-800 dark:text-gray-100">
+                {capitalizeFirstLetter(item.name)}
+              </h3>
+              <span className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 text-white px-2 py-0.5 rounded-full text-xs font-medium">
+                {t('pokemon.number', { id: item.id })}
+              </span>
+            </div>
+            <div className="text-xl opacity-30 text-gray-400 dark:text-gray-600">
+              ⚡
             </div>
           </div>
-          <div className="text-6xl opacity-30">⚡</div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {item.description.split(' | ').map((detail, index) => {
-            const [label, value] = detail.split(':');
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:border-blue-300 transition-colors duration-200"
-              >
-                {label && value ? (
-                  <div>
-                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">
-                      {label.trim()}
-                    </p>
-                    <p className="text-sm text-gray-800 font-medium">
-                      {value.trim()}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-700 font-medium">{detail}</p>
-                )}
+          <div className="flex-1 space-y-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {otherDetails.map((detail, index) => (
+                <div
+                  key={index}
+                  className="bg-white dark:bg-gray-800 rounded-md p-1.5 shadow-sm border border-gray-200 dark:border-gray-700"
+                >
+                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-0.5">
+                    {getLocalizedLabel(detail.label, t)}
+                  </p>
+                  <p className="text-xs text-gray-800 dark:text-gray-100 font-medium">
+                    {detail.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {abilities && (
+              <div className="bg-white dark:bg-gray-800 rounded-md p-1.5 shadow-sm border border-gray-200 dark:border-gray-700">
+                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-0.5">
+                  {getLocalizedLabel(abilities.label, t)}
+                </p>
+                <p className="text-xs text-gray-800 dark:text-gray-100 font-medium">
+                  {abilities.value}
+                </p>
               </div>
-            );
-          })}
+            )}
+          </div>
         </div>
       </div>
     );
+  };
+
+  if (isListItem()) {
+    return renderListItemCard();
   }
 
-  public override render(): React.JSX.Element {
-    const isListItem = this.isListItem();
-
-    if (isListItem) {
-      return this.renderListItemCard();
-    }
-
-    return this.renderDetailedView();
-  }
+  return renderDetailedView();
 }

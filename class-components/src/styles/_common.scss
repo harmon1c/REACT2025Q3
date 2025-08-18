@@ -1,3 +1,15 @@
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 0.3rem;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--honeycomb-light);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--honey-gold-600);
+    cursor: pointer;
+  }
+}
 * {
   box-sizing: border-box;
 }
@@ -62,6 +74,13 @@ img {
 
 .stop-scroll {
   overflow-y: hidden;
+  padding-right: var(--removed-scrollbar-width, 0px);
+}
+
+@media (pointer: fine) {
+  body.stop-scroll {
+    --removed-scrollbar-width: 0px;
+  }
 }
 
 a {

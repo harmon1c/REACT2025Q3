@@ -1,0 +1,47 @@
+export const FORM_KEYS = {
+  labels: {
+    name: 'forms.labels.name',
+    age: 'forms.labels.age',
+    email: 'forms.labels.email',
+    gender: 'forms.labels.gender',
+    gender_male: 'forms.labels.gender_male',
+    gender_female: 'forms.labels.gender_female',
+    gender_other: 'forms.labels.gender_other',
+    terms: 'forms.labels.terms',
+    submit: 'forms.labels.submit',
+    reset: 'forms.labels.reset',
+    password: 'forms.labels.password',
+    confirm_password: 'forms.labels.confirm_password',
+    password_strength: 'forms.labels.password_strength',
+  },
+  placeholders: {
+    name: 'forms.placeholders.name',
+    email: 'forms.placeholders.email',
+    password: 'forms.placeholders.password',
+    confirm_password: 'forms.placeholders.confirm_password',
+  },
+  errors: {
+    name_required: 'forms.errors.name_required',
+    name_capital: 'forms.errors.name_capital',
+    age_required: 'forms.errors.age_required',
+    age_number: 'forms.errors.age_number',
+    email_required: 'forms.errors.email_required',
+    email_invalid: 'forms.errors.email_invalid',
+    gender_required: 'forms.errors.gender_required',
+    terms_required: 'forms.errors.terms_required',
+    password_required: 'forms.errors.password_required',
+    password_weak: 'forms.errors.password_weak',
+    confirm_password_required: 'forms.errors.confirm_password_required',
+    passwords_mismatch: 'forms.errors.passwords_mismatch',
+  },
+  status: {
+    submitted_temp: 'forms.status.submitted_temp',
+    strength_0: 'forms.status.strength_0',
+    strength_1: 'forms.status.strength_1',
+    strength_2: 'forms.status.strength_2',
+    strength_3: 'forms.status.strength_3',
+    strength_4: 'forms.status.strength_4',
+  },
+} as const;
+
+export type FormKey = typeof FORM_KEYS;
